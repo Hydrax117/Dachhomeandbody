@@ -8,7 +8,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
 
 ## Tasks
 
-- [-] 1. Project setup and core infrastructure
+- [x] 1. Project setup and core infrastructure
   - Initialize Next.js 14+ project with TypeScript and App Router
   - Configure TailwindCSS with luxury design tokens (colors, typography, spacing)
   - Set up Prisma with PostgreSQL connection
@@ -19,7 +19,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
   - _Requirements: All (foundational)_
 
 - [ ] 2. Authentication system implementation
-  - [~] 2.1 Configure Auth.js with credentials and Google OAuth providers
+  - [ ] 2.1 Configure Auth.js with credentials and Google OAuth providers
     - Set up NextAuth configuration with session strategy
     - Implement credentials provider with bcrypt password hashing
     - Configure Google OAuth provider
