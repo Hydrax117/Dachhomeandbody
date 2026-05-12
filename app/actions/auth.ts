@@ -4,7 +4,7 @@ import { z } from "zod"
 import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import { prisma } from "@/lib/prisma"
-import { signIn } from "@/lib/auth"
+import { signIn, signOut } from "@/lib/auth"
 import { AuthError } from "next-auth"
 import { sendPasswordResetEmail } from "@/lib/email"
 
@@ -353,4 +353,11 @@ export async function resetPassword(
       },
     }
   }
+}
+
+/**
+ * Sign out the current user and invalidate the session
+ */
+export async function logout(): Promise<void> {
+  await signOut({ redirectTo: "/" })
 }
