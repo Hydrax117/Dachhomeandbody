@@ -2,9 +2,11 @@
 
 import { z } from "zod"
 import bcrypt from "bcryptjs"
+import crypto from "crypto"
 import { prisma } from "@/lib/prisma"
 import { signIn } from "@/lib/auth"
 import { AuthError } from "next-auth"
+import { sendPasswordResetEmail } from "@/lib/email"
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -22,6 +24,19 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 })
 
+export const requestPasswordResetSchema = z.object({
+  email: z.string().email("Invalid email address"),
+})
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[a-zA-Z]/, "Password must contain at least one letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+})
+
 export type RegisterFormState = {
   errors?: {
     name?: string[]
@@ -35,6 +50,24 @@ export type RegisterFormState = {
 export type LoginFormState = {
   errors?: {
     email?: string[]
+    password?: string[]
+    _form?: string[]
+  }
+  success?: boolean
+}
+
+export type RequestPasswordResetFormState = {
+  errors?: {
+    email?: string[]
+    _form?: string[]
+  }
+  success?: boolean
+  message?: string
+}
+
+export type ResetPasswordFormState = {
+  errors?: {
+    token?: string[]
     password?: string[]
     _form?: string[]
   }
@@ -157,5 +190,167 @@ export async function login(
       }
     }
     throw error
+  }
+}
+
+/**
+ * Request a password reset email
+ * Generates a secure token and sends reset email
+ */
+export async function requestPasswordReset(
+  _prevState: RequestPasswordResetFormState,
+  formData: FormData
+): Promise<RequestPasswordResetFormState> {
+  try {
+    // Validate form data
+    const validatedFields = requestPasswordResetSchema.safeParse({
+      email: formData.get("email"),
+    })
+
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+      }
+    }
+
+    const { email } = validatedFields.data
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    // For security, always return success even if user doesn't exist
+    // This prevents email enumeration attacks
+    if (!user) {
+      return {
+        success: true,
+        message:
+          "If an account exists with this email, you will receive a password reset link shortly.",
+      }
+    }
+
+    // Generate cryptographically secure reset token
+    const resetToken = crypto.randomBytes(32).toString("hex")
+
+    // Hash the token before storing (additional security layer)
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex")
+
+    // Set token expiry to 1 hour from now
+    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+
+    // Store hashed token and expiry in database
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetToken: hashedToken,
+        resetTokenExpiry,
+      },
+    })
+
+    // Send password reset email with the unhashed token
+    const emailResult = await sendPasswordResetEmail(
+      email,
+      resetToken,
+      user.name
+    )
+
+    if (!emailResult.success) {
+      return {
+        errors: {
+          _form: ["Failed to send reset email. Please try again later."],
+        },
+      }
+    }
+
+    return {
+      success: true,
+      message:
+        "If an account exists with this email, you will receive a password reset link shortly.",
+    }
+  } catch (error) {
+    console.error("Password reset request error:", error)
+    return {
+      errors: {
+        _form: [
+          "An error occurred while processing your request. Please try again.",
+        ],
+      },
+    }
+  }
+}
+
+/**
+ * Reset password using a valid reset token
+ * Validates token and updates password
+ */
+export async function resetPassword(
+  _prevState: ResetPasswordFormState,
+  formData: FormData
+): Promise<ResetPasswordFormState> {
+  try {
+    // Validate form data
+    const validatedFields = resetPasswordSchema.safeParse({
+      token: formData.get("token"),
+      password: formData.get("password"),
+    })
+
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+      }
+    }
+
+    const { token, password } = validatedFields.data
+
+    // Hash the token to match stored format
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex")
+
+    // Find user with matching token that hasn't expired
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: hashedToken,
+        resetTokenExpiry: {
+          gt: new Date(), // Token must not be expired
+        },
+      },
+    })
+
+    if (!user) {
+      return {
+        errors: {
+          _form: [
+            "Invalid or expired reset token. Please request a new password reset.",
+          ],
+        },
+      }
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // Update password and clear reset token fields
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error("Password reset error:", error)
+    return {
+      errors: {
+        _form: [
+          "An error occurred while resetting your password. Please try again.",
+        ],
+      },
+    }
   }
 }
