@@ -50,7 +50,8 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Protect admin routes with admin role check
     - _Requirements: 1.5, 1.6, 22.5_
 
-  - [ ]* 2.6 Write property tests for authorization
+  - [x] 2.6 Write property tests for authorization
+
     - **Property 5: Admin routes require admin role**
     - **Property 89: Protected endpoints require authentication**
     - **Validates: Requirements 1.5, 22.5**
