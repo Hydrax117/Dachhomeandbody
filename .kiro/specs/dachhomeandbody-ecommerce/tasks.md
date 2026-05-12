@@ -70,7 +70,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Implement transaction helpers
     - _Requirements: All (foundational)_
 
-  - [ ] 3.2 Implement product data access functions
+  - [x] 3.2 Implement product data access functions
     - Create getProducts with filtering, sorting, pagination
     - Create getProduct by slug with relations
     - Create getFeaturedProducts, getBestSellers, getNewArrivals
