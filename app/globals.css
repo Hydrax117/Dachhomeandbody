@@ -14,8 +14,8 @@
   --color-success: #16a34a;
   
   /* Typography */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-manrope), "Manrope", system-ui, sans-serif;
   
   /* Spacing - Generous, spacious */
   --spacing-xs: 0.5rem;
@@ -45,8 +45,8 @@
   --color-success: var(--color-success);
   
   /* Typography */
+  --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
   
   /* Font sizes - Refined scale */
   --font-size-xs: 0.75rem;
@@ -94,6 +94,12 @@
     --color-muted: #a3a3a3;
     --color-border: #262626;
   }
+}
+
+/* Scroll dot animation for hero */
+@keyframes scrollDot {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
 }
 
 /* Base styles */
