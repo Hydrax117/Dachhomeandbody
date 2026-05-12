@@ -1,6 +1,7 @@
 "use client"
 
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
+import { useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useEffect } from "react"
@@ -24,7 +25,7 @@ function SubmitButton() {
 export default function RegisterPage() {
   const router = useRouter()
   const initialState: RegisterFormState = {}
-  const [state, formAction] = useFormState(register, initialState)
+  const [state, formAction] = useActionState(register, initialState)
 
   useEffect(() => {
     if (state.success) {

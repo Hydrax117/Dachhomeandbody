@@ -1,6 +1,7 @@
 "use client"
 
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
+import { useFormStatus } from "react-dom"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Suspense, useEffect } from "react"
@@ -27,7 +28,7 @@ function LoginForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/"
 
   const initialState: LoginFormState = {}
-  const [state, formAction] = useFormState(login, initialState)
+  const [state, formAction] = useActionState(login, initialState)
 
   useEffect(() => {
     if (state.success) {
