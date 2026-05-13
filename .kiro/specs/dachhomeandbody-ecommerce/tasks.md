@@ -147,7 +147,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 4.4, 4.5**
 
 - [ ] 5. Product catalog implementation
-  - [ ] 5.1 Create product listing page with filters
+  - [-] 5.1 Create product listing page with filters
     - Build shop page with product grid
     - Implement filter sidebar (price, fragrance type, gender, longevity, strength)
     - Add sort dropdown (price, newest, popularity)
