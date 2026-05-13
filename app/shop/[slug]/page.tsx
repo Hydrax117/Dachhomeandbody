@@ -237,12 +237,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </div>
 
-        {/* Reviews (Req 6.4) */}
+        {/* Reviews (Req 6.4, 6.1) */}
         <div id="reviews" className="max-w-2xl mb-20">
           <ReviewsList
             reviews={product.reviews}
             averageRating={product.averageRating}
             reviewCount={product.reviewCount}
+            productId={product.id}
           />
         </div>
 

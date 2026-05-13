@@ -1,4 +1,7 @@
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 import { StarRating } from "@/app/components/ui/StarRating"
+import { ReviewForm } from "./ReviewForm"
 
 interface Review {
   id: string
@@ -18,6 +21,7 @@ interface ReviewsListProps {
   reviews: Review[]
   averageRating?: number | null
   reviewCount: number
+  productId: string
 }
 
 function ReviewCard({ review }: { review: Review }) {
@@ -52,7 +56,28 @@ function ReviewCard({ review }: { review: Review }) {
   )
 }
 
-export function ReviewsList({ reviews, averageRating, reviewCount }: ReviewsListProps) {
+export async function ReviewsList({
+  reviews,
+  averageRating,
+  reviewCount,
+  productId,
+}: ReviewsListProps) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  // Check if the logged-in user has a delivered order for this product
+  let canReview = false
+  if (userId) {
+    const deliveredOrder = await prisma.orderItem.findFirst({
+      where: {
+        productId,
+        order: { userId, status: "DELIVERED" },
+      },
+      select: { id: true },
+    })
+    canReview = deliveredOrder !== null
+  }
+
   return (
     <section aria-label="Customer reviews">
       <div className="divider-gold mb-5" aria-hidden="true" />
@@ -82,12 +107,37 @@ export function ReviewsList({ reviews, averageRating, reviewCount }: ReviewsList
           No reviews yet. Be the first to share your experience.
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 mb-10">
           {reviews.map((review) => (
             <ReviewCard key={review.id} review={review} />
           ))}
         </div>
       )}
+
+      {/* Review submission form */}
+      <div className="mt-8">
+        <div className="divider mb-6" aria-hidden="true" />
+        <h3 className="font-serif text-base font-medium mb-4">Write a Review</h3>
+
+        {!userId ? (
+          <p className="text-sm text-[#8b7355]">
+            Please{" "}
+            <a
+              href="/auth/login"
+              className="text-[#C8A96B] underline underline-offset-2 hover:text-[#111111] transition-colors duration-200"
+            >
+              sign in
+            </a>{" "}
+            to leave a review.
+          </p>
+        ) : canReview ? (
+          <ReviewForm productId={productId} />
+        ) : (
+          <p className="text-sm text-[#8b7355]">
+            Only customers who have received this product can leave a review.
+          </p>
+        )}
+      </div>
     </section>
   )
 }

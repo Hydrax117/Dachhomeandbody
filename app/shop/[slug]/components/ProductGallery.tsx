@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import Image from "next/image"
 
 interface ProductGalleryProps {
@@ -12,6 +12,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [zoomed, setZoomed] = useState(false)
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 })
+
+  // Touch swipe state
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
 
   const hasImages = images.length > 0
   const activeImage = hasImages ? images[activeIndex] : null
@@ -27,10 +31,36 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     [zoomed]
   )
 
-  const handlePrev = () =>
-    setActiveIndex((i) => (i === 0 ? images.length - 1 : i - 1))
-  const handleNext = () =>
-    setActiveIndex((i) => (i === images.length - 1 ? 0 : i + 1))
+  const handlePrev = useCallback(
+    () => setActiveIndex((i) => (i === 0 ? images.length - 1 : i - 1)),
+    [images.length]
+  )
+  const handleNext = useCallback(
+    () => setActiveIndex((i) => (i === images.length - 1 ? 0 : i + 1)),
+    [images.length]
+  )
+
+  // Touch swipe handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }, [])
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartX.current === null || touchStartY.current === null) return
+      const dx = e.changedTouches[0].clientX - touchStartX.current
+      const dy = e.changedTouches[0].clientY - touchStartY.current
+      // Only swipe if horizontal movement dominates and exceeds threshold
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40 && images.length > 1) {
+        if (dx < 0) handleNext()
+        else handlePrev()
+      }
+      touchStartX.current = null
+      touchStartY.current = null
+    },
+    [images.length, handleNext, handlePrev]
+  )
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,6 +70,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         onMouseEnter={() => setZoomed(true)}
         onMouseLeave={() => setZoomed(false)}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         aria-label={zoomed ? "Zoom active — move mouse to explore" : "Hover to zoom"}
       >
         {activeImage ? (
