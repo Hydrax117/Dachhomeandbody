@@ -6,6 +6,8 @@ import {
   Manrope,
 } from "next/font/google";
 import "./globals.css";
+import Providers from "@/app/components/layout/Providers";
+import Navbar from "@/app/components/layout/Navbar";
 
 // ── Serif: Playfair Display (variable) ──
 const playfair = Playfair_Display({
@@ -69,7 +71,10 @@ export default function RootLayout({
       className={`${playfair.variable} ${cormorant.variable} ${inter.variable} ${manrope.variable} antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#FAF6F1] text-[#111111]">
-        {children}
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
