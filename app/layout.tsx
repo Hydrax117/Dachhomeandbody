@@ -7,7 +7,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import Providers from "@/app/components/layout/Providers";
-import Navbar from "@/app/components/layout/Navbar";
+import ConditionalNavbar from "@/app/components/layout/ConditionalNavbar";
 
 // ── Serif: Playfair Display (variable) ──
 const playfair = Playfair_Display({
@@ -72,7 +72,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#FAF6F1] text-[#111111]">
         <Providers>
-          <Navbar />
+          <ConditionalNavbar />
           {children}
         </Providers>
       </body>

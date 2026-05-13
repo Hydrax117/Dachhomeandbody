@@ -330,7 +330,7 @@ export async function deleteProduct(id: string) {
  * Requirements: 8.1, 8.3, 8.4
  */
 export async function getAdminProducts(
-  filters: Omit<ProductFilters, "inStock"> & { includeDeleted?: boolean } = {},
+  filters: ProductFilters & { includeDeleted?: boolean } = {},
   sort: ProductSort = "newest",
   pagination: PaginationParams = {}
 ) {
