@@ -1,0 +1,91 @@
+"use client"
+
+import Link from "next/link"
+import { useCart } from "./CartContext"
+import { CouponInput } from "./CouponInput"
+
+interface CartSummaryProps {
+  /** When true, shows a "Proceed to Checkout" button. When false (e.g. on checkout page), omits it. */
+  showCheckoutButton?: boolean
+  onCheckout?: () => void
+}
+
+export function CartSummary({ showCheckoutButton = true, onCheckout }: CartSummaryProps) {
+  const { cart } = useCart()
+
+  const shippingCost = 0 // Free shipping placeholder — will be calculated at checkout
+  const hasDiscount = cart.discount > 0
+
+  return (
+    <div className="space-y-4">
+      {/* Coupon input */}
+      <CouponInput />
+
+      {/* Totals */}
+      <div className="space-y-2.5 pt-1">
+        <div className="flex justify-between text-sm">
+          <span className="text-[#8b7355]">Subtotal</span>
+          <span className="font-medium">₦{cart.subtotal.toLocaleString()}</span>
+        </div>
+
+        {hasDiscount && (
+          <div className="flex justify-between text-sm">
+            <span className="text-[#C8A96B]">Discount ({cart.couponCode})</span>
+            <span className="text-[#C8A96B] font-medium">−₦{cart.discount.toLocaleString()}</span>
+          </div>
+        )}
+
+        <div className="flex justify-between text-sm">
+          <span className="text-[#8b7355]">Shipping</span>
+          <span className="text-[#8b7355]">
+            {shippingCost === 0 ? "Calculated at checkout" : `₦${shippingCost.toLocaleString()}`}
+          </span>
+        </div>
+
+        <div className="divider" aria-hidden="true" />
+
+        <div className="flex justify-between">
+          <span className="font-serif text-base font-medium">Total</span>
+          <span className="font-serif text-base font-medium">₦{cart.total.toLocaleString()}</span>
+        </div>
+      </div>
+
+      {/* Checkout CTA */}
+      {showCheckoutButton && (
+        <div className="pt-1 space-y-2">
+          {onCheckout ? (
+            <button
+              onClick={onCheckout}
+              disabled={cart.items.length === 0}
+              className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Proceed to checkout"
+            >
+              Proceed to Checkout
+            </button>
+          ) : (
+            <Link
+              href="/checkout"
+              className={`btn-primary w-full text-center block ${cart.items.length === 0 ? "pointer-events-none opacity-40" : ""}`}
+              aria-disabled={cart.items.length === 0}
+              tabIndex={cart.items.length === 0 ? -1 : undefined}
+            >
+              Proceed to Checkout
+            </Link>
+          )}
+
+          <Link
+            href="/shop"
+            className="btn-secondary w-full text-center block text-[10px]"
+          >
+            Continue Shopping
+          </Link>
+        </div>
+      )}
+
+      {/* Trust signals */}
+      <p className="text-[10px] text-center text-[#b8b0a8] tracking-wide pt-1">
+        Secure checkout · Free returns
+      </p>
+    </div>
+  )
+}

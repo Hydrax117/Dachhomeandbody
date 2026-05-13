@@ -1,28 +1,29 @@
 "use client"
 
 import { useState } from "react"
+import { useCart, type CartProduct } from "@/app/components/cart/CartContext"
 
 interface AddToCartButtonProps {
-  productId: string
-  stock: number
+  product: CartProduct
   disabled?: boolean
 }
 
-export function AddToCartButton({ productId, stock, disabled }: AddToCartButtonProps) {
+export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
+  const { addItem, openCart } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
-  const isOutOfStock = stock === 0 || disabled
+  const isOutOfStock = product.stock === 0 || disabled
 
   const handleAdd = () => {
     if (isOutOfStock) return
-    // Cart context integration will be wired in task 6.1
-    // For now, show visual feedback
+    addItem(product, quantity)
+    openCart()
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
 
   const decrement = () => setQuantity((q) => Math.max(1, q - 1))
-  const increment = () => setQuantity((q) => Math.min(stock, q + 1))
+  const increment = () => setQuantity((q) => Math.min(product.stock, q + 1))
 
   if (isOutOfStock) {
     return (
@@ -60,7 +61,7 @@ export function AddToCartButton({ productId, stock, disabled }: AddToCartButtonP
         <button
           onClick={increment}
           aria-label="Increase quantity"
-          disabled={quantity >= stock}
+          disabled={quantity >= product.stock}
           className="w-10 h-10 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A96B]"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -73,7 +74,6 @@ export function AddToCartButton({ productId, stock, disabled }: AddToCartButtonP
       {/* Add to cart */}
       <button
         onClick={handleAdd}
-        data-product-id={productId}
         aria-label={added ? "Added to cart" : `Add ${quantity} to cart`}
         className={`btn-primary w-full transition-all duration-300 ${
           added ? "bg-[#C8A96B] border-[#C8A96B] text-[#111111]" : ""
@@ -92,9 +92,9 @@ export function AddToCartButton({ productId, stock, disabled }: AddToCartButtonP
       </button>
 
       {/* Low stock warning */}
-      {stock > 0 && stock <= 5 && (
+      {product.stock > 0 && product.stock <= 5 && (
         <p className="text-[11px] text-[#C8A96B] tracking-wide" role="status">
-          Only {stock} left in stock
+          Only {product.stock} left in stock
         </p>
       )}
     </div>

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { logout } from "@/app/actions/auth"
 import { useFormStatus } from "react-dom"
+import { useCart } from "@/app/components/cart/CartContext"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -79,9 +80,14 @@ function LogoutSubmitButton() {
 // ---------------------------------------------------------------------------
 // Cart icon with badge
 // ---------------------------------------------------------------------------
-function CartIcon({ count, color }: { count: number; color: string }) {
+function CartIcon({ count, color, onClick }: { count: number; color: string; onClick: () => void }) {
   return (
-    <Link href="/cart" aria-label={`Cart, ${count} item${count !== 1 ? "s" : ""}`} className="relative hover:text-[#C8A96B] transition-colors" style={{ color }}>
+    <button
+      onClick={onClick}
+      aria-label={`Cart, ${count} item${count !== 1 ? "s" : ""}`}
+      className="relative hover:text-[#C8A96B] transition-colors"
+      style={{ color }}
+    >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
         <line x1="3" y1="6" x2="21" y2="6" />
@@ -95,7 +101,7 @@ function CartIcon({ count, color }: { count: number; color: string }) {
           {count > 99 ? "99+" : count}
         </span>
       )}
-    </Link>
+    </button>
   )
 }
 
@@ -463,6 +469,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [shopHovered, setShopHovered] = useState(false)
   const { data: session } = useSession()
+  const { itemCount, openCart } = useCart()
 
   // Scroll detection
   useEffect(() => {
@@ -481,9 +488,6 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
   const useDarkText = !transparentHero || scrolled
   const iconColor = useDarkText ? "#111111" : "rgba(255,255,255,0.85)"
   const textColor = useDarkText ? "#111111" : "rgba(255,255,255,0.85)"
-
-  // Cart count — placeholder (will be wired to cart context in task 6)
-  const cartCount = 0
 
   return (
     <>
@@ -589,7 +593,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             </Link>
 
             {/* Cart */}
-            <CartIcon count={cartCount} color={iconColor} />
+            <CartIcon count={itemCount} color={iconColor} onClick={openCart} />
 
             {/* Account dropdown — desktop */}
             <AccountDropdown color={iconColor} />

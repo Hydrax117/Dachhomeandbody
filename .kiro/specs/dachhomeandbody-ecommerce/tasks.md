@@ -196,14 +196,14 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 19: Cart quantity respects stock limits**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.7**
 
-  - [ ] 6.3 Build cart UI components
+  - [x] 6.3 Build cart UI components
     - Create CartDrawer slide-out component
     - Build CartItem component with quantity controls
     - Create CartSummary with totals
     - Add CouponInput component with validation
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - [ ] 6.4 Implement cart persistence
+  - [x] 6.4 Implement cart persistence
     - Save cart to database for authenticated users
     - Load cart on login
     - Merge guest cart with user cart on login
