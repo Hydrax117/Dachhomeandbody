@@ -11,9 +11,32 @@ interface Category {
   name: string
 }
 
+export interface ProductInitialData {
+  name: string
+  slug: string
+  description: string
+  price: number
+  compareAtPrice?: number | null
+  images: string[]
+  categoryId: string
+  stock: number
+  sku: string
+  featured: boolean
+  fragranceType?: string | null
+  topNotes: string[]
+  heartNotes: string[]
+  baseNotes: string[]
+  longevity?: string | null
+  strength?: string | null
+  moodTags: string[]
+  gender?: string | null
+}
+
 interface ProductFormProps {
   categories: Category[]
   action: (prev: CreateProductState, formData: FormData) => Promise<CreateProductState>
+  initialData?: ProductInitialData
+  mode?: "create" | "edit"
 }
 
 // ── Step definitions ───────────────────────────────────────────────────────
@@ -70,7 +93,7 @@ function selectCls(error?: string) {
   ].join(" ")
 }
 
-function SubmitButton() {
+function SubmitButton({ mode }: { mode: "create" | "edit" }) {
   const { pending } = useFormStatus()
   return (
     <button
@@ -78,7 +101,9 @@ function SubmitButton() {
       disabled={pending}
       className="inline-flex items-center gap-2 bg-[#111111] text-white text-xs tracking-[0.12em] uppercase px-6 py-3 rounded hover:bg-[#1a1a1a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {pending ? "Creating…" : "Create Product"}
+      {pending
+        ? mode === "edit" ? "Saving…" : "Creating…"
+        : mode === "edit" ? "Save Changes" : "Create Product"}
     </button>
   )
 }
@@ -88,17 +113,22 @@ function SubmitButton() {
 function BasicInfoStep({
   categories,
   errors,
+  initialData,
 }: {
   categories: Category[]
   errors: CreateProductState["errors"]
+  initialData?: ProductInitialData
 }) {
-  const [slug, setSlug] = useState("")
-  const [nameVal, setNameVal] = useState("")
+  const [slug, setSlug] = useState(initialData?.slug ?? "")
+  const [nameVal, setNameVal] = useState(initialData?.name ?? "")
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value
     setNameVal(val)
-    setSlug(slugify(val))
+    // Only auto-generate slug in create mode (when slug is empty or was auto-generated)
+    if (!initialData) {
+      setSlug(slugify(val))
+    }
   }
 
   return (
@@ -134,6 +164,7 @@ function BasicInfoStep({
         <Label htmlFor="description" required>Description</Label>
         <textarea
           id="description" name="description" required rows={4}
+          defaultValue={initialData?.description ?? ""}
           placeholder="Describe the product in detail…"
           className={inputCls(errors?.description?.[0]) + " resize-y min-h-[100px]"}
         />
@@ -146,6 +177,7 @@ function BasicInfoStep({
           <Label htmlFor="price" required>Price (₦)</Label>
           <input
             id="price" name="price" type="number" required min="0" step="0.01"
+            defaultValue={initialData?.price ?? ""}
             placeholder="25000"
             className={inputCls(errors?.price?.[0])}
           />
@@ -155,6 +187,7 @@ function BasicInfoStep({
           <Label htmlFor="compareAtPrice">Compare At Price (₦)</Label>
           <input
             id="compareAtPrice" name="compareAtPrice" type="number" min="0" step="0.01"
+            defaultValue={initialData?.compareAtPrice ?? ""}
             placeholder="30000"
             className={inputCls(errors?.compareAtPrice?.[0])}
           />
@@ -166,7 +199,11 @@ function BasicInfoStep({
       <div>
         <Label htmlFor="categoryId" required>Category</Label>
         <div className="relative">
-          <select id="categoryId" name="categoryId" required className={selectCls(errors?.categoryId?.[0])}>
+          <select
+            id="categoryId" name="categoryId" required
+            defaultValue={initialData?.categoryId ?? ""}
+            className={selectCls(errors?.categoryId?.[0])}
+          >
             <option value="">Select a category…</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
@@ -185,7 +222,11 @@ function BasicInfoStep({
       <div>
         <Label htmlFor="gender">Gender</Label>
         <div className="relative">
-          <select id="gender" name="gender" className={selectCls()}>
+          <select
+            id="gender" name="gender"
+            defaultValue={initialData?.gender ?? ""}
+            className={selectCls()}
+          >
             <option value="">Select…</option>
             <option value="UNISEX">Unisex</option>
             <option value="MALE">Male</option>
@@ -203,6 +244,7 @@ function BasicInfoStep({
       <div className="flex items-center gap-3">
         <input
           id="featured" name="featured" type="checkbox" value="true"
+          defaultChecked={initialData?.featured ?? false}
           className="w-4 h-4 accent-[#C8A96B] rounded"
         />
         <label htmlFor="featured" className="text-sm text-[#111111]">
@@ -215,14 +257,24 @@ function BasicInfoStep({
 
 // ── Step 2: Fragrance Profile ──────────────────────────────────────────────
 
-function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"] }) {
+function FragranceProfileStep({
+  errors,
+  initialData,
+}: {
+  errors: CreateProductState["errors"]
+  initialData?: ProductInitialData
+}) {
   return (
     <div className="space-y-5">
       {/* Fragrance Type */}
       <div>
         <Label htmlFor="fragranceType">Fragrance Type</Label>
         <div className="relative">
-          <select id="fragranceType" name="fragranceType" className={selectCls()}>
+          <select
+            id="fragranceType" name="fragranceType"
+            defaultValue={initialData?.fragranceType ?? ""}
+            className={selectCls()}
+          >
             <option value="">Select type…</option>
             <option value="PERFUME">Perfume</option>
             <option value="EAU_DE_PARFUM">Eau de Parfum</option>
@@ -244,6 +296,7 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
           <Label htmlFor="topNotes">Top Notes</Label>
           <input
             id="topNotes" name="topNotes" type="text"
+            defaultValue={initialData?.topNotes?.join(", ") ?? ""}
             placeholder="Bergamot, Lemon, Pepper"
             className={inputCls(errors?.topNotes?.[0])}
           />
@@ -254,6 +307,7 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
           <Label htmlFor="heartNotes">Heart Notes</Label>
           <input
             id="heartNotes" name="heartNotes" type="text"
+            defaultValue={initialData?.heartNotes?.join(", ") ?? ""}
             placeholder="Rose, Jasmine, Iris"
             className={inputCls(errors?.heartNotes?.[0])}
           />
@@ -264,6 +318,7 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
           <Label htmlFor="baseNotes">Base Notes</Label>
           <input
             id="baseNotes" name="baseNotes" type="text"
+            defaultValue={initialData?.baseNotes?.join(", ") ?? ""}
             placeholder="Oud, Sandalwood, Musk"
             className={inputCls(errors?.baseNotes?.[0])}
           />
@@ -277,7 +332,11 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
         <div>
           <Label htmlFor="longevity">Longevity</Label>
           <div className="relative">
-            <select id="longevity" name="longevity" className={selectCls()}>
+            <select
+              id="longevity" name="longevity"
+              defaultValue={initialData?.longevity ?? ""}
+              className={selectCls()}
+            >
               <option value="">Select…</option>
               <option value="SHORT">Short (1–3 hrs)</option>
               <option value="MODERATE">Moderate (3–6 hrs)</option>
@@ -295,7 +354,11 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
         <div>
           <Label htmlFor="strength">Strength</Label>
           <div className="relative">
-            <select id="strength" name="strength" className={selectCls()}>
+            <select
+              id="strength" name="strength"
+              defaultValue={initialData?.strength ?? ""}
+              className={selectCls()}
+            >
               <option value="">Select…</option>
               <option value="LIGHT">Light</option>
               <option value="MODERATE">Moderate</option>
@@ -317,6 +380,7 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
         <Label htmlFor="moodTags">Mood Tags</Label>
         <input
           id="moodTags" name="moodTags" type="text"
+          defaultValue={initialData?.moodTags?.join(", ") ?? ""}
           placeholder="Romantic, Mysterious, Fresh"
           className={inputCls()}
         />
@@ -328,12 +392,19 @@ function FragranceProfileStep({ errors }: { errors: CreateProductState["errors"]
 
 // ── Step 3: Images & Stock ─────────────────────────────────────────────────
 
-function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }) {
-  const [images, setImages] = useState<string[]>([])
+function ImagesAndStockStep({
+  errors,
+  initialData,
+}: {
+  errors: CreateProductState["errors"]
+  initialData?: ProductInitialData
+}) {
+  const [images, setImages] = useState<string[]>(initialData?.images ?? [])
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [, startTransition] = useTransition()
+  const dragIndex = useRef<number | null>(null)
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -359,7 +430,6 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
       setImages((prev) => [...prev, ...uploaded])
     })
     setUploading(false)
-    // Reset file input so same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
@@ -367,9 +437,28 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
     setImages((prev) => prev.filter((_, i) => i !== idx))
   }
 
+  function moveImage(from: number, to: number) {
+    setImages((prev) => {
+      const next = [...prev]
+      const [item] = next.splice(from, 1)
+      next.splice(to, 0, item)
+      return next
+    })
+  }
+
+  function handleDragStart(idx: number) {
+    dragIndex.current = idx
+  }
+
+  function handleDrop(idx: number) {
+    if (dragIndex.current === null || dragIndex.current === idx) return
+    moveImage(dragIndex.current, idx)
+    dragIndex.current = null
+  }
+
   return (
     <div className="space-y-6">
-      {/* Hidden inputs for image URLs */}
+      {/* Hidden inputs for image URLs — order matters */}
       {images.map((url, i) => (
         <input key={i} type="hidden" name="images" value={url} />
       ))}
@@ -412,15 +501,23 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
         {errors?.images?.[0] && <FieldError message={errors.images[0]} />}
       </div>
 
-      {/* Image previews */}
+      {/* Image previews with drag-to-reorder */}
       {images.length > 0 && (
         <div>
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-2">
-            Uploaded Images ({images.length})
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1">
+            Images ({images.length}) — drag to reorder
           </p>
+          <p className="text-[10px] text-[#aaa] mb-3">First image is the primary display image</p>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {images.map((url, idx) => (
-              <div key={idx} className="relative group aspect-square">
+              <div
+                key={url + idx}
+                draggable
+                onDragStart={() => handleDragStart(idx)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => handleDrop(idx)}
+                className="relative group aspect-square cursor-grab active:cursor-grabbing"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
@@ -432,6 +529,29 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
                     Primary
                   </span>
                 )}
+                {/* Reorder arrows */}
+                <div className="absolute bottom-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {idx > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => moveImage(idx, idx - 1)}
+                      aria-label={`Move image ${idx + 1} left`}
+                      className="w-5 h-5 bg-white/90 text-[#111111] rounded flex items-center justify-center text-xs shadow"
+                    >
+                      ←
+                    </button>
+                  )}
+                  {idx < images.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => moveImage(idx, idx + 1)}
+                      aria-label={`Move image ${idx + 1} right`}
+                      className="w-5 h-5 bg-white/90 text-[#111111] rounded flex items-center justify-center text-xs shadow"
+                    >
+                      →
+                    </button>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={() => removeImage(idx)}
@@ -452,6 +572,7 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
           <Label htmlFor="sku" required>SKU</Label>
           <input
             id="sku" name="sku" type="text" required
+            defaultValue={initialData?.sku ?? ""}
             placeholder="DHB-001"
             className={inputCls(errors?.sku?.[0])}
           />
@@ -461,6 +582,7 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
           <Label htmlFor="stock" required>Stock Quantity</Label>
           <input
             id="stock" name="stock" type="number" required min="0" step="1"
+            defaultValue={initialData?.stock ?? ""}
             placeholder="50"
             className={inputCls(errors?.stock?.[0])}
           />
@@ -473,11 +595,10 @@ function ImagesAndStockStep({ errors }: { errors: CreateProductState["errors"] }
 
 // ── Main ProductForm component ─────────────────────────────────────────────
 
-export default function ProductForm({ categories, action }: ProductFormProps) {
+export default function ProductForm({ categories, action, initialData, mode = "create" }: ProductFormProps) {
   const [step, setStep] = useState<Step>(0)
   const [state, formAction] = useActionState(action, {})
 
-  // If there are errors, show the step that contains the first error
   const stepErrors: Record<Step, (keyof NonNullable<CreateProductState["errors"]>)[]> = {
     0: ["name", "slug", "description", "price", "compareAtPrice", "categoryId", "gender"],
     1: ["fragranceType", "topNotes", "heartNotes", "baseNotes", "longevity", "strength"],
@@ -542,13 +663,13 @@ export default function ProductForm({ categories, action }: ProductFormProps) {
         </h2>
 
         <div className={step === 0 ? undefined : "hidden"} aria-hidden={step !== 0}>
-          <BasicInfoStep categories={categories} errors={state.errors} />
+          <BasicInfoStep categories={categories} errors={state.errors} initialData={initialData} />
         </div>
         <div className={step === 1 ? undefined : "hidden"} aria-hidden={step !== 1}>
-          <FragranceProfileStep errors={state.errors} />
+          <FragranceProfileStep errors={state.errors} initialData={initialData} />
         </div>
         <div className={step === 2 ? undefined : "hidden"} aria-hidden={step !== 2}>
-          <ImagesAndStockStep errors={state.errors} />
+          <ImagesAndStockStep errors={state.errors} initialData={initialData} />
         </div>
       </div>
 
@@ -573,7 +694,7 @@ export default function ProductForm({ categories, action }: ProductFormProps) {
               Next →
             </button>
           ) : (
-            <SubmitButton />
+            <SubmitButton mode={mode} />
           )}
         </div>
       </div>
