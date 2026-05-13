@@ -483,7 +483,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 57: Coupon usage limit auto-deactivates**
     - **Validates: Requirements 11.1, 11.5**
 
-  - [-] 16.3 Implement category management
+  - [x] 16.3 Implement category management
     - Create category list page
     - Add create/edit category forms
     - Show product count per category

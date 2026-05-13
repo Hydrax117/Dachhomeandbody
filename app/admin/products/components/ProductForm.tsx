@@ -535,15 +535,21 @@ export default function ProductForm({ categories, action }: ProductFormProps) {
         </div>
       )}
 
-      {/* Step content */}
+      {/* Step content — all steps stay mounted so FormData includes all fields */}
       <div className="bg-white border border-[#e5e5e5] rounded-lg p-6 mb-6">
         <h2 className="font-serif text-lg font-medium text-[#111111] mb-5">
           {STEPS[step]}
         </h2>
 
-        {step === 0 && <BasicInfoStep categories={categories} errors={state.errors} />}
-        {step === 1 && <FragranceProfileStep errors={state.errors} />}
-        {step === 2 && <ImagesAndStockStep errors={state.errors} />}
+        <div className={step === 0 ? undefined : "hidden"} aria-hidden={step !== 0}>
+          <BasicInfoStep categories={categories} errors={state.errors} />
+        </div>
+        <div className={step === 1 ? undefined : "hidden"} aria-hidden={step !== 1}>
+          <FragranceProfileStep errors={state.errors} />
+        </div>
+        <div className={step === 2 ? undefined : "hidden"} aria-hidden={step !== 2}>
+          <ImagesAndStockStep errors={state.errors} />
+        </div>
       </div>
 
       {/* Navigation */}
