@@ -240,10 +240,7 @@ function AccountDropdown({ color }: { color: string }) {
 // ---------------------------------------------------------------------------
 function MegaMenu({ onClose }: { onClose: () => void }) {
   return (
-    <div
-      className="absolute left-0 right-0 top-full bg-[#FAF8F5] border-t border-[#e5e5e5] shadow-lg z-40"
-      onMouseLeave={onClose}
-    >
+    <div className="absolute left-0 right-0 bg-[#FAF8F5] border-t border-[#e5e5e5] shadow-lg z-40">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-3 gap-10">
         {shopMegaMenu.map((col) => (
           <div key={col.heading}>
@@ -525,7 +522,6 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
 
             {/* Shop — with mega menu */}
             <li
-              className="relative"
               onMouseEnter={() => setShopHovered(true)}
               onMouseLeave={() => setShopHovered(false)}
             >
@@ -549,8 +545,6 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </button>
-
-              {shopHovered && <MegaMenu onClose={() => setShopHovered(false)} />}
             </li>
 
             {/* Other links */}
@@ -615,6 +609,16 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             </button>
           </div>
         </nav>
+
+        {/* Full-width mega menu — outside nav so it spans the header */}
+        {shopHovered && (
+          <div
+            onMouseEnter={() => setShopHovered(true)}
+            onMouseLeave={() => setShopHovered(false)}
+          >
+            <MegaMenu onClose={() => setShopHovered(false)} />
+          </div>
+        )}
       </header>
 
       {/* Mobile drawer */}
