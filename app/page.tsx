@@ -29,18 +29,22 @@ function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="font-serif text-lg lg:text-xl tracking-[0.2em] uppercase font-medium"
+          className="font-serif text-base lg:text-lg tracking-[0.22em] uppercase font-normal transition-colors duration-300"
+          style={{ color: scrolled ? "#111111" : "#ffffff" }}
         >
           Dachhomeandbody
         </Link>
 
         {/* Desktop nav links */}
-        <ul className="hidden lg:flex items-center gap-10 text-xs tracking-[0.15em] uppercase font-medium text-[#1a1a1a]">
+        <ul
+          className="hidden lg:flex items-center gap-10 text-[10px] tracking-[0.18em] uppercase font-medium transition-colors duration-300"
+          style={{ color: scrolled ? "#111111" : "rgba(255,255,255,0.85)" }}
+        >
           {["Home", "Shop", "Collections", "About", "Contact"].map((item) => (
             <li key={item}>
               <Link
                 href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                className="hover:text-[#8b7355] transition-colors duration-200"
+                className="hover:text-[#C8A96B] transition-colors duration-200"
               >
                 {item}
               </Link>
@@ -49,35 +53,38 @@ function Navbar() {
         </ul>
 
         {/* Right icons */}
-        <div className="flex items-center gap-5">
+        <div
+          className="flex items-center gap-5 transition-colors duration-300"
+          style={{ color: scrolled ? "#111111" : "rgba(255,255,255,0.85)" }}
+        >
           {/* Search */}
-          <button aria-label="Search" className="hidden lg:block hover:text-[#8b7355] transition-colors">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <button aria-label="Search" className="hidden lg:block hover:text-[#C8A96B] transition-colors">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
           </button>
           {/* Wishlist */}
-          <button aria-label="Wishlist" className="hidden lg:block hover:text-[#8b7355] transition-colors">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <button aria-label="Wishlist" className="hidden lg:block hover:text-[#C8A96B] transition-colors">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
           {/* Cart */}
-          <button aria-label="Cart" className="hover:text-[#8b7355] transition-colors relative">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <button aria-label="Cart" className="hover:text-[#C8A96B] transition-colors relative">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
           </button>
           {/* Account */}
-          <Link href="/auth/login" aria-label="Account" className="hidden lg:block hover:text-[#8b7355] transition-colors">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <Link href="/auth/login" aria-label="Account" className="hidden lg:block hover:text-[#C8A96B] transition-colors">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
           </Link>
           {/* Mobile hamburger */}
           <button
             aria-label="Menu"
-            className="lg:hidden"
+            className="lg:hidden hover:text-[#C8A96B] transition-colors"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -130,37 +137,40 @@ function Hero() {
         className="object-cover object-center"
         aria-hidden="true"
       />
-      {/* Dark overlay for text legibility */}
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-      {/* Warm light orb */}
+      {/* Base dark overlay */}
+      <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
+      {/* Stronger vignette at top so navbar area is clearly dark */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/40" aria-hidden="true" />
+      {/* Warm amber glow — centred behind headline */}
       <div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-15"
-        style={{ background: "radial-gradient(circle, #c9a96e 0%, transparent 70%)" }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none"
+        style={{ background: "radial-gradient(circle, #C8A96B 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
-      {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <p className="text-[#c9a96e] text-xs tracking-[0.3em] uppercase mb-6 font-medium">
+      {/* Content — padded top to clear fixed navbar */}
+      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto pt-20">
+        <p className="text-[#C8A96B] text-[10px] tracking-[0.35em] uppercase mb-8 font-medium">
           Luxury Fragrance House
         </p>
-        <h1 className="font-serif text-white text-4xl sm:text-5xl lg:text-7xl font-medium leading-[1.1] mb-6">
+        <h1 className="font-serif text-white font-light leading-[1.08] mb-7"
+          style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)" }}>
           Crafted scents for<br />
-          <em className="not-italic text-[#c9a96e]">unforgettable</em> presence.
+          <em className="not-italic text-[#C8A96B]">unforgettable</em> presence.
         </h1>
-        <p className="text-white/60 text-base lg:text-lg max-w-xl mx-auto mb-10 leading-relaxed font-light">
+        <p className="text-white/55 text-sm lg:text-base max-w-md mx-auto mb-12 leading-[1.8] font-light tracking-wide">
           Luxury fragrances designed to leave a lasting impression — on every room you enter, every memory you leave behind.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/shop"
-            className="px-8 py-3.5 bg-[#c9a96e] text-[#1a1a1a] text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 min-w-[180px] text-center"
+            className="px-9 py-4 bg-[#C8A96B] text-[#111111] text-[10px] tracking-[0.25em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 min-w-[190px] text-center"
           >
             Shop Collection
           </Link>
           <Link
             href="/collections"
-            className="px-8 py-3.5 border border-white/30 text-white text-xs tracking-[0.2em] uppercase font-medium hover:border-white/70 transition-colors duration-300 min-w-[180px] text-center"
+            className="px-9 py-4 border border-white/25 text-white text-[10px] tracking-[0.25em] uppercase font-medium hover:border-white/60 hover:bg-white/5 transition-all duration-300 min-w-[190px] text-center"
           >
             Discover Signature Scents
           </Link>
@@ -335,8 +345,8 @@ function SignatureShowcase() {
     <section className="py-24 lg:py-32 bg-[#1a1208] text-white overflow-hidden">
       <div className="px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#c9a96e] text-xs tracking-[0.3em] uppercase mb-3">Featured</p>
-          <h2 className="font-serif text-3xl lg:text-5xl font-medium">Signature Fragrance</h2>
+          <p className="text-[#C8A96B] text-xs tracking-[0.3em] uppercase mb-3">Featured</p>
+          <h2 className="font-serif text-white text-3xl lg:text-5xl font-medium">Signature Fragrance</h2>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -357,7 +367,7 @@ function SignatureShowcase() {
 
           {/* Details */}
           <div>
-            <h3 className="font-serif text-2xl lg:text-4xl font-medium mb-2">Noir Absolu</h3>
+            <h3 className="font-serif text-white text-2xl lg:text-4xl font-medium mb-2">Noir Absolu</h3>
             <p className="text-[#c9a96e] text-xs tracking-[0.2em] uppercase mb-8">Eau de Parfum · 50ml</p>
 
             {/* Notes */}
@@ -501,7 +511,7 @@ function Newsletter() {
   return (
     <section className="py-24 lg:py-32 bg-[#1a1208] text-white text-center px-6">
       <p className="text-[#c9a96e] text-xs tracking-[0.3em] uppercase mb-4">Stay Connected</p>
-      <h2 className="font-serif text-3xl lg:text-5xl font-medium mb-4">
+      <h2 className="font-serif text-white text-3xl lg:text-5xl font-medium mb-4">
         Join the fragrance experience.
       </h2>
       <p className="text-white/50 text-sm lg:text-base max-w-md mx-auto mb-10">

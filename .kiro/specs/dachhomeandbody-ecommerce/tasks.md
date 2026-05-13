@@ -77,7 +77,8 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Create admin product CRUD operations
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 8.1, 8.3, 8.4, 12.2, 12.3, 12.4_
 
-  - [ ]* 3.3 Write property tests for product queries
+  - [-] 3.3 Write property tests for product queries
+
     - **Property 8: Product filters match all criteria**
     - **Property 9: Product sorting orders correctly**
     - **Property 10: Search matches across multiple fields**
