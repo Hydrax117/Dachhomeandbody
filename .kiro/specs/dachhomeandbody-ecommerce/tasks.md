@@ -134,7 +134,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 29: Order status changes trigger notifications**
     - **Validates: Requirements 5.3, 16.2, 16.3**
 
-  - [ ] 4.5 Integrate Paystack payment gateway
+  - [x] 4.5 Integrate Paystack payment gateway
     - Configure Paystack SDK with secret key
     - Create payment initialization endpoint
     - Implement payment webhook handler
