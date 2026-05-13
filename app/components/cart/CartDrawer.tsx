@@ -7,7 +7,7 @@ import { CartItem } from "./CartItem"
 import { CartSummary } from "./CartSummary"
 
 export function CartDrawer() {
-  const { cart, isOpen, closeCart, itemCount } = useCart()
+  const { cart, isOpen, closeCart, itemCount, dismissStockNotice } = useCart()
   const drawerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -108,6 +108,26 @@ export function CartDrawer() {
             </svg>
           </button>
         </div>
+
+        {/* Stock notice */}
+        {cart.stockNotice && (
+          <div
+            role="alert"
+            className="flex items-start justify-between gap-3 px-6 py-3 bg-[#fff8ec] border-b border-[#f0d9a0] text-[11px] text-[#7a5c00] tracking-wide"
+          >
+            <span>{cart.stockNotice}</span>
+            <button
+              onClick={dismissStockNotice}
+              aria-label="Dismiss notice"
+              className="shrink-0 text-[#b8a060] hover:text-[#7a5c00] transition-colors mt-0.5"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         {/* Cart items */}
         {cart.items.length === 0 ? (

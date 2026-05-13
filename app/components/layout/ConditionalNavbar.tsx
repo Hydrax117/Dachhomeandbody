@@ -9,7 +9,10 @@ import Navbar from "./Navbar"
  */
 export default function ConditionalNavbar() {
   const pathname = usePathname()
+  // Admin routes use their own sidebar layout
   if (pathname.startsWith("/admin")) return null
+  // Checkout has its own minimal header
+  if (pathname.startsWith("/checkout")) return null
   // Only the homepage has a full-bleed dark hero — all other pages have a light background
   const transparentHero = pathname === "/"
   return <Navbar transparentHero={transparentHero} />

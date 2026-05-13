@@ -182,8 +182,8 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Create ProductFilters component
     - _Requirements: 2.1, 2.5, 2.6, 2.8_
 
-- [ ] 6. Shopping cart implementation
-  - [ ] 6.1 Implement cart state management
+- [x] 6. Shopping cart implementation
+  - [x] 6.1 Implement cart state management
     - Create cart context with React Context API
     - Implement add, update, remove cart operations
     - Add cart persistence for authenticated users
@@ -220,8 +220,8 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
   - Test cart operations
   - Ask the user if questions arise
 
-- [ ] 8. Checkout and payment flow
-  - [ ] 8.1 Create checkout page with multi-step form
+- [ ] 8. Checkout and payment flow 
+  - [x] 8.1 Create checkout page with multi-step form
     - Build checkout layout with order summary
     - Create shipping address form with validation
     - Add payment method selection

@@ -42,6 +42,7 @@ export interface Cart {
   total: number
   couponCode?: string
   couponError?: string
+  stockNotice?: string | null
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ type CartAction =
   | { type: "REMOVE_COUPON" }
   | { type: "CLEAR_CART" }
   | { type: "LOAD_CART"; items: CartItem[] }
+  | { type: "SET_STOCK_NOTICE"; message: string | null }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -79,14 +81,23 @@ function cartReducer(state: Cart, action: CartAction): Cart {
     case "ADD_ITEM": {
       const existing = state.items.find((i) => i.productId === action.product.id)
       let items: CartItem[]
+      let stockNotice: string | null = null
 
       if (existing) {
-        const newQty = Math.min(existing.quantity + action.quantity, action.product.stock)
+        const requested = existing.quantity + action.quantity
+        const newQty = Math.min(requested, action.product.stock)
+        if (requested > action.product.stock) {
+          stockNotice = `Only ${action.product.stock} unit${action.product.stock !== 1 ? "s" : ""} available for "${action.product.name}".`
+        }
         items = state.items.map((i) =>
           i.productId === action.product.id ? { ...i, quantity: newQty } : i
         )
       } else {
-        const qty = Math.min(action.quantity, action.product.stock)
+        const requested = action.quantity
+        const qty = Math.min(requested, action.product.stock)
+        if (requested > action.product.stock) {
+          stockNotice = `Only ${action.product.stock} unit${action.product.stock !== 1 ? "s" : ""} available for "${action.product.name}".`
+        }
         items = [
           ...state.items,
           { productId: action.product.id, product: action.product, quantity: qty },
@@ -99,16 +110,21 @@ function cartReducer(state: Cart, action: CartAction): Cart {
         items,
         subtotal,
         total: Math.max(0, subtotal - state.discount),
+        stockNotice,
       }
     }
 
     case "UPDATE_QUANTITY": {
+      let stockNotice: string | null = null
       const items =
         action.quantity <= 0
           ? state.items.filter((i) => i.productId !== action.productId)
           : state.items.map((i) => {
               if (i.productId !== action.productId) return i
               const qty = Math.min(action.quantity, i.product.stock)
+              if (action.quantity > i.product.stock) {
+                stockNotice = `Only ${i.product.stock} unit${i.product.stock !== 1 ? "s" : ""} available for "${i.product.name}".`
+              }
               return { ...i, quantity: qty }
             })
 
@@ -118,6 +134,7 @@ function cartReducer(state: Cart, action: CartAction): Cart {
         items,
         subtotal,
         total: Math.max(0, subtotal - state.discount),
+        stockNotice,
       }
     }
 
@@ -162,6 +179,10 @@ function cartReducer(state: Cart, action: CartAction): Cart {
       return initialState
     }
 
+    case "SET_STOCK_NOTICE": {
+      return { ...state, stockNotice: action.message }
+    }
+
     default:
       return state
   }
@@ -189,6 +210,7 @@ interface CartContextValue {
   applyCoupon: (code: string) => Promise<void>
   removeCoupon: () => void
   clearCart: () => void
+  dismissStockNotice: () => void
   itemCount: number
 }
 
@@ -320,6 +342,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [session?.user?.id])
 
+  const dismissStockNotice = useCallback(() => {
+    dispatch({ type: "SET_STOCK_NOTICE", message: null })
+  }, [])
+
   const itemCount = cart.items.reduce((sum, i) => sum + i.quantity, 0)
 
   return (
@@ -335,6 +361,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         applyCoupon,
         removeCoupon,
         clearCart,
+        dismissStockNotice,
         itemCount,
       }}
     >
