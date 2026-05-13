@@ -458,7 +458,7 @@ function MobileMenu({
 // ---------------------------------------------------------------------------
 // Main Navbar
 // ---------------------------------------------------------------------------
-export default function Navbar() {
+export default function Navbar({ transparentHero = false }: { transparentHero?: boolean }) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [shopHovered, setShopHovered] = useState(false)
@@ -477,8 +477,10 @@ export default function Navbar() {
     return () => { document.body.style.overflow = "" }
   }, [mobileOpen])
 
-  const iconColor = scrolled ? "#111111" : "rgba(255,255,255,0.85)"
-  const textColor = scrolled ? "#111111" : "rgba(255,255,255,0.85)"
+  // On pages without a dark hero, always use dark text regardless of scroll position
+  const useDarkText = !transparentHero || scrolled
+  const iconColor = useDarkText ? "#111111" : "rgba(255,255,255,0.85)"
+  const textColor = useDarkText ? "#111111" : "rgba(255,255,255,0.85)"
 
   // Cart count — placeholder (will be wired to cart context in task 6)
   const cartCount = 0
@@ -487,7 +489,7 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? "bg-[#FAF8F5]/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
+          useDarkText ? "bg-[#FAF8F5]/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
         }`}
       >
         <nav
@@ -498,7 +500,7 @@ export default function Navbar() {
           <Link
             href="/"
             className="font-serif text-base lg:text-lg tracking-[0.22em] uppercase font-normal transition-colors duration-300 shrink-0"
-            style={{ color: scrolled ? "#111111" : "#ffffff" }}
+            style={{ color: useDarkText ? "#111111" : "#ffffff" }}
             aria-label="Dachhomeandbody — Home"
           >
             Dachhomeandbody

@@ -10,5 +10,7 @@ import Navbar from "./Navbar"
 export default function ConditionalNavbar() {
   const pathname = usePathname()
   if (pathname.startsWith("/admin")) return null
-  return <Navbar />
+  // Only the homepage has a full-bleed dark hero — all other pages have a light background
+  const transparentHero = pathname === "/"
+  return <Navbar transparentHero={transparentHero} />
 }
