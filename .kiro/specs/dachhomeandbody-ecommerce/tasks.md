@@ -112,7 +112,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 3.4, 3.5, 11.2, 11.3, 11.4, 11.6**
 
 - [ ] 4. External service integrations
-  - [ ] 4.1 Set up Cloudinary image upload service
+  - [x] 4.1 Set up Cloudinary image upload service
     - Configure Cloudinary SDK with credentials
     - Create image upload API route
     - Implement image deletion and URL generation
