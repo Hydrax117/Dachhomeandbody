@@ -1,16 +1,19 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useCart } from "./CartContext"
 import { CouponInput } from "./CouponInput"
 
 interface CartSummaryProps {
   /** When true, shows a "Proceed to Checkout" button. When false (e.g. on checkout page), omits it. */
   showCheckoutButton?: boolean
+  /** Called before navigating to checkout (e.g. to close the cart drawer) */
   onCheckout?: () => void
 }
 
 export function CartSummary({ showCheckoutButton = true, onCheckout }: CartSummaryProps) {
+  const router = useRouter()
   const { cart } = useCart()
 
   const shippingCost = 0 // Free shipping placeholder — will be calculated at checkout
@@ -53,25 +56,17 @@ export function CartSummary({ showCheckoutButton = true, onCheckout }: CartSumma
       {/* Checkout CTA */}
       {showCheckoutButton && (
         <div className="pt-1 space-y-2">
-          {onCheckout ? (
-            <button
-              onClick={onCheckout}
-              disabled={cart.items.length === 0}
-              className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Proceed to checkout"
-            >
-              Proceed to Checkout
-            </button>
-          ) : (
-            <Link
-              href="/checkout"
-              className={`btn-primary w-full text-center block ${cart.items.length === 0 ? "pointer-events-none opacity-40" : ""}`}
-              aria-disabled={cart.items.length === 0}
-              tabIndex={cart.items.length === 0 ? -1 : undefined}
-            >
-              Proceed to Checkout
-            </Link>
-          )}
+          <button
+            onClick={() => {
+              onCheckout?.()
+              router.push("/checkout")
+            }}
+            disabled={cart.items.length === 0}
+            className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label="Proceed to checkout"
+          >
+            Proceed to Checkout
+          </button>
 
           <Link
             href="/shop"

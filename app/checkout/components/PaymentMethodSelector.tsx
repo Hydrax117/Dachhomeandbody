@@ -87,7 +87,7 @@ export function PaymentMethodSelector({
 
         // Build metadata for the order
         const metadata = {
-          cartItems: cart.items.map((item) => ({
+          items: cart.items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.product.price,

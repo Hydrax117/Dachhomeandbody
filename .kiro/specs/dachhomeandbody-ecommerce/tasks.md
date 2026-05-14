@@ -84,7 +84,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 10: Search matches across multiple fields**
     - **Validates: Requirements 2.2, 2.3, 2.4**
 
-  - [ ] 3.4 Implement order data access functions
+  - [x] 3.4 Implement order data access functions
     - Create createOrder with transaction support
     - Create getUserOrders with pagination
     - Create getOrder with items and product relations
@@ -220,7 +220,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
   - Test cart operations
   - Ask the user if questions arise
 
-- [ ] 8. Checkout and payment flow 
+- [x] 8. Checkout and payment flow 
   - [x] 8.1 Create checkout page with multi-step form
     - Build checkout layout with order summary
     - Create shipping address form with validation
@@ -235,7 +235,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 25: Authenticated checkout pre-fills addresses**
     - **Validates: Requirements 4.2, 4.6, 4.7**
 
-  - [ ] 8.3 Implement payment processing
+  - [x] 8.3 Implement payment processing
     - Initialize Paystack payment session
     - Handle payment success callback
     - Handle payment failure
@@ -244,7 +244,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Send order confirmation email
     - _Requirements: 4.3, 4.4, 4.5, 16.1_
 
-  - [ ] 8.4 Create order confirmation page
+  - [x] 8.4 Create order confirmation page
     - Display order details and order number
     - Show estimated delivery date
     - Provide order tracking link

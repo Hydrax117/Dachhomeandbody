@@ -7,7 +7,13 @@ export const metadata: Metadata = {
   title: "Checkout",
 }
 
-export default async function CheckoutPage() {
+interface PageProps {
+  searchParams: Promise<{ payment_error?: string }>
+}
+
+export default async function CheckoutPage({ searchParams }: PageProps) {
+  const params = await searchParams
+  const paymentError = params.payment_error ?? null
   const session = await auth()
 
   // Load saved addresses for authenticated users
@@ -47,6 +53,7 @@ export default async function CheckoutPage() {
       userEmail={session?.user?.email ?? null}
       userName={session?.user?.name ?? null}
       savedAddresses={savedAddresses}
+      paymentError={paymentError}
     />
   )
 }

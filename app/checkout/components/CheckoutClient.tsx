@@ -26,6 +26,7 @@ interface CheckoutClientProps {
   userEmail: string | null
   userName: string | null
   savedAddresses: SavedAddress[]
+  paymentError?: string | null
 }
 
 type Step = "shipping" | "payment"
@@ -93,6 +94,7 @@ export function CheckoutClient({
   userEmail,
   userName,
   savedAddresses,
+  paymentError,
 }: CheckoutClientProps) {
   const { cart } = useCart()
   const [step, setStep] = useState<Step>("shipping")
@@ -144,6 +146,16 @@ export function CheckoutClient({
           {/* Left — form area */}
           <div>
             <StepIndicator current={step} />
+
+            {/* Payment failure banner (from redirect after failed payment) */}
+            {paymentError && (
+              <div
+                role="alert"
+                className="mb-6 px-4 py-3 border border-red-200 bg-red-50 text-red-700 text-sm rounded-sm"
+              >
+                {paymentError}
+              </div>
+            )}
 
             {step === "shipping" && (
               <ShippingAddressForm
