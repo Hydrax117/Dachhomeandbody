@@ -16,7 +16,7 @@ export function CartSummary({ showCheckoutButton = true, onCheckout }: CartSumma
   const router = useRouter()
   const { cart } = useCart()
 
-  const shippingCost = 0 // Free shipping placeholder — will be calculated at checkout
+  const shippingCost: number = 0 // Free shipping placeholder — will be calculated at checkout
   const hasDiscount = cart.discount > 0
 
   return (

@@ -17,7 +17,7 @@ const InitializePaymentSchema = z.object({
   /** Total amount in NGN (naira) */
   amount: z.number().positive("Amount must be positive"),
   /** Optional: cart/order metadata to attach to the transaction */
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   /** Optional: URL to redirect to after payment */
   callbackUrl: z.string().url().optional(),
 })

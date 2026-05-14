@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, FragranceType, Longevity, Strength, Gender } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -90,14 +90,14 @@ async function main() {
         stock: 50,
         sku: 'PERF-MO-001',
         featured: true,
-        fragranceType: 'EAU_DE_PARFUM',
+        fragranceType: FragranceType.EAU_DE_PARFUM,
         topNotes: ['Bergamot', 'Saffron', 'Pink Pepper'],
         heartNotes: ['Oud Wood', 'Rose', 'Jasmine'],
         baseNotes: ['Amber', 'Vanilla', 'Musk'],
-        longevity: 'VERY_LONG',
-        strength: 'STRONG',
+        longevity: Longevity.VERY_LONG,
+        strength: Strength.STRONG,
         moodTags: ['Mysterious', 'Sophisticated', 'Evening'],
-        gender: 'UNISEX',
+        gender: Gender.UNISEX,
       },
       {
         name: 'Citrus Dawn',
@@ -112,14 +112,14 @@ async function main() {
         stock: 75,
         sku: 'PERF-CD-002',
         featured: true,
-        fragranceType: 'EAU_DE_TOILETTE',
+        fragranceType: FragranceType.EAU_DE_TOILETTE,
         topNotes: ['Lemon', 'Orange', 'Grapefruit'],
         heartNotes: ['Neroli', 'Lavender', 'Green Tea'],
         baseNotes: ['Cedarwood', 'White Musk'],
-        longevity: 'MODERATE',
-        strength: 'LIGHT',
+        longevity: Longevity.MODERATE,
+        strength: Strength.LIGHT,
         moodTags: ['Fresh', 'Energizing', 'Daytime'],
-        gender: 'UNISEX',
+        gender: Gender.UNISEX,
       },
       {
         name: 'Velvet Rose',
@@ -134,14 +134,14 @@ async function main() {
         stock: 60,
         sku: 'PERF-VR-003',
         featured: false,
-        fragranceType: 'EAU_DE_PARFUM',
+        fragranceType: FragranceType.EAU_DE_PARFUM,
         topNotes: ['Peony', 'Blackcurrant'],
         heartNotes: ['Rose', 'Violet', 'Iris'],
         baseNotes: ['Sandalwood', 'Vanilla', 'Musk'],
-        longevity: 'LONG',
-        strength: 'MODERATE',
+        longevity: Longevity.LONG,
+        strength: Strength.MODERATE,
         moodTags: ['Romantic', 'Elegant', 'Feminine'],
-        gender: 'FEMALE',
+        gender: Gender.FEMALE,
       },
     ]
 

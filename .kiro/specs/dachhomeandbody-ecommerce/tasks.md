@@ -33,7 +33,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 86: Passwords are hashed before storage**
     - **Validates: Requirements 1.1, 1.2, 22.2**
 
-  - [x] 2.3 Implement password reset flow
+  - [x] 2.3 Implement password reset flow 
     - Create password reset token generation
     - Build password reset email template
     - Implement reset token validation and password update
@@ -255,7 +255,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 4.8**
 
 - [ ] 9. Customer dashboard and profile
-  - [ ] 9.1 Create customer dashboard layout
+  - [x] 9.1 Create customer dashboard layout
     - Build dashboard navigation
     - Create overview page with recent orders
     - _Requirements: 5.1_
