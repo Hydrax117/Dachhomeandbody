@@ -283,7 +283,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 64: Default address pre-selects at checkout**
     - **Validates: Requirements 13.1, 13.3**
 
-  - [ ] 9.6 Implement wishlist functionality
+  - [x] 9.6 Implement wishlist functionality
     - Create wishlist page
     - Add wishlist add/remove operations
     - Display current prices and stock status
