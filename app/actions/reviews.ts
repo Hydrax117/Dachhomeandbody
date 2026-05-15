@@ -3,6 +3,8 @@
 import { z } from "zod"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { approveReview, rejectReview } from "@/lib/reviews"
+import { revalidatePath } from "next/cache"
 
 // ---------------------------------------------------------------------------
 // Validation schema (not exported — "use server" files can only export async functions)
@@ -130,17 +132,34 @@ export async function submitReview(
 
     const verifiedPurchase = true
 
-    // Create review with PENDING status (Requirement 6.1)
-    await prisma.review.create({
-      data: {
-        productId,
-        userId,
-        rating,
-        title: title || null,
-        comment,
-        verifiedPurchase,
-        status: "PENDING",
-      },
+    // Create review with APPROVED status so it's immediately visible
+    await prisma.$transaction(async (tx) => {
+      await tx.review.create({
+        data: {
+          productId,
+          userId,
+          rating,
+          title: title || null,
+          comment,
+          verifiedPurchase,
+          status: "APPROVED",
+        },
+      })
+
+      // Recalculate product average rating and review count
+      const result = await tx.review.aggregate({
+        where: { productId, status: "APPROVED" },
+        _avg: { rating: true },
+        _count: { id: true },
+      })
+
+      await tx.product.update({
+        where: { id: productId },
+        data: {
+          averageRating: result._avg.rating ?? null,
+          reviewCount: result._count.id,
+        },
+      })
     })
 
     return { success: true }
@@ -151,5 +170,57 @@ export async function submitReview(
         _form: ["An error occurred while submitting your review. Please try again."],
       },
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Admin moderation actions
+// ---------------------------------------------------------------------------
+
+export type ReviewModerationResult = { success: true } | { success: false; error: string }
+
+/**
+ * Approve a review and update product rating.
+ * Requirements: 6.2
+ */
+export async function approveReviewAction(
+  id: string
+): Promise<ReviewModerationResult> {
+  const session = await auth()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized" }
+  }
+
+  try {
+    await approveReview(id)
+    revalidatePath("/admin/reviews")
+    revalidatePath("/shop", "layout")
+    return { success: true }
+  } catch (error) {
+    console.error("Approve review error:", error)
+    return { success: false, error: "Failed to approve review." }
+  }
+}
+
+/**
+ * Reject a review.
+ * Requirements: 6.3
+ */
+export async function rejectReviewAction(
+  id: string
+): Promise<ReviewModerationResult> {
+  const session = await auth()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized" }
+  }
+
+  try {
+    await rejectReview(id)
+    revalidatePath("/admin/reviews")
+    revalidatePath("/shop", "layout")
+    return { success: true }
+  } catch (error) {
+    console.error("Reject review error:", error)
+    return { success: false, error: "Failed to reject review." }
   }
 }

@@ -85,7 +85,7 @@ export function ReviewForm({ productId }: ReviewFormProps) {
           Thank you for your review!
         </p>
         <p className="text-sm text-[#8b7355]">
-          Your review has been submitted and is pending approval.
+          Your review has been published.
         </p>
       </div>
     )

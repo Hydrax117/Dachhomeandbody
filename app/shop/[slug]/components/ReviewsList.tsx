@@ -66,16 +66,25 @@ export async function ReviewsList({
   const userId = session?.user?.id
 
   // Check if the logged-in user has a delivered order for this product
+  // and hasn't already reviewed it
   let canReview = false
+  let hasReviewed = false
   if (userId) {
-    const deliveredOrder = await prisma.orderItem.findFirst({
-      where: {
-        productId,
-        order: { userId, status: "DELIVERED" },
-      },
-      select: { id: true },
-    })
-    canReview = deliveredOrder !== null
+    const [deliveredOrder, existingReview] = await Promise.all([
+      prisma.orderItem.findFirst({
+        where: {
+          productId,
+          order: { userId, status: "DELIVERED" },
+        },
+        select: { id: true },
+      }),
+      prisma.review.findFirst({
+        where: { productId, userId },
+        select: { id: true },
+      }),
+    ])
+    hasReviewed = existingReview !== null
+    canReview = deliveredOrder !== null && !hasReviewed
   }
 
   return (
@@ -129,6 +138,10 @@ export async function ReviewsList({
               sign in
             </a>{" "}
             to leave a review.
+          </p>
+        ) : hasReviewed ? (
+          <p className="text-sm text-[#8b7355]">
+            You have already reviewed this product. Thank you for your feedback!
           </p>
         ) : canReview ? (
           <ReviewForm productId={productId} />
