@@ -7,9 +7,11 @@
 
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { getUserOrders } from "@/lib/orders"
+import { getUserOrders, getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
+
+type OrderItem = NonNullable<Awaited<ReturnType<typeof getOrder>>>
 
 export const metadata: Metadata = {
   title: "Overview",
@@ -196,7 +198,7 @@ export default async function AccountOverviewPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
-                {recentOrders.map((order) => (
+                {(recentOrders as OrderItem[]).map((order) => (
                   <tr key={order.id} className="hover:bg-[#FAF8F5] transition-colors">
                     <td className="px-4 py-3">
                       <Link

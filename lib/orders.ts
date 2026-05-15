@@ -80,9 +80,16 @@ export async function createOrderFromPayment({
   }
 
   const totalNaira = fromKobo(amountKobo)
-  const discount = metadata?.discount ?? 0
-  const shippingCost = metadata?.shippingCost ?? 0
+  const discount = Number(metadata?.discount ?? 0)
+  const shippingCost = Number(metadata?.shippingCost ?? 0)
   const subtotal = totalNaira - shippingCost + discount
+
+  // Coerce item fields to numbers (Paystack metadata serialises everything as strings)
+  const coercedItems = items.map((item) => ({
+    productId: item.productId,
+    quantity: Number(item.quantity),
+    price: Number(item.price),
+  }))
 
   // Fetch products for stock decrement
   const productIds = items.map((i) => i.productId)
@@ -98,7 +105,7 @@ export async function createOrderFromPayment({
       data: {
         orderNumber: generateOrderNumber(),
         userId: metadata?.userId ?? null,
-        guestEmail: metadata?.guestEmail ?? customerEmail,
+        guestEmail: metadata?.guestEmail || customerEmail,
         guestName: metadata?.guestName ?? null,
         subtotal,
         discount,
@@ -109,10 +116,10 @@ export async function createOrderFromPayment({
         paymentMethod: "paystack",
         paymentReference: reference,
         shippingAddress: shippingAddress as object,
-        couponCode: metadata?.couponCode ?? null,
+        couponCode: metadata?.couponCode || null,
         couponId: metadata?.couponId ?? null,
         items: {
-          create: items.map((item) => ({
+          create: coercedItems.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
@@ -123,7 +130,7 @@ export async function createOrderFromPayment({
     })
 
     // Decrement stock
-    for (const item of items) {
+    for (const item of coercedItems) {
       if (!productMap.has(item.productId)) continue
       await tx.product.update({
         where: { id: item.productId },
@@ -205,6 +212,7 @@ const orderListSelect = {
   status: true,
   paymentStatus: true,
   paymentMethod: true,
+  paymentReference: true,
   subtotal: true,
   discount: true,
   shippingCost: true,

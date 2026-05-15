@@ -43,7 +43,19 @@ export async function loadCart(): Promise<PersistedCartItem[]> {
   })
 
   // Filter out deleted products
-  return items
+  return (items as Array<{
+    productId: string
+    quantity: number
+    product: {
+      id: string
+      name: string
+      slug: string
+      price: number
+      images: string[]
+      stock: number
+      deleted: boolean
+    }
+  }>)
     .filter((item) => !item.product.deleted)
     .map((item) => ({
       productId: item.productId,
@@ -123,8 +135,8 @@ export async function mergeGuestCart(guestItems: { productId: string; quantity: 
     }),
   ])
 
-  const stockMap = new Map(products.map((p) => [p.id, p.stock]))
-  const dbMap = new Map(dbItems.map((i) => [i.productId, i.quantity]))
+  const stockMap = new Map((products as Array<{ id: string; stock: number }>).map((p) => [p.id, p.stock]))
+  const dbMap = new Map((dbItems as Array<{ productId: string; quantity: number }>).map((i) => [i.productId, i.quantity]))
 
   // Upsert each guest item, merging quantities
   await Promise.all(

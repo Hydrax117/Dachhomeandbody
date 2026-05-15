@@ -7,52 +7,12 @@
 
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { getUserOrders } from "@/lib/orders"
+import { getUserOrders, getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
-import type { Prisma } from "@prisma/client"
 
-// Infer the order shape from Prisma's select
-type OrderListItem = Prisma.OrderGetPayload<{
-  select: {
-    id: true
-    orderNumber: true
-    status: true
-    paymentStatus: true
-    paymentMethod: true
-    subtotal: true
-    discount: true
-    shippingCost: true
-    total: true
-    couponCode: true
-    shippingAddress: true
-    createdAt: true
-    updatedAt: true
-    shippedAt: true
-    deliveredAt: true
-    userId: true
-    guestEmail: true
-    guestName: true
-    user: { select: { id: true; name: true; email: true } }
-    items: {
-      select: {
-        id: true
-        quantity: true
-        price: true
-        subtotal: true
-        product: {
-          select: {
-            id: true
-            name: true
-            slug: true
-            images: true
-            sku: true
-          }
-        }
-      }
-    }
-  }
-}>
+// Derive the order shape from the existing data access function
+type OrderListItem = NonNullable<Awaited<ReturnType<typeof getOrder>>>
 
 export const metadata: Metadata = {
   title: "My Orders",
