@@ -371,3 +371,79 @@ export async function getAdminProduct(id: string) {
     select: { ...productDetailSelect, deleted: true, sku: true },
   })
 }
+
+// ---------------------------------------------------------------------------
+// Stock management
+// ---------------------------------------------------------------------------
+
+export const stockAdjustmentSchema = z.object({
+  newStock: z.number().int().nonnegative({ message: "Stock cannot be negative" }),
+  notes: z.string().max(500).optional(),
+})
+
+export type StockAdjustmentInput = z.infer<typeof stockAdjustmentSchema>
+
+/**
+ * Update product stock and record the change in StockHistory.
+ * Requirements: 18.3, 8.6
+ */
+export async function updateProductStock(
+  productId: string,
+  input: StockAdjustmentInput,
+  adminUserId?: string
+) {
+  const { newStock, notes } = stockAdjustmentSchema.parse(input)
+
+  return prisma.$transaction(async (tx) => {
+    const product = await tx.product.findUnique({
+      where: { id: productId },
+      select: { id: true, stock: true, name: true },
+    })
+
+    if (!product) throw new Error("Product not found")
+
+    const change = newStock - product.stock
+
+    const updated = await tx.product.update({
+      where: { id: productId },
+      data: { stock: newStock },
+      select: productListSelect,
+    })
+
+    await tx.stockHistory.create({
+      data: {
+        productId,
+        userId: adminUserId ?? null,
+        previousStock: product.stock,
+        newStock,
+        change,
+        reason: "Manual adjustment",
+        notes: notes ?? null,
+      },
+    })
+
+    return updated
+  })
+}
+
+/**
+ * Get stock history for a product, newest first.
+ * Requirements: 18.3
+ */
+export async function getStockHistory(productId: string, limit = 20) {
+  return prisma.stockHistory.findMany({
+    where: { productId },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      previousStock: true,
+      newStock: true,
+      change: true,
+      reason: true,
+      notes: true,
+      createdAt: true,
+      user: { select: { id: true, name: true, email: true } },
+    },
+  })
+}

@@ -1,7 +1,7 @@
 "use server"
 
 import { auth } from "@/lib/auth"
-import { createProduct, deleteProduct, updateProduct, productCreateSchema, productUpdateSchema } from "@/lib/products"
+import { createProduct, deleteProduct, updateProduct, updateProductStock, stockAdjustmentSchema, productCreateSchema, productUpdateSchema } from "@/lib/products"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
@@ -178,4 +178,46 @@ export async function updateProductAction(
   revalidatePath(`/admin/products/${productId}/edit`)
   revalidatePath("/shop")
   redirect("/admin/products")
+}
+
+export type UpdateStockState = {
+  errors?: Partial<Record<keyof z.infer<typeof stockAdjustmentSchema> | "_form", string[]>>
+  success?: boolean
+}
+
+export async function updateStockAction(
+  productId: string,
+  _prev: UpdateStockState,
+  formData: FormData
+): Promise<UpdateStockState> {
+  const session = await auth()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { errors: { _form: ["Unauthorized"] } }
+  }
+
+  const raw = {
+    newStock: Number(formData.get("newStock")),
+    notes: formData.get("notes") ? String(formData.get("notes")) : undefined,
+  }
+
+  const parsed = stockAdjustmentSchema.safeParse(raw)
+  if (!parsed.success) {
+    const fieldErrors: UpdateStockState["errors"] = {}
+    for (const [key, msgs] of Object.entries(parsed.error.flatten().fieldErrors)) {
+      ;(fieldErrors as Record<string, string[]>)[key] = msgs as string[]
+    }
+    return { errors: fieldErrors }
+  }
+
+  try {
+    await updateProductStock(productId, parsed.data, session.user.id)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to update stock. Please try again."
+    return { errors: { _form: [msg] } }
+  }
+
+  revalidatePath(`/admin/products/${productId}/edit`)
+  revalidatePath("/admin/products")
+  revalidatePath("/shop")
+  return { success: true }
 }

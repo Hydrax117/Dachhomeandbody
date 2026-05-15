@@ -1,9 +1,11 @@
 import { getAdminProduct } from "@/lib/products"
+import { getStockHistory } from "@/lib/products"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { updateProductAction } from "../../actions"
+import { updateProductAction, updateStockAction } from "../../actions"
 import ProductForm from "../../components/ProductForm"
+import StockManager from "../../components/StockManager"
 import type { ProductInitialData } from "../../components/ProductForm"
 
 export const metadata = {
@@ -17,12 +19,13 @@ export default async function EditProductPage({
 }) {
   const { id } = await params
 
-  const [product, categories] = await Promise.all([
+  const [product, categories, stockHistory] = await Promise.all([
     getAdminProduct(id),
     prisma.category.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
+    getStockHistory(id),
   ])
 
   if (!product) notFound()
@@ -48,11 +51,12 @@ export default async function EditProductPage({
     gender: product.gender ?? null,
   }
 
-  // Bind the product id into the action
-  const boundAction = updateProductAction.bind(null, id)
+  // Bind the product id into the actions
+  const boundUpdateAction = updateProductAction.bind(null, id)
+  const boundStockAction = updateStockAction.bind(null, id)
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
@@ -76,10 +80,23 @@ export default async function EditProductPage({
 
       <ProductForm
         categories={categories}
-        action={boundAction}
+        action={boundUpdateAction}
         initialData={initialData}
         mode="edit"
       />
+
+      {/* Stock Management Section */}
+      <div>
+        <h2 className="font-serif text-xl font-medium text-[#111111] mb-4">
+          Stock Management
+        </h2>
+        <StockManager
+          productId={id}
+          currentStock={product.stock}
+          stockHistory={stockHistory}
+          updateAction={boundStockAction}
+        />
+      </div>
     </div>
   )
 }

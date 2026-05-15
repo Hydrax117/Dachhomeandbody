@@ -9,15 +9,15 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+.kiro
 # testing
 /coverage
 
 # next.js
 /.next/
 /out/
-.kiro
 .kiro/
+/.kiro/
 # production
 /build
 

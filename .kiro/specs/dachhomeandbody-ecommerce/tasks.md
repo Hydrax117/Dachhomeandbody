@@ -509,7 +509,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 75: Order cancellation restores stock**
     - **Validates: Requirements 18.1, 18.2, 18.5**
 
-  - [ ] 17.3 Add stock management UI for admin
+  - [x] 17.3 Add stock management UI for admin
     - Create stock adjustment form
     - Validate non-negative stock values
     - Show stock history/audit log

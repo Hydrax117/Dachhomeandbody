@@ -91,6 +91,7 @@ model User {
   cart          CartItem[]
   accounts      Account[]
   sessions      Session[]
+  stockHistory  StockHistory[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -177,6 +178,7 @@ model Product {
   orderItems      OrderItem[]
   wishlistItems   WishlistItem[]
   cartItems       CartItem[]
+  stockHistory    StockHistory[]
   
   deleted         Boolean         @default(false)
   
@@ -332,4 +334,24 @@ model CartItem {
   @@unique([userId, productId])
   @@index([userId])
   @@index([productId])
+}
+
+model StockHistory {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  previousStock Int
+  newStock      Int
+  change        Int
+  reason        String   // e.g., "Manual adjustment", "Order completed", "Order cancelled"
+  notes         String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([productId])
+  @@index([userId])
+  @@index([createdAt])
 }
