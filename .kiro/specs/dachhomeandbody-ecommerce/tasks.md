@@ -405,7 +405,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 8.4**
 
 - [ ] 14. Admin order management
-  - [ ] 14.1 Create orders list page for admin
+  - [x] 14.1 Create orders list page for admin
     - Display all orders in table
     - Add filters (status, date range, customer)
     - Implement order search

@@ -17,6 +17,43 @@ import {
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
+/** Shape returned by admin order list queries. */
+export interface AdminOrderRow {
+  id: string
+  orderNumber: string
+  status: string
+  paymentStatus: string
+  paymentMethod: string
+  paymentReference: string | null
+  subtotal: number
+  discount: number
+  shippingCost: number
+  total: number
+  couponCode: string | null
+  shippingAddress: Prisma.JsonValue
+  createdAt: Date
+  updatedAt: Date
+  shippedAt: Date | null
+  deliveredAt: Date | null
+  userId: string | null
+  guestEmail: string | null
+  guestName: string | null
+  user: { id: string; name: string | null; email: string } | null
+  items: Array<{
+    id: string
+    quantity: number
+    price: number
+    subtotal: number
+    product: {
+      id: string
+      name: string
+      slug: string
+      images: string[]
+      sku: string
+    }
+  }>
+}
+
 export interface OrderMetadata {
   userId?: string | null
   guestEmail?: string | null
@@ -379,7 +416,7 @@ export async function getAdminOrders(
   filters: AdminOrderFilters = {},
   sort: AdminOrderSort = "newest",
   pagination: PaginationParams = {}
-) {
+): Promise<import("@/lib/db").PaginatedResult<AdminOrderRow>> {
   const where = buildAdminOrderWhere(filters)
   const orderBy = buildAdminOrderOrderBy(sort)
   const { skip, take } = buildPaginationArgs(pagination)
@@ -391,7 +428,7 @@ export async function getAdminOrders(
       skip,
       take,
       select: orderDetailSelect,
-    }),
+    }) as Promise<AdminOrderRow[]>,
     prisma.order.count({ where }),
   ])
 
