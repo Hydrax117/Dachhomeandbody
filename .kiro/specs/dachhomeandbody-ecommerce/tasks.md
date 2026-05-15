@@ -441,7 +441,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 9.4**
 
 - [ ] 15. Admin customer and review management
-  - [ ] 15.1 Create customer list page
+  - [x] 15.1 Create customer list page
     - Display all customers in table
     - Add search functionality
     - Show customer stats (order count, total spend)
