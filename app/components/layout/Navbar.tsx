@@ -85,7 +85,7 @@ function CartIcon({ count, color, onClick }: { count: number; color: string; onC
     <button
       onClick={onClick}
       aria-label={`Cart, ${count} item${count !== 1 ? "s" : ""}`}
-      className="relative hover:text-[#C8A96B] transition-colors"
+      className="relative cursor-pointer hover:text-[#C8A96B] transition-colors"
       style={{ color }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -164,7 +164,7 @@ function AccountDropdown({ color }: { color: string }) {
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => setOpen((v) => !v)}
-        className="hover:text-[#C8A96B] transition-colors"
+        className="cursor-pointer hover:text-[#C8A96B] transition-colors"
         style={{ color }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -465,8 +465,18 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [shopHovered, setShopHovered] = useState(false)
+  const shopLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { data: session } = useSession()
   const { itemCount, openCart } = useCart()
+
+  const openShopMenu = () => {
+    if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current)
+    setShopHovered(true)
+  }
+
+  const closeShopMenu = () => {
+    shopLeaveTimer.current = setTimeout(() => setShopHovered(false), 120)
+  }
 
   // Scroll detection
   useEffect(() => {
@@ -522,8 +532,8 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
 
             {/* Shop — with mega menu */}
             <li
-              onMouseEnter={() => setShopHovered(true)}
-              onMouseLeave={() => setShopHovered(false)}
+              onMouseEnter={openShopMenu}
+              onMouseLeave={closeShopMenu}
             >
               <button
                 aria-haspopup="true"
@@ -565,7 +575,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             {/* Search — desktop only */}
             <button
               aria-label="Search"
-              className="hidden lg:block hover:text-[#C8A96B] transition-colors"
+              className="hidden lg:block cursor-pointer hover:text-[#C8A96B] transition-colors"
               style={{ color: iconColor }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -613,8 +623,8 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
         {/* Full-width mega menu — outside nav so it spans the header */}
         {shopHovered && (
           <div
-            onMouseEnter={() => setShopHovered(true)}
-            onMouseLeave={() => setShopHovered(false)}
+            onMouseEnter={openShopMenu}
+            onMouseLeave={closeShopMenu}
           >
             <MegaMenu onClose={() => setShopHovered(false)} />
           </div>
