@@ -75,6 +75,12 @@ export async function updateOrderStatusAction(
     revalidatePath(`/admin/orders/${orderId}`)
     revalidatePath("/admin/orders")
 
+    // Revalidate product pages and admin products when stock changes (cancellation)
+    if (status === "CANCELLED") {
+      revalidatePath("/shop", "layout")
+      revalidatePath("/admin/products")
+    }
+
     return { success: true }
   } catch (err) {
     console.error("Failed to update order status:", err)

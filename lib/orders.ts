@@ -437,7 +437,8 @@ export async function getAdminOrders(
 
 /**
  * Update order status and optionally set shipped/delivered timestamps.
- * Requirements: 9.2, 5.5
+ * When an order is cancelled, restores stock for all order items.
+ * Requirements: 9.2, 5.5, 18.5
  */
 export async function updateOrderStatus(
   id: string,
@@ -447,6 +448,40 @@ export async function updateOrderStatus(
 
   if (status === "SHIPPED") data.shippedAt = new Date()
   if (status === "DELIVERED") data.deliveredAt = new Date()
+
+  // When cancelling, restore stock for all items in a transaction
+  if (status === "CANCELLED") {
+    return prisma.$transaction(async (tx) => {
+      // Fetch current order to check it's not already cancelled
+      const current = await tx.order.findUnique({
+        where: { id },
+        select: {
+          status: true,
+          items: { select: { productId: true, quantity: true } },
+        },
+      })
+
+      if (!current) throw new Error("Order not found")
+
+      // Only restore stock if transitioning from a non-cancelled state
+      if (current.status !== "CANCELLED" && current.status !== "REFUNDED") {
+        for (const item of current.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          })
+        }
+      }
+
+      const updated = await tx.order.update({
+        where: { id },
+        data,
+        select: { orderNumber: true, status: true },
+      })
+
+      return updated
+    })
+  }
 
   const updated = await prisma.order.update({
     where: { id },

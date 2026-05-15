@@ -496,7 +496,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 19.1, 19.4**
 
 - [ ] 17. Inventory management
-  - [ ] 17.1 Implement stock tracking
+  - [x] 17.1 Implement stock tracking
     - Decrease stock on order completion
     - Restore stock on order cancellation
     - Display low stock warnings
