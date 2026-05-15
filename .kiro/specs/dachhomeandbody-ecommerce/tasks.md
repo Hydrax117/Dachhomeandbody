@@ -447,7 +447,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Show customer stats (order count, total spend)
     - _Requirements: 23.1, 23.3_
 
-  - [ ] 15.2 Build customer detail page
+  - [x] 15.2 Build customer detail page
     - Display profile information
     - Show order history for customer
     - Display total spend and order count

@@ -1,6 +1,6 @@
 /**
  * Customer data access functions for admin management.
- * Requirements: 23.1, 23.3
+ * Requirements: 23.1, 23.2, 23.3, 23.4, 23.5
  */
 
 import { prisma } from "@/lib/prisma"
@@ -113,4 +113,95 @@ export async function getAdminCustomers(
   }
 
   return paginate(rows, total, pagination)
+}
+
+// ── Customer Detail ────────────────────────────────────────────────────────
+
+export interface AdminCustomerDetail {
+  id: string
+  name: string | null
+  email: string
+  phone: string | null
+  image: string | null
+  role: string
+  createdAt: Date
+  updatedAt: Date
+  _count: {
+    orders: number
+  }
+  totalSpend: number
+  orders: Array<{
+    id: string
+    orderNumber: string
+    status: string
+    paymentStatus: string
+    total: number
+    createdAt: Date
+    items: Array<{
+      id: string
+      quantity: number
+      price: number
+      subtotal: number
+      product: {
+        id: string
+        name: string
+        images: string[]
+      }
+    }>
+  }>
+}
+
+/**
+ * Get a single customer with full profile, order history, and spend stats.
+ * Requirements: 23.2, 23.4, 23.5
+ */
+export async function getAdminCustomerDetail(
+  id: string
+): Promise<AdminCustomerDetail | null> {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      image: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: { select: { orders: true } },
+      orders: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          orderNumber: true,
+          status: true,
+          paymentStatus: true,
+          total: true,
+          createdAt: true,
+          items: {
+            select: {
+              id: true,
+              quantity: true,
+              price: true,
+              subtotal: true,
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  images: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!user) return null
+
+  const totalSpend = user.orders.reduce((sum, o) => sum + o.total, 0)
+
+  return { ...user, totalSpend }
 }
