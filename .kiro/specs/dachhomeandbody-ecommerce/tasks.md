@@ -260,7 +260,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Create overview page with recent orders
     - _Requirements: 5.1_
 
-  - [ ] 9.2 Implement order history page
+  - [x] 9.2 Implement order history page
     - Display all user orders sorted by date
     - Add order status badges
     - Create order detail modal/page

@@ -1,0 +1,302 @@
+/**
+ * /account/orders — Customer order history page
+ *
+ * Displays all user orders sorted by date (newest first) with status badges.
+ * Requirements: 5.1, 5.2
+ */
+
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
+import { getUserOrders } from "@/lib/orders"
+import Link from "next/link"
+import type { Metadata } from "next"
+import type { Prisma } from "@prisma/client"
+
+// Infer the order shape from Prisma's select
+type OrderListItem = Prisma.OrderGetPayload<{
+  select: {
+    id: true
+    orderNumber: true
+    status: true
+    paymentStatus: true
+    paymentMethod: true
+    subtotal: true
+    discount: true
+    shippingCost: true
+    total: true
+    couponCode: true
+    shippingAddress: true
+    createdAt: true
+    updatedAt: true
+    shippedAt: true
+    deliveredAt: true
+    userId: true
+    guestEmail: true
+    guestName: true
+    user: { select: { id: true; name: true; email: true } }
+    items: {
+      select: {
+        id: true
+        quantity: true
+        price: true
+        subtotal: true
+        product: {
+          select: {
+            id: true
+            name: true
+            slug: true
+            images: true
+            sku: true
+          }
+        }
+      }
+    }
+  }
+}>
+
+export const metadata: Metadata = {
+  title: "My Orders",
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+  }).format(amount)
+
+const statusStyles: Record<string, string> = {
+  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  PROCESSING: "bg-blue-50 text-blue-700 border-blue-200",
+  SHIPPED: "bg-purple-50 text-purple-700 border-purple-200",
+  DELIVERED: "bg-green-50 text-green-700 border-green-200",
+  CANCELLED: "bg-red-50 text-red-700 border-red-200",
+  REFUNDED: "bg-gray-50 text-gray-700 border-gray-200",
+}
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span
+      className={`inline-block text-[10px] tracking-[0.12em] uppercase px-2 py-0.5 rounded border ${
+        statusStyles[status] ?? "bg-gray-50 text-gray-700 border-gray-200"
+      }`}
+    >
+      {status.toLowerCase()}
+    </span>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+interface PageProps {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function OrderHistoryPage({ searchParams }: PageProps) {
+  const session = await auth()
+
+  if (!session?.user) {
+    redirect("/auth/login?callbackUrl=/account/orders")
+  }
+
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1)
+  const pageSize = 10
+
+  const { data: orders, total, totalPages } = await getUserOrders(
+    session!.user.id,
+    { page, pageSize }
+  )
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
+          My Orders
+        </h1>
+        <p className="text-sm text-[#8b7355] mt-1">
+          {total === 0
+            ? "You haven't placed any orders yet."
+            : `${total} order${total === 1 ? "" : "s"} total`}
+        </p>
+      </div>
+
+      {orders.length === 0 ? (
+        /* Empty state */
+        <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
+          <div className="w-14 h-14 rounded-full bg-[#f5f0e8] flex items-center justify-center mx-auto mb-5">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#C8A96B"
+              strokeWidth="1.5"
+              aria-hidden="true"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-[#111111] mb-1">No orders yet</p>
+          <p className="text-xs text-[#8b7355] mb-6">
+            When you place an order, it will appear here.
+          </p>
+          <Link href="/shop" className="btn-primary text-xs">
+            Start Shopping
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Orders list */}
+          <div className="space-y-3">
+            {(orders as OrderListItem[]).map((order) => {
+              const shippingAddress = order.shippingAddress as {
+                name?: string
+                city?: string
+                state?: string | null
+              } | null
+
+              return (
+                <Link
+                  key={order.id}
+                  href={`/account/orders/${order.id}`}
+                  className="block bg-white border border-[#e5e5e5] rounded hover:border-[#C8A96B] transition-colors group"
+                  aria-label={`Order ${order.orderNumber}`}
+                >
+                  {/* Order header row */}
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0ece4]">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div>
+                        <p className="text-sm font-medium text-[#111111] group-hover:text-[#C8A96B] transition-colors">
+                          #{order.orderNumber}
+                        </p>
+                        <p className="text-[11px] text-[#8b7355] mt-0.5">
+                          {new Date(order.createdAt).toLocaleDateString("en-NG", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <StatusBadge status={order.status} />
+                      <span className="text-sm font-medium text-[#111111]">
+                        {formatCurrency(order.total)}
+                      </span>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#8b7355"
+                        strokeWidth="1.5"
+                        className="group-hover:stroke-[#C8A96B] transition-colors"
+                        aria-hidden="true"
+                      >
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Order items preview */}
+                  <div className="px-5 py-3 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {/* Product image thumbnails (up to 3) */}
+                      <div className="flex -space-x-2">
+                        {order.items.slice(0, 3).map((item: OrderListItem["items"][number]) => (
+                          <div
+                            key={item.id}
+                            className="w-9 h-10 rounded border border-[#e5e5e5] bg-[#f5f0e8] overflow-hidden shrink-0"
+                          >
+                            {item.product.images[0] ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={item.product.images[0]}
+                                alt={item.product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <svg
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="#b8b0a8"
+                                  strokeWidth="1.5"
+                                  aria-hidden="true"
+                                >
+                                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                                  <circle cx="8.5" cy="8.5" r="1.5" />
+                                  <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {order.items.length > 3 && (
+                          <div className="w-9 h-10 rounded border border-[#e5e5e5] bg-[#f5f0e8] flex items-center justify-center shrink-0">
+                            <span className="text-[10px] text-[#8b7355]">
+                              +{order.items.length - 3}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-[#8b7355] truncate">
+                        {order.items.length === 1
+                          ? order.items[0].product.name
+                          : `${order.items.length} items`}
+                      </p>
+                    </div>
+
+                    {shippingAddress?.city && (
+                      <p className="text-[11px] text-[#8b7355] shrink-0 hidden sm:block">
+                        {shippingAddress.city}
+                        {shippingAddress.state ? `, ${shippingAddress.state}` : ""}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <nav
+              className="flex items-center justify-center gap-2 pt-2"
+              aria-label="Order history pagination"
+            >
+              {page > 1 && (
+                <Link
+                  href={`/account/orders?page=${page - 1}`}
+                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                >
+                  ← Previous
+                </Link>
+              )}
+              <span className="text-xs text-[#8b7355]">
+                Page {page} of {totalPages}
+              </span>
+              {page < totalPages && (
+                <Link
+                  href={`/account/orders?page=${page + 1}`}
+                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                >
+                  Next →
+                </Link>
+              )}
+            </nav>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
