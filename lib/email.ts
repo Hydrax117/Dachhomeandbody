@@ -4,7 +4,10 @@ import { Resend } from "resend"
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Email configuration
-const FROM_EMAIL = "noreply@dachhomeandbody.com"
+// Use RESEND_FROM_EMAIL env var if set (verified domain), otherwise fall back
+// to Resend's shared test address which works without domain verification.
+const FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev"
 const SITE_NAME = "Dachhomeandbody"
 const SITE_URL = process.env.NEXTAUTH_URL || "https://dachhomeandbody.com"
 
@@ -147,12 +150,16 @@ export async function sendPasswordResetEmail(
     </p>`
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Reset your ${SITE_NAME} password`,
       html: emailWrapper(content),
     })
+    if (error) {
+      console.error("Resend error (password reset):", error)
+      return { success: false, error: error.message }
+    }
     return { success: true }
   } catch (error) {
     console.error("Failed to send password reset email:", error)
@@ -222,12 +229,16 @@ export async function sendOrderConfirmationEmail(
     </p>`
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Order confirmed — ${orderNumber}`,
       html: emailWrapper(content),
     })
+    if (error) {
+      console.error("Resend error (order confirmation):", error)
+      return { success: false, error: error.message }
+    }
     return { success: true }
   } catch (error) {
     console.error("Failed to send order confirmation email:", error)
@@ -268,12 +279,16 @@ export async function sendShippingNotificationEmail(
     </p>`
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Your order ${orderNumber} has shipped`,
       html: emailWrapper(content),
     })
+    if (error) {
+      console.error("Resend error (shipping notification):", error)
+      return { success: false, error: error.message }
+    }
     return { success: true }
   } catch (error) {
     console.error("Failed to send shipping notification email:", error)
@@ -307,12 +322,16 @@ export async function sendDeliveryConfirmationEmail(
     </p>`
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Your order ${orderNumber} has been delivered`,
       html: emailWrapper(content),
     })
+    if (error) {
+      console.error("Resend error (delivery confirmation):", error)
+      return { success: false, error: error.message }
+    }
     return { success: true }
   } catch (error) {
     console.error("Failed to send delivery confirmation email:", error)
@@ -338,12 +357,16 @@ export async function sendNewsletterWelcomeEmail(email: string) {
     </p>`
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Welcome to ${SITE_NAME}`,
       html: emailWrapper(content),
     })
+    if (error) {
+      console.error("Resend error (newsletter welcome):", error)
+      return { success: false, error: error.message }
+    }
     return { success: true }
   } catch (error) {
     console.error("Failed to send newsletter welcome email:", error)
