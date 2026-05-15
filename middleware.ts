@@ -7,6 +7,9 @@ const protectedRoutes = ["/account", "/checkout"]
 // Routes that require admin role
 const adminRoutes = ["/admin"]
 
+// Routes that are for customers only (admins should not access)
+const customerOnlyRoutes = ["/shop", "/account", "/checkout", "/cart", "/collections"]
+
 // Auth routes (redirect to home if already logged in)
 const authRoutes = ["/auth/login", "/auth/register"]
 
@@ -27,6 +30,11 @@ export default auth((req) => {
     pathname.startsWith(route)
   )
 
+  // Check if the path is a customer-only route
+  const isCustomerOnlyRoute = customerOnlyRoutes.some((route) =>
+    pathname.startsWith(route)
+  )
+
   // Check if the path is an auth route
   const isAuthRoute = authRoutes.some((route) =>
     pathname.startsWith(route)
@@ -35,7 +43,6 @@ export default auth((req) => {
   // Admin routes: require ADMIN role
   if (isAdminRoute) {
     if (!isLoggedIn) {
-      // Preserve the intended destination for post-login redirect (Req 1.6)
       const loginUrl = new URL("/auth/login", nextUrl)
       loginUrl.searchParams.set("callbackUrl", pathname)
       return NextResponse.redirect(loginUrl)
@@ -47,6 +54,11 @@ export default auth((req) => {
     }
   }
 
+  // Customer-only routes: admins are redirected to their dashboard
+  if (isCustomerOnlyRoute && isLoggedIn && isAdmin) {
+    return NextResponse.redirect(new URL("/admin", nextUrl))
+  }
+
   // Protected customer routes: require authentication
   if (isProtectedRoute && !isLoggedIn) {
     const loginUrl = new URL("/auth/login", nextUrl)
@@ -56,7 +68,9 @@ export default auth((req) => {
 
   // Auth routes: redirect logged-in users away from login/register
   if (isAuthRoute && isLoggedIn) {
-    return NextResponse.redirect(new URL("/", nextUrl))
+    // Admins go to their dashboard, customers go to home
+    const destination = isAdmin ? "/admin" : "/"
+    return NextResponse.redirect(new URL(destination, nextUrl))
   }
 
   return NextResponse.next()

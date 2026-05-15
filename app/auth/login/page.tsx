@@ -53,10 +53,12 @@ function LoginForm() {
 
   useEffect(() => {
     if (state.success) {
-      router.push(callbackUrl)
+      // Admins always go to their dashboard; customers go to callbackUrl
+      const destination = state.isAdmin ? "/admin" : callbackUrl
+      router.push(destination)
       router.refresh()
     }
-  }, [state.success, callbackUrl, router])
+  }, [state.success, state.isAdmin, callbackUrl, router])
 
   return (
     <div className="min-h-screen flex font-[family-name:var(--font-manrope)]">

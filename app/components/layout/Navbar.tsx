@@ -469,6 +469,8 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
   const { data: session } = useSession()
   const { itemCount, openCart } = useCart()
 
+  const isAdmin = session?.user?.role === "ADMIN"
+
   const openShopMenu = () => {
     if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current)
     setShopHovered(true)
@@ -530,7 +532,8 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
               </Link>
             </li>
 
-            {/* Shop — with mega menu */}
+            {/* Shop — with mega menu (customers only) */}
+            {!isAdmin && (
             <li
               onMouseEnter={openShopMenu}
               onMouseLeave={closeShopMenu}
@@ -556,6 +559,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
                 </svg>
               </button>
             </li>
+            )}
 
             {/* Other links */}
             {primaryLinks.slice(1).map((link) => (
@@ -572,7 +576,8 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
 
           {/* Right icons */}
           <div className="flex items-center gap-5" style={{ color: iconColor }}>
-            {/* Search — desktop only */}
+            {/* Search — desktop only, customers only */}
+            {!isAdmin && (
             <button
               aria-label="Search"
               className="hidden lg:block cursor-pointer hover:text-[#C8A96B] transition-colors"
@@ -583,8 +588,10 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
+            )}
 
-            {/* Wishlist — desktop only */}
+            {/* Wishlist — desktop only, customers only */}
+            {!isAdmin && (
             <Link
               href="/account/wishlist"
               aria-label="Wishlist"
@@ -595,9 +602,12 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </Link>
+            )}
 
-            {/* Cart */}
+            {/* Cart — customers only */}
+            {!isAdmin && (
             <CartIcon count={itemCount} color={iconColor} onClick={openCart} />
+            )}
 
             {/* Account dropdown — desktop */}
             <AccountDropdown color={iconColor} />
@@ -621,7 +631,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
         </nav>
 
         {/* Full-width mega menu — outside nav so it spans the header */}
-        {shopHovered && (
+        {shopHovered && !isAdmin && (
           <div
             onMouseEnter={openShopMenu}
             onMouseLeave={closeShopMenu}

@@ -30,6 +30,7 @@ export type LoginFormState = {
     _form?: string[]
   }
   success?: boolean
+  isAdmin?: boolean
 }
 
 export type RequestPasswordResetFormState = {
@@ -147,7 +148,13 @@ export async function login(
       redirect: false,
     })
 
-    return { success: true }
+    // Check if the user is an admin so the client can redirect appropriately
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { role: true },
+    })
+
+    return { success: true, isAdmin: user?.role === "ADMIN" }
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
