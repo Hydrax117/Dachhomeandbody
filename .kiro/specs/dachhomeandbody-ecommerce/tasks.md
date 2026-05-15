@@ -424,7 +424,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Display payment and shipping info
     - _Requirements: 9.3, 23.5_
 
-  - [ ] 14.4 Implement order status management
+  - [x] 14.4 Implement order status management
     - Add status update dropdown
     - Send email notification on status change
     - Update order timestamps (shippedAt, deliveredAt)

@@ -11,6 +11,7 @@ import { redirect, notFound } from "next/navigation"
 import { getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
+import OrderStatusForm from "../components/OrderStatusForm"
 
 type OrderDetail = NonNullable<Awaited<ReturnType<typeof getOrder>>>
 type OrderItem = OrderDetail["items"][number]
@@ -421,21 +422,24 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
             </div>
           </Section>
 
-          {/* Admin actions */}
-          <div className="space-y-2">
-            <Link
-              href={`/admin/orders/${order.id}/edit`}
-              className="w-full text-center text-xs block px-4 py-2.5 bg-[#111111] text-white rounded hover:bg-[#333] transition-colors"
-            >
-              Update Order Status
-            </Link>
-            <Link
-              href="/admin/orders"
-              className="w-full text-center text-xs block px-4 py-2.5 border border-[#e5e5e5] text-[#8b7355] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
-            >
-              Back to Orders
-            </Link>
-          </div>
+          {/* Admin actions — status update */}
+          <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
+            <div className="px-5 py-4 border-b border-[#f0ece4]">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                Manage Order
+              </h2>
+            </div>
+            <div className="px-5 py-4">
+              <OrderStatusForm orderId={order.id} currentStatus={order.status} />
+            </div>
+          </section>
+
+          <Link
+            href="/admin/orders"
+            className="w-full text-center text-xs block px-4 py-2.5 border border-[#e5e5e5] text-[#8b7355] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+          >
+            Back to Orders
+          </Link>
         </div>
       </div>
     </div>
