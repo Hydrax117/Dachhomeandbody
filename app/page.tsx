@@ -411,11 +411,11 @@ function Newsletter() {
             placeholder="Your email address"
             required
             aria-label="Email address for newsletter"
-            className="flex-1 bg-white/5 border border-white/20 px-5 py-3.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c9a96e] transition-colors"
+            className="flex-1 bg-white/5 border border-white/20 px-5 py-4 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c9a96e] transition-colors"
           />
           <button
             type="submit"
-            className="bg-[#c9a96e] text-[#1a1a1a] px-8 py-3.5 text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 whitespace-nowrap"
+            className="bg-[#c9a96e] text-[#1a1a1a] px-8 py-4 text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 whitespace-nowrap min-h-[52px]"
           >
             Subscribe
           </button>

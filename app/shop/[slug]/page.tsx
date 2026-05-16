@@ -88,8 +88,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <main className="pt-24 lg:pt-28 pb-20">
       <div className="container-luxury">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center gap-2 text-[11px] tracking-[0.1em] uppercase text-[#8b7355]">
+        <nav aria-label="Breadcrumb" className="mb-8 overflow-x-auto">
+          <ol className="flex items-center gap-2 text-[11px] tracking-[0.1em] uppercase text-[#8b7355] whitespace-nowrap min-w-0">
             <li>
               <Link href="/" className="hover:text-[#C8A96B] transition-colors duration-200">
                 Home

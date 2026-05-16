@@ -26,8 +26,8 @@ export default async function AccountLayout({
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="h-16 bg-[#FAF8F5] border-b border-[#e5e5e5] flex items-center justify-between px-6 shrink-0">
+        {/* Top bar — desktop only (mobile top bar is in AccountSidebar) */}
+        <header className="hidden lg:flex h-16 bg-[#FAF8F5] border-b border-[#e5e5e5] items-center justify-between px-6 shrink-0">
           <div />
           <div className="flex items-center gap-3">
             <span className="text-xs text-[#8b7355]">
@@ -52,8 +52,8 @@ export default async function AccountLayout({
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+        {/* Page content — add top padding on mobile to clear the fixed top bar */}
+        <main className="flex-1 overflow-y-auto p-6 pt-20 lg:pt-6 lg:p-8">
           {children}
         </main>
       </div>

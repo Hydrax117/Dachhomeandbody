@@ -5,6 +5,7 @@ import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { authConfig } from "@/auth.config"
 
 type UserRole = "CUSTOMER" | "ADMIN"
 
@@ -29,15 +30,8 @@ const credentialsSchema = z.object({
 })
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(prisma),
-  trustHost: true,
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
-  },
   providers: [
     // Credentials provider for email/password authentication
     Credentials({
@@ -93,6 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user, trigger, session }) {
       // Initial sign in
       if (user) {
@@ -107,13 +102,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       return token
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as UserRole
-      }
-      return session
     },
     async signIn({ user, account }) {
       // For OAuth providers, ensure user has a role

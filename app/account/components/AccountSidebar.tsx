@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { logout } from "@/app/actions/auth"
 import { useFormStatus } from "react-dom"
+import { useState, useEffect } from "react"
 
 // ---------------------------------------------------------------------------
 // Icons
@@ -110,22 +111,38 @@ function NavItem({ label, href, icon, exact }: { label: string; href: string; ic
 }
 
 // ---------------------------------------------------------------------------
-// Sidebar
+// Sidebar inner content (shared between desktop and mobile drawer)
 // ---------------------------------------------------------------------------
-export default function AccountSidebar({ userName }: { userName?: string | null }) {
+function SidebarContent({
+  userName,
+  onClose,
+}: {
+  userName?: string | null
+  onClose?: () => void
+}) {
   return (
-    <aside
-      className="w-56 shrink-0 bg-[#FAF8F5] border-r border-[#e5e5e5] flex flex-col h-full"
-      aria-label="Account navigation"
-    >
+    <>
       {/* Brand */}
-      <div className="h-16 flex items-center px-5 border-b border-[#e5e5e5] shrink-0">
+      <div className="h-16 flex items-center justify-between px-5 border-b border-[#e5e5e5] shrink-0">
         <Link
           href="/"
           className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111] hover:text-[#C8A96B] transition-colors"
+          onClick={onClose}
         >
           Dachhomeandbody
         </Link>
+        {onClose && (
+          <button
+            aria-label="Close menu"
+            onClick={onClose}
+            className="lg:hidden hover:text-[#C8A96B] transition-colors p-1"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* User greeting */}
@@ -149,6 +166,7 @@ export default function AccountSidebar({ userName }: { userName?: string | null 
       <div className="shrink-0 border-t border-[#e5e5e5] px-3 py-4 space-y-1">
         <Link
           href="/shop"
+          onClick={onClose}
           className="flex items-center gap-3 px-3 py-2.5 rounded text-sm text-[#6b6b6b] hover:bg-[#f5f0e8] hover:text-[#111111] transition-colors"
         >
           <StoreIcon />
@@ -158,6 +176,80 @@ export default function AccountSidebar({ userName }: { userName?: string | null 
           <LogoutButton />
         </form>
       </div>
-    </aside>
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar
+// ---------------------------------------------------------------------------
+export default function AccountSidebar({ userName }: { userName?: string | null }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : ""
+    return () => { document.body.style.overflow = "" }
+  }, [mobileOpen])
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible on lg+ */}
+      <aside
+        className="hidden lg:flex w-56 shrink-0 bg-[#FAF8F5] border-r border-[#e5e5e5] flex-col h-full"
+        aria-label="Account navigation"
+      >
+        <SidebarContent userName={userName} />
+      </aside>
+
+      {/* Mobile: top bar with hamburger */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#FAF8F5] border-b border-[#e5e5e5] flex items-center justify-between px-4">
+        <Link
+          href="/"
+          className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111]"
+        >
+          Dachhomeandbody
+        </Link>
+        <button
+          aria-label="Open account menu"
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen(true)}
+          className="p-2 hover:text-[#C8A96B] transition-colors"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile drawer backdrop */}
+      <div
+        aria-hidden="true"
+        onClick={() => setMobileOpen(false)}
+        className={`fixed inset-0 bg-black/40 z-40 lg:hidden transition-opacity duration-300 ${
+          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      />
+
+      {/* Mobile drawer */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Account navigation"
+        className={`fixed top-0 left-0 h-full w-[min(280px,85vw)] bg-[#FAF8F5] z-50 lg:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <SidebarContent userName={userName} onClose={() => setMobileOpen(false)} />
+      </div>
+    </>
   )
 }

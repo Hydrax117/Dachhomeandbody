@@ -1,5 +1,16 @@
-import { auth } from "@/lib/auth"
+/**
+ * Edge middleware — must stay under 1 MB.
+ *
+ * We use the lightweight edge-compatible NextAuth initialisation that only
+ * imports `authConfig` (no Prisma, no bcrypt, no heavy Node.js modules).
+ * The full auth config (with adapter, providers, etc.) lives in lib/auth.ts
+ * and is only used in the Node.js runtime (server actions, API routes).
+ */
+import NextAuth from "next-auth"
+import { authConfig } from "@/auth.config"
 import { NextResponse } from "next/server"
+
+const { auth } = NextAuth(authConfig)
 
 // Routes that require authentication (customer)
 const protectedRoutes = ["/account", "/checkout"]
@@ -20,25 +31,10 @@ export default auth((req) => {
   const isLoggedIn = !!session?.user
   const isAdmin = session?.user?.role === "ADMIN"
 
-  // Check if the path is an admin route
-  const isAdminRoute = adminRoutes.some((route) =>
-    pathname.startsWith(route)
-  )
-
-  // Check if the path is a protected customer route
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  )
-
-  // Check if the path is a customer-only route
-  const isCustomerOnlyRoute = customerOnlyRoutes.some((route) =>
-    pathname.startsWith(route)
-  )
-
-  // Check if the path is an auth route
-  const isAuthRoute = authRoutes.some((route) =>
-    pathname.startsWith(route)
-  )
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route))
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
+  const isCustomerOnlyRoute = customerOnlyRoutes.some((route) => pathname.startsWith(route))
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
 
   // Admin routes: require ADMIN role
   if (isAdminRoute) {
@@ -47,9 +43,7 @@ export default auth((req) => {
       loginUrl.searchParams.set("callbackUrl", pathname)
       return NextResponse.redirect(loginUrl)
     }
-
     if (!isAdmin) {
-      // Authenticated but not admin — redirect to home
       return NextResponse.redirect(new URL("/", nextUrl))
     }
   }
@@ -68,7 +62,6 @@ export default auth((req) => {
 
   // Auth routes: redirect logged-in users away from login/register
   if (isAuthRoute && isLoggedIn) {
-    // Admins go to their dashboard, customers go to home
     const destination = isAdmin ? "/admin" : "/"
     return NextResponse.redirect(new URL(destination, nextUrl))
   }
@@ -78,14 +71,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico
-     * - public folder files
-     * - API auth routes (handled by NextAuth)
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }

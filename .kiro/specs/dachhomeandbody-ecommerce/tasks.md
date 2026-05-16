@@ -394,7 +394,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 68: Image reordering persists**
     - **Validates: Requirements 8.3, 17.4**
 
-  - [ ] 13.5 Implement product deletion
+  - [x] 13.5 Implement product deletion
     - Add soft delete functionality
     - Hide deleted products from customer views
     - Maintain order history references
@@ -618,7 +618,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - _Requirements: 20.2_
 
 - [ ] 23. Responsive design and mobile optimization
-  - [ ] 23.1 Implement mobile-responsive layouts
+  - [x] 23.1 Implement mobile-responsive layouts
     - Ensure all pages work on mobile devices
     - Add touch-friendly controls
     - Implement swipe gestures for image galleries

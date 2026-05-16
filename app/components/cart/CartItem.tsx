@@ -67,7 +67,7 @@ export function CartItem({ item }: CartItemProps) {
           <button
             onClick={() => removeItem(product.id)}
             aria-label={`Remove ${product.name} from cart`}
-            className="shrink-0 text-[#b8b0a8] hover:text-[#c0392b] transition-colors duration-150 mt-0.5"
+            className="shrink-0 w-8 h-8 flex items-center justify-center text-[#b8b0a8] hover:text-[#c0392b] transition-colors duration-150 -mr-1"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -87,7 +87,7 @@ export function CartItem({ item }: CartItemProps) {
             <button
               onClick={decrement}
               aria-label="Decrease quantity"
-              className="w-8 h-8 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A96B]"
+              className="w-11 h-11 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A96B]"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -104,7 +104,7 @@ export function CartItem({ item }: CartItemProps) {
               onClick={increment}
               aria-label="Increase quantity"
               disabled={quantity >= product.stock}
-              className="w-8 h-8 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A96B]"
+              className="w-11 h-11 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A96B]"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="12" y1="5" x2="12" y2="19" />

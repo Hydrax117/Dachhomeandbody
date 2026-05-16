@@ -144,7 +144,7 @@ export function CheckoutClient({
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:gap-16 items-start">
 
           {/* Left — form area */}
-          <div>
+          <div className="order-2 lg:order-1">
             <StepIndicator current={step} />
 
             {/* Payment failure banner (from redirect after failed payment) */}
@@ -179,7 +179,7 @@ export function CheckoutClient({
           </div>
 
           {/* Right — order summary */}
-          <div className="lg:sticky lg:top-24">
+          <div className="order-1 lg:order-2 lg:sticky lg:top-24">
             <CheckoutOrderSummary />
           </div>
         </div>
