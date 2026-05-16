@@ -1,8 +1,9 @@
-"use client"
-
+import { connection } from "next/server"
 import Link from "next/link"
 import Image from "next/image"
-import { useState, useEffect } from "react"
+import { getFeaturedProducts, getBestSellers } from "@/lib/products"
+import { getCategories } from "@/lib/categories"
+import { Newsletter } from "@/app/components/Newsletter"
 
 // ---------------------------------------------------------------------------
 // Hero Section
@@ -10,7 +11,6 @@ import { useState, useEffect } from "react"
 function Hero() {
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Background image */}
       <Image
         src="/homepage-bg.png"
         alt=""
@@ -19,24 +19,22 @@ function Hero() {
         className="object-cover object-center"
         aria-hidden="true"
       />
-      {/* Base dark overlay */}
       <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
-      {/* Stronger vignette at top so navbar area is clearly dark */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/40" aria-hidden="true" />
-      {/* Warm amber glow — centred behind headline */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none"
         style={{ background: "radial-gradient(circle, #C8A96B 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
-      {/* Content — padded top to clear fixed navbar */}
       <div className="relative z-10 text-center px-6 max-w-3xl mx-auto pt-20">
         <p className="text-[#C8A96B] text-[10px] tracking-[0.35em] uppercase mb-8 font-medium">
           Luxury Fragrance House
         </p>
-        <h1 className="font-serif text-white font-light leading-[1.08] mb-7"
-          style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)" }}>
+        <h1
+          className="font-serif text-white font-light leading-[1.08] mb-7"
+          style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)" }}
+        >
           Crafted scents for<br />
           <em className="not-italic text-[#C8A96B]">unforgettable</em> presence.
         </h1>
@@ -51,7 +49,7 @@ function Hero() {
             Shop Collection
           </Link>
           <Link
-            href="/collections"
+            href="/shop"
             className="px-9 py-4 border border-white/25 text-white text-[10px] tracking-[0.25em] uppercase font-medium hover:border-white/60 hover:bg-white/5 transition-all duration-300 min-w-[190px] text-center"
           >
             Discover Signature Scents
@@ -59,7 +57,6 @@ function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
         <span className="text-[10px] tracking-[0.2em] uppercase">Scroll</span>
         <div className="w-px h-8 bg-white/20 relative overflow-hidden">
@@ -71,17 +68,35 @@ function Hero() {
 }
 
 // ---------------------------------------------------------------------------
-// Featured Collections
+// Featured Collections — real categories from DB
 // ---------------------------------------------------------------------------
-const collections = [
-  { name: "Oud Collection", subtitle: "Deep & Resinous", bg: "from-[#2d1f0e] to-[#1a1208]" },
-  { name: "Floral Collection", subtitle: "Soft & Romantic", bg: "from-[#2a1a1a] to-[#1a1010]" },
-  { name: "Night Collection", subtitle: "Dark & Mysterious", bg: "from-[#0d0d1a] to-[#080810]" },
-  { name: "Home Fragrance", subtitle: "Warm & Inviting", bg: "from-[#1a1a0d] to-[#101008]" },
-  { name: "Body Mists", subtitle: "Light & Fresh", bg: "from-[#0d1a1a] to-[#081010]" },
+// Map category slugs to local images; fallback gradient for unmatched ones
+const categoryImages: Record<string, string> = {
+  oud: "/oud-image.png",
+  floral: "/floral-image.png",
+  night: "/night-image.png",
+  "body-mist": "/body-mist-image.png",
+  "body-mists": "/body-mist-image.png",
+}
+
+const categoryGradients = [
+  "from-[#2d1f0e] to-[#1a1208]",
+  "from-[#2a1a1a] to-[#1a1010]",
+  "from-[#0d0d1a] to-[#080810]",
+  "from-[#1a1a0d] to-[#101008]",
+  "from-[#0d1a1a] to-[#081010]",
+  "from-[#1a0d1a] to-[#100810]",
 ]
 
-function FeaturedCollections() {
+type Category = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  _count: { products: number }
+}
+
+function FeaturedCollections({ categories }: { categories: Category[] }) {
   return (
     <section className="py-24 lg:py-32 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="text-center mb-16">
@@ -90,65 +105,99 @@ function FeaturedCollections() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {collections.map((col, i) => (
-          <Link
-            key={col.name}
-            href="/collections"
-            className={`group relative overflow-hidden ${i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}`}
-          >
-            <div
-              className={`bg-gradient-to-br ${col.bg} aspect-[4/5] flex flex-col justify-end p-8 transition-transform duration-700 group-hover:scale-[1.02]`}
+        {categories.map((cat, i) => {
+          const image = categoryImages[cat.slug]
+          return (
+            <Link
+              key={cat.id}
+              href={`/shop?categoryId=${cat.id}`}
+              className={`group relative overflow-hidden ${i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}`}
             >
-              <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                <p className="text-[#c9a96e] text-[10px] tracking-[0.25em] uppercase mb-2">{col.subtitle}</p>
-                <h3 className="font-serif text-white text-xl lg:text-2xl font-medium mb-4">{col.name}</h3>
-                <span className="text-white/50 text-xs tracking-[0.15em] uppercase border-b border-white/20 pb-0.5 group-hover:text-white/80 group-hover:border-white/50 transition-colors duration-300">
-                  Explore →
-                </span>
+              <div className={`relative aspect-[4/5] flex flex-col justify-end bg-gradient-to-br ${categoryGradients[i % categoryGradients.length]}`}>
+                {image && (
+                  <Image
+                    src={image}
+                    alt={cat.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                )}
+                {/* Dark overlay so text stays readable over the photo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
+                <div className="relative z-10 p-8 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                  <p className="text-[#c9a96e] text-[10px] tracking-[0.25em] uppercase mb-2">
+                    {cat._count.products} {cat._count.products === 1 ? "product" : "products"}
+                  </p>
+                  <h3 className="font-serif text-white text-xl lg:text-2xl font-medium mb-4">{cat.name}</h3>
+                  {cat.description && (
+                    <p className="text-white/50 text-xs mb-3 line-clamp-2">{cat.description}</p>
+                  )}
+                  <span className="text-white/50 text-xs tracking-[0.15em] uppercase border-b border-white/20 pb-0.5 group-hover:text-white/80 group-hover:border-white/50 transition-colors duration-300">
+                    Explore →
+                  </span>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          )
+        })}
       </div>
     </section>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Best Sellers
+// Best Sellers — real products from DB
 // ---------------------------------------------------------------------------
-const bestSellers = [
-  { name: "Noir Absolu", desc: "Oud · Amber · Sandalwood", price: "₦28,500" },
-  { name: "Rose Éternelle", desc: "Rose · Jasmine · Musk", price: "₦24,000" },
-  { name: "Bois Sacré", desc: "Cedar · Vetiver · Vanilla", price: "₦31,000" },
-  { name: "Lumière Dorée", desc: "Bergamot · Neroli · Amber", price: "₦22,500" },
-]
+type Product = {
+  id: string
+  name: string
+  slug: string
+  price: number
+  images: string[]
+  topNotes: string[]
+  heartNotes: string[]
+  baseNotes: string[]
+  averageRating: number | null
+  reviewCount: number
+}
 
-function ProductCard({ name, desc, price }: { name: string; desc: string; price: string }) {
+function ProductCard({ product }: { product: Product }) {
+  const notes = [...product.topNotes, ...product.heartNotes, ...product.baseNotes]
+    .slice(0, 3)
+    .join(" · ")
+
   return (
-    <div className="group">
-      {/* Image placeholder */}
+    <Link href={`/shop/${product.slug}`} className="group">
       <div className="relative overflow-hidden bg-[#f0ece4] aspect-[3/4] mb-5">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#e8e0d0] to-[#d4c9b0] flex items-center justify-center">
-          <div className="w-16 h-24 rounded-full bg-[#c9a96e]/20 border border-[#c9a96e]/30" />
-        </div>
-        {/* Hover overlay */}
+        {product.images[0] ? (
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#e8e0d0] to-[#d4c9b0] flex items-center justify-center">
+            <div className="w-16 h-24 rounded-full bg-[#c9a96e]/20 border border-[#c9a96e]/30" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-        {/* Quick add */}
         <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 bg-[#1a1a1a] py-3 text-center">
-          <span className="text-white text-[10px] tracking-[0.2em] uppercase">Add to Cart</span>
+          <span className="text-white text-[10px] tracking-[0.2em] uppercase">View Product</span>
         </div>
       </div>
       <div>
-        <h3 className="font-serif text-base font-medium mb-1">{name}</h3>
-        <p className="text-[#8b7355] text-xs tracking-wide mb-2">{desc}</p>
-        <p className="text-sm font-medium">{price}</p>
+        <h3 className="font-serif text-base font-medium mb-1">{product.name}</h3>
+        {notes && <p className="text-[#8b7355] text-xs tracking-wide mb-2">{notes}</p>}
+        <p className="text-sm font-medium">₦{product.price.toLocaleString()}</p>
       </div>
-    </div>
+    </Link>
   )
 }
 
-function BestSellers() {
+function BestSellers({ products }: { products: Product[] }) {
   return (
     <section className="py-24 lg:py-32 bg-white">
       <div className="px-6 lg:px-12 max-w-7xl mx-auto">
@@ -165,11 +214,36 @@ function BestSellers() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
-          {bestSellers.map((p) => (
-            <ProductCard key={p.name} {...p} />
-          ))}
-        </div>
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-[#8b7355] text-sm text-center py-12">No products available yet.</p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Featured Products (replaces static "Featured" section)
+// ---------------------------------------------------------------------------
+function FeaturedProducts({ products }: { products: Product[] }) {
+  if (products.length === 0) return null
+
+  return (
+    <section className="py-24 lg:py-32 px-6 lg:px-12 max-w-7xl mx-auto">
+      <div className="text-center mb-16">
+        <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-3">Curated</p>
+        <h2 className="font-serif text-3xl lg:text-5xl font-medium">Featured</h2>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
+        {products.slice(0, 4).map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
       </div>
     </section>
   )
@@ -182,19 +256,20 @@ function BrandStory() {
   return (
     <section className="py-24 lg:py-32 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-        {/* Image */}
         <div className="relative">
-          <div className="aspect-[4/5] bg-gradient-to-br from-[#2d2318] to-[#1a1208] overflow-hidden">
-            <div
-              className="absolute inset-0 opacity-30"
-              style={{ background: "radial-gradient(ellipse at 30% 60%, #c9a96e 0%, transparent 60%)" }}
+          <div className="aspect-[4/5] bg-gradient-to-br from-[#2d2318] to-[#1a1208] overflow-hidden relative">
+            <Image
+              src="/story-image.png"
+              alt="Our story — the art of fragrance"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
             />
+            <div className="absolute inset-0 bg-black/20" aria-hidden="true" />
           </div>
-          {/* Offset accent block */}
           <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#c9a96e]/10 border border-[#c9a96e]/20" aria-hidden="true" />
         </div>
 
-        {/* Text */}
         <div className="lg:pl-8">
           <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-6">Our Story</p>
           <h2 className="font-serif text-3xl lg:text-5xl font-medium leading-[1.15] mb-8">
@@ -213,81 +288,6 @@ function BrandStory() {
           >
             Discover Our Story
           </Link>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Signature Fragrance Showcase
-// ---------------------------------------------------------------------------
-function SignatureShowcase() {
-  return (
-    <section className="py-24 lg:py-32 bg-[#1a1208] text-white overflow-hidden">
-      <div className="px-6 lg:px-12 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-[#C8A96B] text-xs tracking-[0.3em] uppercase mb-3">Featured</p>
-          <h2 className="font-serif text-white text-3xl lg:text-5xl font-medium">Signature Fragrance</h2>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Bottle visual */}
-          <div className="flex justify-center">
-            <div className="relative w-48 lg:w-64">
-              <div className="aspect-[1/2] bg-gradient-to-b from-[#c9a96e]/30 to-[#c9a96e]/5 border border-[#c9a96e]/20 rounded-sm flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-[#c9a96e]/20 border border-[#c9a96e]/40" />
-              </div>
-              {/* Glow */}
-              <div
-                className="absolute inset-0 -z-10 blur-3xl opacity-20"
-                style={{ background: "radial-gradient(circle, #c9a96e 0%, transparent 70%)" }}
-                aria-hidden="true"
-              />
-            </div>
-          </div>
-
-          {/* Details */}
-          <div>
-            <h3 className="font-serif text-white text-2xl lg:text-4xl font-medium mb-2">Noir Absolu</h3>
-            <p className="text-[#c9a96e] text-xs tracking-[0.2em] uppercase mb-8">Eau de Parfum · 50ml</p>
-
-            {/* Notes */}
-            <div className="space-y-5 mb-10">
-              {[
-                { label: "Top Notes", notes: "Bergamot · Citrus · Black Pepper" },
-                { label: "Heart Notes", notes: "Rose · Jasmine · Iris" },
-                { label: "Base Notes", notes: "Vanilla · Musk · Oud" },
-              ].map(({ label, notes }) => (
-                <div key={label} className="flex gap-6 items-start">
-                  <span className="text-[10px] tracking-[0.2em] uppercase text-white/40 w-24 shrink-0 pt-0.5">{label}</span>
-                  <span className="text-white/80 text-sm">{notes}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Mood & longevity */}
-            <div className="flex gap-8 mb-10">
-              <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-white/40 mb-1">Mood</p>
-                <p className="text-sm text-white/80">Confident · Mysterious</p>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-white/40 mb-1">Longevity</p>
-                <p className="text-sm text-white/80">12+ Hours</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <span className="font-serif text-2xl text-[#c9a96e]">₦28,500</span>
-              <Link
-                href="/shop"
-                className="px-8 py-3 bg-[#c9a96e] text-[#1a1a1a] text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300"
-              >
-                Shop Now
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -337,10 +337,9 @@ function CustomerReviews() {
 }
 
 // ---------------------------------------------------------------------------
-// Instagram / Social Grid
+// Social Grid
 // ---------------------------------------------------------------------------
 function SocialGrid() {
-  // Placeholder grid items with editorial gradient tones
   const tones = [
     "from-[#2d2318] to-[#1a1208]",
     "from-[#1a1a0d] to-[#101008]",
@@ -379,53 +378,6 @@ function SocialGrid() {
 }
 
 // ---------------------------------------------------------------------------
-// Newsletter
-// ---------------------------------------------------------------------------
-function Newsletter() {
-  const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email) setSubmitted(true)
-  }
-
-  return (
-    <section className="py-24 lg:py-32 bg-[#1a1208] text-white text-center px-6">
-      <p className="text-[#c9a96e] text-xs tracking-[0.3em] uppercase mb-4">Stay Connected</p>
-      <h2 className="font-serif text-white text-3xl lg:text-5xl font-medium mb-4">
-        Join the fragrance experience.
-      </h2>
-      <p className="text-white/50 text-sm lg:text-base max-w-md mx-auto mb-10">
-        Be the first to discover new scents and exclusive releases.
-      </p>
-
-      {submitted ? (
-        <p className="text-[#c9a96e] tracking-wide">Thank you for joining us.</p>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Your email address"
-            required
-            aria-label="Email address for newsletter"
-            className="flex-1 bg-white/5 border border-white/20 px-5 py-4 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c9a96e] transition-colors"
-          />
-          <button
-            type="submit"
-            className="bg-[#c9a96e] text-[#1a1a1a] px-8 py-4 text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 whitespace-nowrap min-h-[52px]"
-          >
-            Subscribe
-          </button>
-        </form>
-      )}
-    </section>
-  )
-}
-
-// ---------------------------------------------------------------------------
 // Footer
 // ---------------------------------------------------------------------------
 function Footer() {
@@ -433,7 +385,6 @@ function Footer() {
     <footer className="bg-[#0d0b08] text-white/60 py-16 px-6 lg:px-12">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
             <p className="font-serif text-white text-lg tracking-[0.15em] uppercase mb-4">Dachhomeandbody</p>
             <p className="text-sm leading-relaxed text-white/40 max-w-xs">
@@ -441,7 +392,6 @@ function Footer() {
             </p>
           </div>
 
-          {/* Shop */}
           <div>
             <p className="text-white text-[10px] tracking-[0.25em] uppercase mb-5">Shop</p>
             <ul className="space-y-3 text-sm">
@@ -451,7 +401,6 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
           <div>
             <p className="text-white text-[10px] tracking-[0.25em] uppercase mb-5">Company</p>
             <ul className="space-y-3 text-sm">
@@ -461,7 +410,6 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Help */}
           <div>
             <p className="text-white text-[10px] tracking-[0.25em] uppercase mb-5">Help</p>
             <ul className="space-y-3 text-sm">
@@ -475,7 +423,6 @@ function Footer() {
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/30">© {new Date().getFullYear()} Dachhomeandbody. All rights reserved.</p>
 
-          {/* Social */}
           <div className="flex items-center gap-5">
             {[
               { label: "Instagram", path: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z M17.5 6.5h.01 M2 2h20v20H2z" },
@@ -490,7 +437,6 @@ function Footer() {
             ))}
           </div>
 
-          {/* Payment icons placeholder */}
           <div className="flex items-center gap-2 text-[10px] tracking-wider text-white/30 uppercase">
             <span>Visa</span><span>·</span><span>Mastercard</span><span>·</span><span>Paystack</span>
           </div>
@@ -501,17 +447,25 @@ function Footer() {
 }
 
 // ---------------------------------------------------------------------------
-// Page composition
+// Page — server component, fetches real data
 // ---------------------------------------------------------------------------
-export default function HomePage() {
+export default async function HomePage() {
+  await connection()
+
+  const [categories, bestSellers, featuredProducts] = await Promise.all([
+    getCategories(),
+    getBestSellers(4),
+    getFeaturedProducts(4),
+  ])
+
   return (
     <>
       <main>
         <Hero />
-        <FeaturedCollections />
-        <BestSellers />
+        <FeaturedCollections categories={categories} />
+        <BestSellers products={bestSellers} />
+        <FeaturedProducts products={featuredProducts} />
         <BrandStory />
-        <SignatureShowcase />
         <CustomerReviews />
         <SocialGrid />
         <Newsletter />

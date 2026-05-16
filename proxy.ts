@@ -1,5 +1,5 @@
 /**
- * Edge middleware — must stay under 1 MB.
+ * Proxy (formerly middleware) — must stay under 1 MB.
  *
  * We use the lightweight edge-compatible NextAuth initialisation that only
  * imports `authConfig` (no Prisma, no bcrypt, no heavy Node.js modules).
