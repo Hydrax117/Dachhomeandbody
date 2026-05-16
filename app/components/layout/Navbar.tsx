@@ -70,7 +70,7 @@ function LogoutSubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full text-left px-4 py-2.5 text-xs tracking-[0.12em] uppercase hover:text-[#C8A96B] transition-colors disabled:opacity-50"
+      className="w-full text-left px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors disabled:opacity-50"
     >
       {pending ? "Signing out…" : "Sign Out"}
     </button>
@@ -176,13 +176,13 @@ function AccountDropdown({ color }: { color: string }) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full mt-3 w-52 bg-[#FAF8F5] border border-[#e5e5e5] shadow-lg py-2 z-50"
+          className="absolute right-0 top-full mt-3 w-52 bg-[#1a1a1a] border border-white/10 shadow-xl py-2 z-50"
         >
           {/* User info */}
-          <div className="px-4 py-3 border-b border-[#e5e5e5]">
-            <p className="text-xs font-medium truncate">{session.user.name ?? session.user.email}</p>
+          <div className="px-4 py-3 border-b border-white/10">
+            <p className="text-xs font-medium text-white truncate">{session.user.name ?? session.user.email}</p>
             {session.user.name && (
-              <p className="text-[10px] text-[#8b7355] truncate mt-0.5">{session.user.email}</p>
+              <p className="text-[10px] text-white/50 truncate mt-0.5">{session.user.email}</p>
             )}
           </div>
 
@@ -192,7 +192,7 @@ function AccountDropdown({ color }: { color: string }) {
               href="/account"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase hover:text-[#C8A96B] transition-colors"
+              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors"
             >
               My Account
             </Link>
@@ -200,7 +200,7 @@ function AccountDropdown({ color }: { color: string }) {
               href="/account/orders"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase hover:text-[#C8A96B] transition-colors"
+              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors"
             >
               Orders
             </Link>
@@ -208,7 +208,7 @@ function AccountDropdown({ color }: { color: string }) {
               href="/account/wishlist"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase hover:text-[#C8A96B] transition-colors"
+              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors"
             >
               Wishlist
             </Link>
@@ -224,7 +224,7 @@ function AccountDropdown({ color }: { color: string }) {
             )}
           </nav>
 
-          <div className="border-t border-[#e5e5e5] mt-1">
+          <div className="border-t border-white/10 mt-1">
             <form action={logout}>
               <LogoutSubmitButton />
             </form>
