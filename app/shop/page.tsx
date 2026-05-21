@@ -1,25 +1,18 @@
 import type { Metadata } from "next"
 import { getProducts } from "@/lib/products"
 import type { ProductFilters, ProductSort } from "@/lib/products"
-import { FragranceType, Gender, Longevity, Strength } from "@prisma/client"
+import { getCategories } from "@/lib/categories"
 import { ShopClient } from "./components/ShopClient"
 
 export const metadata: Metadata = {
   title: "Shop",
   description:
-    "Browse our full collection of luxury fragrances and body care products.",
+    "Browse our full collection of luxury home fragrance, natural skincare, and curated gift services.",
 }
 
 // ---------------------------------------------------------------------------
 // Helpers — parse & validate URL search params
 // ---------------------------------------------------------------------------
-
-function parseMultiEnum<T extends string>(
-  values: string[],
-  valid: T[]
-): T[] {
-  return values.filter((v): v is T => valid.includes(v as T))
-}
 
 function parsePositiveNumber(value: string | null): number | undefined {
   if (!value) return undefined
@@ -50,20 +43,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     return Array.isArray(v) ? v[0] : v
   }
 
-  // Helper to get multiple string values
-  const multi = (key: string): string[] => {
-    const v = params[key]
-    if (!v) return []
-    return Array.isArray(v) ? v : [v]
-  }
-
   // Build filters
   const filters: ProductFilters = {
     search: str("q") ?? undefined,
-    fragranceType: parseMultiEnum(multi("type"), Object.values(FragranceType)),
-    gender: parseMultiEnum(multi("gender"), Object.values(Gender)),
-    longevity: parseMultiEnum(multi("longevity"), Object.values(Longevity)),
-    strength: parseMultiEnum(multi("strength"), Object.values(Strength)),
+    categoryId: str("categoryId") ?? undefined,
     priceMin: parsePositiveNumber(str("priceMin")),
     priceMax: parsePositiveNumber(str("priceMax")),
   }
@@ -79,16 +62,19 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const page = parsePage(str("page"))
   const pageSize = 20
 
-  const result = await getProducts(filters, sort, { page, pageSize })
+  const [result, categories] = await Promise.all([
+    getProducts(filters, sort, { page, pageSize }),
+    getCategories(),
+  ])
 
   return (
     <main className="pt-24 lg:pt-28 pb-20">
       <div className="container-luxury">
         {/* Page header */}
         <header className="mb-10 lg:mb-14">
-          <p className="text-eyebrow mb-3">Collection</p>
+          <p className="text-eyebrow mb-3">Our Products</p>
           <h1 className="font-serif text-3xl lg:text-5xl font-medium">
-            All Fragrances
+            Shop All
           </h1>
         </header>
 
@@ -98,6 +84,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           total={result.total}
           page={result.page}
           totalPages={result.totalPages}
+          categories={categories}
         />
       </div>
     </main>

@@ -68,7 +68,7 @@ function FieldError({ message }: { message?: string }) {
 
 function Label({ htmlFor, children, required }: { htmlFor: string; children: React.ReactNode; required?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="block text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1.5">
+    <label htmlFor={htmlFor} className="block text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1.5">
       {children}
       {required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
@@ -78,7 +78,7 @@ function Label({ htmlFor, children, required }: { htmlFor: string; children: Rea
 function inputCls(error?: string) {
   return [
     "w-full px-3 py-2.5 border text-sm text-[#111111] bg-white rounded",
-    "focus:outline-none focus:ring-1 focus:ring-[#C8A96B] focus:border-[#C8A96B]",
+    "focus:outline-none focus:ring-1 focus:ring-[#B8965C] focus:border-[#B8965C]",
     "placeholder-[#aaa] transition-colors",
     error ? "border-red-400" : "border-[#e5e5e5]",
   ].join(" ")
@@ -87,7 +87,7 @@ function inputCls(error?: string) {
 function selectCls(error?: string) {
   return [
     "w-full px-3 py-2.5 border text-sm text-[#111111] bg-white rounded",
-    "focus:outline-none focus:ring-1 focus:ring-[#C8A96B] focus:border-[#C8A96B]",
+    "focus:outline-none focus:ring-1 focus:ring-[#B8965C] focus:border-[#B8965C]",
     "transition-colors appearance-none",
     error ? "border-red-400" : "border-[#e5e5e5]",
   ].join(" ")
@@ -209,7 +209,7 @@ function BasicInfoStep({
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8b7355]">
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -232,7 +232,7 @@ function BasicInfoStep({
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
           </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8b7355]">
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -245,7 +245,7 @@ function BasicInfoStep({
         <input
           id="featured" name="featured" type="checkbox" value="true"
           defaultChecked={initialData?.featured ?? false}
-          className="w-4 h-4 accent-[#C8A96B] rounded"
+          className="w-4 h-4 accent-[#B8965C] rounded"
         />
         <label htmlFor="featured" className="text-sm text-[#111111]">
           Mark as featured product
@@ -282,7 +282,7 @@ function FragranceProfileStep({
             <option value="COLOGNE">Cologne</option>
             <option value="BODY_MIST">Body Mist</option>
           </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8b7355]">
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -343,7 +343,7 @@ function FragranceProfileStep({
               <option value="LONG">Long (6–12 hrs)</option>
               <option value="VERY_LONG">Very Long (12+ hrs)</option>
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8b7355]">
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -365,7 +365,7 @@ function FragranceProfileStep({
               <option value="STRONG">Strong</option>
               <option value="VERY_STRONG">Very Strong</option>
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8b7355]">
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -467,7 +467,7 @@ function ImagesAndStockStep({
       <div>
         <Label htmlFor="imageUpload">Product Images</Label>
         <div
-          className="border-2 border-dashed border-[#e5e5e5] rounded-lg p-6 text-center hover:border-[#C8A96B] transition-colors cursor-pointer"
+          className="border-2 border-dashed border-[#e5e5e5] rounded-lg p-6 text-center hover:border-[#B8965C] transition-colors cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
           onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
           role="button"
@@ -484,10 +484,10 @@ function ImagesAndStockStep({
             onChange={handleFileChange}
           />
           {uploading ? (
-            <p className="text-sm text-[#8b7355]">Uploading…</p>
+            <p className="text-sm text-[#8C8C8C]">Uploading…</p>
           ) : (
             <>
-              <svg className="mx-auto mb-2 text-[#C8A96B]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <svg className="mx-auto mb-2 text-[#B8965C]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
@@ -504,7 +504,7 @@ function ImagesAndStockStep({
       {/* Image previews with drag-to-reorder */}
       {images.length > 0 && (
         <div>
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1">
             Images ({images.length}) — drag to reorder
           </p>
           <p className="text-[10px] text-[#aaa] mb-3">First image is the primary display image</p>
@@ -525,7 +525,7 @@ function ImagesAndStockStep({
                   className="w-full h-full object-cover rounded border border-[#e5e5e5]"
                 />
                 {idx === 0 && (
-                  <span className="absolute top-1 left-1 text-[9px] tracking-widest uppercase bg-[#C8A96B] text-white px-1.5 py-0.5 rounded">
+                  <span className="absolute top-1 left-1 text-[9px] tracking-widest uppercase bg-[#B8965C] text-white px-1.5 py-0.5 rounded">
                     Primary
                   </span>
                 )}
@@ -628,14 +628,14 @@ export default function ProductForm({ categories, action, initialData, mode = "c
                   isActive
                     ? "bg-[#111111] text-white"
                     : isDone
-                    ? "text-[#C8A96B] hover:text-[#111111]"
-                    : "text-[#8b7355] hover:text-[#111111]",
+                    ? "text-[#B8965C] hover:text-[#111111]"
+                    : "text-[#8C8C8C] hover:text-[#111111]",
                   hasErr ? "ring-1 ring-red-400" : "",
                 ].join(" ")}
               >
                 <span className={[
                   "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium shrink-0",
-                  isActive ? "bg-white text-[#111111]" : isDone ? "bg-[#C8A96B] text-white" : "bg-[#e5e5e5] text-[#8b7355]",
+                  isActive ? "bg-white text-[#111111]" : isDone ? "bg-[#B8965C] text-white" : "bg-[#e5e5e5] text-[#8C8C8C]",
                 ].join(" ")}>
                   {isDone ? "✓" : i + 1}
                 </span>
@@ -679,7 +679,7 @@ export default function ProductForm({ categories, action, initialData, mode = "c
           type="button"
           onClick={() => setStep((s) => Math.max(0, s - 1) as Step)}
           disabled={step === 0}
-          className="text-xs text-[#8b7355] hover:text-[#111111] transition-colors disabled:opacity-30 disabled:cursor-not-allowed px-4 py-2 border border-[#e5e5e5] rounded hover:border-[#C8A96B]"
+          className="text-xs text-[#8C8C8C] hover:text-[#111111] transition-colors disabled:opacity-30 disabled:cursor-not-allowed px-4 py-2 border border-[#e5e5e5] rounded hover:border-[#B8965C]"
         >
           ← Back
         </button>

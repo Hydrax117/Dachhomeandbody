@@ -27,7 +27,7 @@ export function CartItem({ item }: CartItemProps) {
   const lineTotal = product.price * quantity
 
   return (
-    <li className="flex gap-4 py-5 border-b border-[#e8ddd0] last:border-0">
+    <li className="flex gap-4 py-5 border-b border-[#EBEBEB] last:border-0">
       {/* Product image */}
       <Link
         href={`/shop/${product.slug}`}
@@ -44,7 +44,7 @@ export function CartItem({ item }: CartItemProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#e8e0d0] to-[#d4c9b0]" />
+          <div className="w-full h-full bg-gradient-to-br from-[#EBEBEB] to-[#C4C4C4]" />
         )}
       </Link>
 
@@ -54,11 +54,11 @@ export function CartItem({ item }: CartItemProps) {
           <div className="min-w-0">
             <Link
               href={`/shop/${product.slug}`}
-              className="font-serif text-sm leading-snug hover:text-[#C8A96B] transition-colors duration-200 line-clamp-2"
+              className="font-serif text-sm leading-snug hover:text-[#B8965C] transition-colors duration-200 line-clamp-2"
             >
               {product.name}
             </Link>
-            <p className="text-[11px] text-[#8b7355] mt-0.5 tracking-wide">
+            <p className="text-[11px] text-[#8C8C8C] mt-0.5 tracking-wide">
               ₦{product.price.toLocaleString()} each
             </p>
           </div>
@@ -67,7 +67,7 @@ export function CartItem({ item }: CartItemProps) {
           <button
             onClick={() => removeItem(product.id)}
             aria-label={`Remove ${product.name} from cart`}
-            className="shrink-0 w-8 h-8 flex items-center justify-center text-[#b8b0a8] hover:text-[#c0392b] transition-colors duration-150 -mr-1"
+            className="shrink-0 w-8 h-8 flex items-center justify-center text-[#C4C4C4] hover:text-[#c0392b] transition-colors duration-150 -mr-1"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -80,14 +80,14 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex items-center justify-between mt-3">
           {/* Quantity controls */}
           <div
-            className="flex items-center border border-[#e8ddd0]"
+            className="flex items-center border border-[#EBEBEB]"
             role="group"
             aria-label={`Quantity for ${product.name}`}
           >
             <button
               onClick={decrement}
               aria-label="Decrease quantity"
-              className="w-11 h-11 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A96B]"
+              className="w-11 h-11 flex items-center justify-center text-[#4A4A4A] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#B8965C]"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -104,7 +104,7 @@ export function CartItem({ item }: CartItemProps) {
               onClick={increment}
               aria-label="Increase quantity"
               disabled={quantity >= product.stock}
-              className="w-11 h-11 flex items-center justify-center text-[#4a4a4a] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A96B]"
+              className="w-11 h-11 flex items-center justify-center text-[#4A4A4A] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#B8965C]"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -121,7 +121,7 @@ export function CartItem({ item }: CartItemProps) {
 
         {/* Low stock warning */}
         {product.stock > 0 && product.stock <= 5 && (
-          <p className="text-[10px] text-[#C8A96B] tracking-wide mt-1.5" role="status">
+          <p className="text-[10px] text-[#B8965C] tracking-wide mt-1.5" role="status">
             Only {product.stock} left
           </p>
         )}

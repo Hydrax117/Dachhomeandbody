@@ -89,15 +89,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="container-luxury">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-8 overflow-x-auto">
-          <ol className="flex items-center gap-2 text-[11px] tracking-[0.1em] uppercase text-[#8b7355] whitespace-nowrap min-w-0">
+          <ol className="flex items-center gap-2 text-[11px] tracking-[0.1em] uppercase text-[#8C8C8C] whitespace-nowrap min-w-0">
             <li>
-              <Link href="/" className="hover:text-[#C8A96B] transition-colors duration-200">
+              <Link href="/" className="hover:text-[#B8965C] transition-colors duration-200">
                 Home
               </Link>
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <Link href="/shop" className="hover:text-[#C8A96B] transition-colors duration-200">
+              <Link href="/shop" className="hover:text-[#B8965C] transition-colors duration-200">
                 Shop
               </Link>
             </li>
@@ -105,7 +105,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <li>
               <Link
                 href={`/shop?category=${product.category.slug}`}
-                className="hover:text-[#C8A96B] transition-colors duration-200"
+                className="hover:text-[#B8965C] transition-colors duration-200"
               >
                 {product.category.name}
               </Link>
@@ -147,8 +147,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       width="13"
                       height="13"
                       viewBox="0 0 24 24"
-                      fill={i < Math.round(product.averageRating!) ? "#C8A96B" : "none"}
-                      stroke="#C8A96B"
+                      fill={i < Math.round(product.averageRating!) ? "#B8965C" : "none"}
+                      stroke="#B8965C"
                       strokeWidth="1.5"
                     >
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -157,7 +157,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
                 <a
                   href="#reviews"
-                  className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors duration-200"
+                  className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors duration-200"
                   aria-label={`${product.averageRating.toFixed(1)} stars, ${product.reviewCount} reviews — jump to reviews`}
                 >
                   {product.averageRating.toFixed(1)} ({product.reviewCount}{" "}
@@ -169,14 +169,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Price */}
             <div className="flex items-baseline gap-3">
               <span
-                className={`font-serif text-2xl ${isOutOfStock ? "text-[#8b7355]" : "text-[#111111]"}`}
+                className={`font-serif text-2xl ${isOutOfStock ? "text-[#8C8C8C]" : "text-[#111111]"}`}
                 aria-label={`Price: ₦${product.price.toLocaleString()}`}
               >
                 ₦{product.price.toLocaleString()}
               </span>
               {hasDiscount && (
                 <>
-                  <span className="text-sm text-[#b8b0a8] line-through" aria-label={`Original price: ₦${product.compareAtPrice!.toLocaleString()}`}>
+                  <span className="text-sm text-[#C4C4C4] line-through" aria-label={`Original price: ₦${product.compareAtPrice!.toLocaleString()}`}>
                     ₦{product.compareAtPrice!.toLocaleString()}
                   </span>
                   <span className="badge badge-gold text-[9px]" aria-label={`${discountPercent}% off`}>
@@ -189,13 +189,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Stock status */}
             <div>
               {isOutOfStock ? (
-                <p className="text-sm text-[#8b7355] flex items-center gap-2" role="status">
-                  <span className="w-2 h-2 rounded-full bg-[#8b7355] inline-block" aria-hidden="true" />
+                <p className="text-sm text-[#8C8C8C] flex items-center gap-2" role="status">
+                  <span className="w-2 h-2 rounded-full bg-[#8C8C8C] inline-block" aria-hidden="true" />
                   Out of Stock
                 </p>
               ) : product.stock <= 5 ? (
-                <p className="text-sm text-[#C8A96B] flex items-center gap-2" role="status">
-                  <span className="w-2 h-2 rounded-full bg-[#C8A96B] inline-block" aria-hidden="true" />
+                <p className="text-sm text-[#B8965C] flex items-center gap-2" role="status">
+                  <span className="w-2 h-2 rounded-full bg-[#B8965C] inline-block" aria-hidden="true" />
                   Low Stock — Only {product.stock} left
                 </p>
               ) : (
@@ -225,7 +225,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             />
 
             {/* SKU */}
-            <p className="text-[11px] text-[#b8b0a8] tracking-wide">
+            <p className="text-[11px] text-[#C4C4C4] tracking-wide">
               SKU: {product.sku}
             </p>
           </div>

@@ -71,7 +71,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
         {/* Mobile filter button */}
         <button
           onClick={onFilterOpen}
-          className="lg:hidden flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase border border-[#e8ded3] px-4 py-3 min-h-[44px] hover:border-[#111111] transition-colors"
+          className="lg:hidden flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase border border-[#EBEBEB] px-4 py-3 min-h-[44px] hover:border-[#111111] transition-colors"
           aria-label="Open filters"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -82,7 +82,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
           Filters
         </button>
 
-        <p className="text-sm text-[#8b7355]">
+        <p className="text-sm text-[#8C8C8C]">
           {isPending ? (
             <span className="inline-block w-16 h-4 skeleton rounded" aria-hidden="true" />
           ) : (
@@ -107,7 +107,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#b8b0a8] pointer-events-none"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C4C4C4] pointer-events-none"
             aria-hidden="true"
           >
             <circle cx="11" cy="11" r="8" />
@@ -119,7 +119,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
             type="search"
             value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Search fragrances…"
+            placeholder="Search products…"
             className="input pl-9 pr-8 py-2.5 text-sm w-full"
             aria-label="Search products"
           />
@@ -128,7 +128,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
               type="button"
               onClick={clearSearch}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#b8b0a8] hover:text-[#111111] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#C4C4C4] hover:text-[#111111] transition-colors"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -161,7 +161,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
-            className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#8b7355]"
+            className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#8C8C8C]"
             aria-hidden="true"
           >
             <polyline points="6 9 12 15 18 9" />

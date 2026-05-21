@@ -9,7 +9,6 @@ interface ProductCardProps {
   compareAtPrice?: number | null
   images: string[]
   stock: number
-  fragranceType?: string | null
   averageRating?: number | null
   reviewCount: number
   category: { name: string; slug: string }
@@ -25,15 +24,15 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
             width="10"
             height="10"
             viewBox="0 0 24 24"
-            fill={i < Math.round(rating) ? "#C8A96B" : "none"}
-            stroke="#C8A96B"
+            fill={i < Math.round(rating) ? "#B8965C" : "none"}
+            stroke="#B8965C"
             strokeWidth="1.5"
           >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         ))}
       </div>
-      <span className="text-[10px] text-[#8b7355]">({count})</span>
+      <span className="text-[10px] text-[#8C8C8C]">({count})</span>
     </div>
   )
 }
@@ -45,7 +44,6 @@ export function ProductCard({
   compareAtPrice,
   images,
   stock,
-  fragranceType,
   averageRating,
   reviewCount,
   category,
@@ -53,14 +51,6 @@ export function ProductCard({
   const isOutOfStock = stock === 0
   const hasDiscount = compareAtPrice && compareAtPrice > price
   const primaryImage = images[0]
-
-  const fragranceTypeLabel: Record<string, string> = {
-    PERFUME: "Perfume",
-    EAU_DE_PARFUM: "Eau de Parfum",
-    EAU_DE_TOILETTE: "Eau de Toilette",
-    COLOGNE: "Cologne",
-    BODY_MIST: "Body Mist",
-  }
 
   return (
     <article className="group">
@@ -76,12 +66,12 @@ export function ProductCard({
               className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#e8e0d0] to-[#d4c9b0] flex items-center justify-center">
-              <div className="w-16 h-24 rounded-full bg-[#C8A96B]/20 border border-[#C8A96B]/30" aria-hidden="true" />
+            <div className="absolute inset-0 bg-[#EBEBEB] flex items-center justify-center">
+              <div className="w-16 h-24 rounded-full bg-[#B8965C]/15 border border-[#B8965C]/25" aria-hidden="true" />
             </div>
           )}
 
-          {/* Overlays */}
+          {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/8 transition-colors duration-500" aria-hidden="true" />
 
           {/* Badges */}
@@ -104,10 +94,10 @@ export function ProductCard({
 
         {/* Info */}
         <div className="px-0.5">
-          <p className="text-[10px] tracking-[0.2em] uppercase text-[#8b7355] mb-1">
-            {fragranceType ? fragranceTypeLabel[fragranceType] ?? category.name : category.name}
+          <p className="text-[10px] tracking-[0.2em] uppercase text-[#B8965C] mb-1">
+            {category.name}
           </p>
-          <h3 className="font-serif text-base font-medium leading-snug mb-2 group-hover:text-[#8b7355] transition-colors duration-200">
+          <h3 className="font-serif text-base font-medium leading-snug mb-2 group-hover:text-[#B8965C] transition-colors duration-200">
             {name}
           </h3>
 
@@ -118,11 +108,11 @@ export function ProductCard({
           ) : null}
 
           <div className="flex items-center gap-2">
-            <span className={`font-serif text-base ${isOutOfStock ? "text-[#8b7355]" : "text-[#111111]"}`}>
+            <span className={`font-serif text-base ${isOutOfStock ? "text-[#8C8C8C]" : "text-[#111111]"}`}>
               ₦{price.toLocaleString()}
             </span>
             {hasDiscount && (
-              <span className="text-xs text-[#b8b0a8] line-through">
+              <span className="text-xs text-[#C4C4C4] line-through">
                 ₦{compareAtPrice!.toLocaleString()}
               </span>
             )}

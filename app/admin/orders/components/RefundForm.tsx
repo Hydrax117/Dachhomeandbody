@@ -37,7 +37,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
 
   if (!canRefund) {
     return (
-      <p className="text-xs text-[#8b7355]">
+      <p className="text-xs text-[#8C8C8C]">
         {currentStatus === "REFUNDED"
           ? "This order has already been refunded."
           : "Cancelled orders cannot be refunded."}
@@ -58,7 +58,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
 
   return (
     <form action={formAction} className="space-y-3" noValidate>
-      <p className="text-xs text-[#8b7355]">
+      <p className="text-xs text-[#8C8C8C]">
         Order total: <span className="font-medium text-[#111111]">{formatCurrency(orderTotal)}</span>
       </p>
 
@@ -71,7 +71,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
       <div>
         <label
           htmlFor="refund-amount"
-          className="block text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium mb-1.5"
+          className="block text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium mb-1.5"
         >
           Refund Amount (₦) <span aria-hidden="true">*</span>
         </label>
@@ -84,7 +84,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
           defaultValue={orderTotal}
           required
           disabled={isPending}
-          className="w-full px-3 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#C8A96B] transition-colors disabled:opacity-60"
+          className="w-full px-3 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#B8965C] transition-colors disabled:opacity-60"
           aria-describedby={state.errors?.refundAmount ? "refund-amount-error" : undefined}
         />
         <FieldError messages={state.errors?.refundAmount} />
@@ -93,7 +93,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
       <div>
         <label
           htmlFor="refund-notes"
-          className="block text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium mb-1.5"
+          className="block text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium mb-1.5"
         >
           Notes
         </label>
@@ -103,7 +103,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
           rows={2}
           placeholder="Reason for refund…"
           disabled={isPending}
-          className="w-full px-3 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#C8A96B] transition-colors resize-none disabled:opacity-60 placeholder:text-[#aaa]"
+          className="w-full px-3 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#B8965C] transition-colors resize-none disabled:opacity-60 placeholder:text-[#aaa]"
         />
         <FieldError messages={state.errors?.notes} />
       </div>
@@ -120,7 +120,7 @@ export default function RefundForm({ orderId, orderTotal, currentStatus }: Refun
           type="button"
           onClick={() => setOpen(false)}
           disabled={isPending}
-          className="text-xs text-[#8b7355] hover:text-[#111111] transition-colors"
+          className="text-xs text-[#8C8C8C] hover:text-[#111111] transition-colors"
         >
           Cancel
         </button>

@@ -99,7 +99,7 @@ function NavItem({ label, href, icon, exact }: { label: string; href: string; ic
         aria-current={isActive ? "page" : undefined}
         className={`flex items-center gap-3 px-3 py-2.5 rounded text-sm transition-colors ${
           isActive
-            ? "bg-[#1a1208] text-[#C8A96B] font-medium"
+            ? "bg-[#0A0A0A] text-[#B8965C] font-medium"
             : "text-[#6b6b6b] hover:bg-[#f5f0e8] hover:text-[#111111]"
         }`}
       >
@@ -126,7 +126,7 @@ function SidebarContent({
       <div className="h-16 flex items-center justify-between px-5 border-b border-[#e5e5e5] shrink-0">
         <Link
           href="/"
-          className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111] hover:text-[#C8A96B] transition-colors"
+          className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111] hover:text-[#B8965C] transition-colors"
           onClick={onClose}
         >
           Dachhomeandbody
@@ -135,7 +135,7 @@ function SidebarContent({
           <button
             aria-label="Close menu"
             onClick={onClose}
-            className="lg:hidden hover:text-[#C8A96B] transition-colors p-1"
+            className="lg:hidden hover:text-[#B8965C] transition-colors p-1"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -148,7 +148,7 @@ function SidebarContent({
       {/* User greeting */}
       {userName && (
         <div className="px-5 py-4 border-b border-[#e5e5e5]">
-          <p className="text-[10px] tracking-[0.2em] uppercase text-[#8b7355]">Welcome back</p>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-[#8C8C8C]">Welcome back</p>
           <p className="text-sm font-medium text-[#111111] mt-0.5 truncate">{userName}</p>
         </div>
       )}
@@ -202,14 +202,14 @@ export default function AccountSidebar({ userName }: { userName?: string | null 
     <>
       {/* Desktop sidebar — always visible on lg+ */}
       <aside
-        className="hidden lg:flex w-56 shrink-0 bg-[#FAF8F5] border-r border-[#e5e5e5] flex-col h-full"
+        className="hidden lg:flex w-56 shrink-0 bg-[#F8F5F2] border-r border-[#e5e5e5] flex-col h-full"
         aria-label="Account navigation"
       >
         <SidebarContent userName={userName} />
       </aside>
 
       {/* Mobile: top bar with hamburger */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#FAF8F5] border-b border-[#e5e5e5] flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#F8F5F2] border-b border-[#e5e5e5] flex items-center justify-between px-4">
         <Link
           href="/"
           className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111]"
@@ -220,7 +220,7 @@ export default function AccountSidebar({ userName }: { userName?: string | null 
           aria-label="Open account menu"
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen(true)}
-          className="p-2 hover:text-[#C8A96B] transition-colors"
+          className="p-2 hover:text-[#B8965C] transition-colors"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6" />
@@ -244,7 +244,7 @@ export default function AccountSidebar({ userName }: { userName?: string | null 
         role="dialog"
         aria-modal="true"
         aria-label="Account navigation"
-        className={`fixed top-0 left-0 h-full w-[min(280px,85vw)] bg-[#FAF8F5] z-50 lg:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-[min(280px,85vw)] bg-[#F8F5F2] z-50 lg:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

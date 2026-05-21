@@ -2,7 +2,17 @@
 
 ## Overview
 
-The Dachhomeandbody e-commerce platform is a luxury fragrance and body care shopping experience built with Next.js 14+ (App Router), TypeScript, and modern web technologies. The architecture follows a full-stack Next.js approach with server-side rendering, server actions, and API routes, backed by PostgreSQL with Prisma ORM.
+The DACH Home & Body e-commerce platform is a luxury home fragrance, natural skincare, and gift services shopping experience built with Next.js 14+ (App Router), TypeScript, and modern web technologies. The architecture follows a full-stack Next.js approach with server-side rendering, server actions, and API routes, backed by PostgreSQL with Prisma ORM.
+
+**Business:** DACH Home & Body — owned by Adacha B. Dzarma  
+**Location:** Abuja, FCT, Nigeria  
+**Contact:** 07064313141 | adachadzarma@gmail.com  
+**Products & Services:** Home Fragrance, Natural Skincare, Gift Services  
+**Target Audience:** Luxury & wellness lifestyle shoppers, Gift Buyers  
+**Brand Colors:** Primary — Black; Secondary — Gold, Grey & White  
+**Brand Style:** Minimalist Luxury  
+**Desired Customer Feeling:** Personal, Elegant, Memorable  
+**Delivery:** Abuja — Same day (except custom orders); Nationwide — 3–5 business days
 
 The design emphasizes:
 - **Luxury aesthetics**: Cinematic, minimal, spacious design inspired by premium fragrance brands

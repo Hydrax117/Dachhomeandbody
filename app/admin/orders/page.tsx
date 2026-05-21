@@ -114,7 +114,7 @@ export default async function AdminOrdersPage({
       {/* Header */}
       <div>
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">Orders</h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           {total} order{total !== 1 ? "s" : ""}
           {hasFilters ? " matching filters" : " total"}
         </p>
@@ -132,13 +132,13 @@ export default async function AdminOrdersPage({
       {/* Table */}
       {orders.length === 0 ? (
         <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             {hasFilters ? "No orders match your filters." : "No orders yet."}
           </p>
           {hasFilters && (
             <Link
               href="/admin/orders"
-              className="inline-block mt-3 text-xs text-[#C8A96B] hover:underline"
+              className="inline-block mt-3 text-xs text-[#B8965C] hover:underline"
             >
               Clear filters →
             </Link>
@@ -149,26 +149,26 @@ export default async function AdminOrdersPage({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Order
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Customer
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Status
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden md:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Payment
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Items
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Total
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Actions
                   </th>
                 </tr>
@@ -185,16 +185,16 @@ export default async function AdminOrdersPage({
                   )
 
                   return (
-                    <tr key={order.id} className="hover:bg-[#FAF8F5] transition-colors">
+                    <tr key={order.id} className="hover:bg-[#F8F5F2] transition-colors">
                       {/* Order number + date */}
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="font-medium text-[#111111] hover:text-[#C8A96B] transition-colors"
+                          className="font-medium text-[#111111] hover:text-[#B8965C] transition-colors"
                         >
                           #{order.orderNumber}
                         </Link>
-                        <p className="text-[11px] text-[#8b7355] mt-0.5">
+                        <p className="text-[11px] text-[#8C8C8C] mt-0.5">
                           {new Date(order.createdAt).toLocaleDateString("en-NG", {
                             day: "numeric",
                             month: "short",
@@ -206,7 +206,7 @@ export default async function AdminOrdersPage({
                       {/* Customer */}
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <p className="text-[#111111] truncate max-w-[160px]">{customerName}</p>
-                        <p className="text-[11px] text-[#8b7355] truncate max-w-[160px]">
+                        <p className="text-[11px] text-[#8C8C8C] truncate max-w-[160px]">
                           {customerEmail}
                         </p>
                       </td>
@@ -220,7 +220,7 @@ export default async function AdminOrdersPage({
                       <td className="px-4 py-3 hidden md:table-cell">
                         <span
                           className={`text-xs font-medium ${
-                            paymentStatusStyles[order.paymentStatus] ?? "text-[#8b7355]"
+                            paymentStatusStyles[order.paymentStatus] ?? "text-[#8C8C8C]"
                           }`}
                         >
                           {order.paymentStatus.toLowerCase()}
@@ -229,7 +229,7 @@ export default async function AdminOrdersPage({
 
                       {/* Item count */}
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-[#8b7355]">
+                        <span className="text-xs text-[#8C8C8C]">
                           {itemCount} item{itemCount !== 1 ? "s" : ""}
                         </span>
                       </td>
@@ -250,7 +250,7 @@ export default async function AdminOrdersPage({
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
+                          className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
                           aria-label={`View order ${order.orderNumber}`}
                         >
                           View
@@ -265,15 +265,15 @@ export default async function AdminOrdersPage({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#FAF8F5]">
-              <p className="text-xs text-[#8b7355]">
+            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#F8F5F2]">
+              <p className="text-xs text-[#8C8C8C]">
                 Page {page} of {totalPages} — {total} orders
               </p>
               <div className="flex items-center gap-2">
                 {page > 1 && (
                   <Link
                     href={buildPageUrl(params, page - 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     ← Prev
                   </Link>
@@ -281,7 +281,7 @@ export default async function AdminOrdersPage({
                 {page < totalPages && (
                   <Link
                     href={buildPageUrl(params, page + 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     Next →
                   </Link>

@@ -57,19 +57,19 @@ function SavedAddressSelector({
             className={[
               "w-full text-left px-4 py-3.5 border rounded-sm text-sm transition-all duration-200",
               addr.id === selectedId
-                ? "border-[#C8A96B] bg-[#C8A96B]/5"
-                : "border-[#E8DED3] hover:border-[#C8A96B]/50",
+                ? "border-[#B8965C] bg-[#B8965C]/5"
+                : "border-[#EBEBEB] hover:border-[#B8965C]/50",
             ].join(" ")}
             aria-pressed={addr.id === selectedId}
           >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-medium text-[#111111]">{addr.name}</p>
-                <p className="text-[#8b7355] text-xs mt-0.5">
+                <p className="text-[#8C8C8C] text-xs mt-0.5">
                   {addr.address}, {addr.city}
                   {addr.state ? `, ${addr.state}` : ""} {addr.postalCode}
                 </p>
-                <p className="text-[#8b7355] text-xs">{addr.phone}</p>
+                <p className="text-[#8C8C8C] text-xs">{addr.phone}</p>
               </div>
               {addr.isDefault && (
                 <span className="badge badge-gold shrink-0 text-[9px]">Default</span>
@@ -84,7 +84,7 @@ function SavedAddressSelector({
             "w-full text-left px-4 py-3 border rounded-sm text-xs tracking-[0.12em] uppercase transition-all duration-200",
             selectedId === null
               ? "border-[#111111] text-[#111111]"
-              : "border-[#E8DED3] text-[#8b7355] hover:border-[#111111]/30",
+              : "border-[#EBEBEB] text-[#8C8C8C] hover:border-[#111111]/30",
           ].join(" ")}
         >
           + Use a new address
@@ -265,10 +265,10 @@ export function ShippingAddressForm({
 
       {/* Guest email */}
       {!isAuthenticated && (
-        <div className="mb-6 pb-6 border-b border-[#E8DED3]">
-          <p className="text-xs text-[#8b7355] mb-4">
+        <div className="mb-6 pb-6 border-b border-[#EBEBEB]">
+          <p className="text-xs text-[#8C8C8C] mb-4">
             Checking out as a guest.{" "}
-            <a href="/auth/login?callbackUrl=/checkout" className="text-[#C8A96B] hover:underline">
+            <a href="/auth/login?callbackUrl=/checkout" className="text-[#B8965C] hover:underline">
               Sign in
             </a>{" "}
             to save your details.

@@ -31,7 +31,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full py-4 px-6 bg-[#111111] text-[#F8F5F2] font-[family-name:var(--font-manrope)] text-xs tracking-[0.2em] uppercase rounded-sm transition-all duration-300 hover:bg-[#C8A96B] hover:text-[#111111] disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#C8A96B] focus:ring-offset-2 focus:ring-offset-[#F8F5F2]"
+      className="w-full py-4 px-6 bg-[#111111] text-[#F8F5F2] font-[family-name:var(--font-manrope)] text-xs tracking-[0.2em] uppercase rounded-sm transition-all duration-300 hover:bg-[#B8965C] hover:text-[#111111] disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#B8965C] focus:ring-offset-2 focus:ring-offset-[#F8F5F2]"
     >
       {pending ? "Creating account..." : "Create Account"}
     </button>
@@ -70,7 +70,7 @@ export default function RegisterPage() {
           <p className="font-[family-name:var(--font-playfair)] text-[#F8F5F2]/90 text-3xl leading-snug italic font-light mb-6 max-w-xs">
             &ldquo;Crafted scents for unforgettable presence.&rdquo;
           </p>
-          <div className="w-10 h-px bg-[#C8A96B]" />
+          <div className="w-10 h-px bg-[#B8965C]" />
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export default function RegisterPage() {
                 id="name" name="name" type="text" autoComplete="name" required
                 aria-describedby={state.errors?.name ? "name-error" : undefined}
                 placeholder="Your full name"
-                className="w-full px-4 py-3.5 bg-white/10 lg:bg-transparent border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] placeholder-white/30 lg:placeholder-[#111111]/30 text-sm rounded-sm focus:outline-none focus:border-[#C8A96B] focus:ring-1 focus:ring-[#C8A96B] transition-colors duration-200"
+                className="w-full px-4 py-3.5 bg-white/10 lg:bg-transparent border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] placeholder-white/30 lg:placeholder-[#111111]/30 text-sm rounded-sm focus:outline-none focus:border-[#B8965C] focus:ring-1 focus:ring-[#B8965C] transition-colors duration-200"
               />
               {state.errors?.name && (
                 <p id="name-error" className="mt-1.5 text-xs text-red-400 lg:text-red-600">{state.errors.name[0]}</p>
@@ -136,7 +136,7 @@ export default function RegisterPage() {
                 id="email" name="email" type="email" autoComplete="email" required
                 aria-describedby={state.errors?.email ? "email-error" : undefined}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3.5 bg-white/10 lg:bg-transparent border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] placeholder-white/30 lg:placeholder-[#111111]/30 text-sm rounded-sm focus:outline-none focus:border-[#C8A96B] focus:ring-1 focus:ring-[#C8A96B] transition-colors duration-200"
+                className="w-full px-4 py-3.5 bg-white/10 lg:bg-transparent border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] placeholder-white/30 lg:placeholder-[#111111]/30 text-sm rounded-sm focus:outline-none focus:border-[#B8965C] focus:ring-1 focus:ring-[#B8965C] transition-colors duration-200"
               />
               {state.errors?.email && (
                 <p id="email-error" className="mt-1.5 text-xs text-red-400 lg:text-red-600">{state.errors.email[0]}</p>
@@ -155,13 +155,13 @@ export default function RegisterPage() {
                   autoComplete="new-password" required
                   aria-describedby="password-hint password-error"
                   placeholder="Create a password"
-                  className="w-full px-4 py-3.5 pr-11 bg-white/10 lg:bg-transparent border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] placeholder-white/30 lg:placeholder-[#111111]/30 text-sm rounded-sm focus:outline-none focus:border-[#C8A96B] focus:ring-1 focus:ring-[#C8A96B] transition-colors duration-200"
+                  className="w-full px-4 py-3.5 pr-11 bg-white/10 lg:bg-transparent border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] placeholder-white/30 lg:placeholder-[#111111]/30 text-sm rounded-sm focus:outline-none focus:border-[#B8965C] focus:ring-1 focus:ring-[#B8965C] transition-colors duration-200"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 lg:text-[#111111]/40 hover:text-[#C8A96B] transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 lg:text-[#111111]/40 hover:text-[#B8965C] transition-colors"
                 >
                   {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
                 </button>
@@ -188,7 +188,7 @@ export default function RegisterPage() {
             {/* Google */}
             <a
               href="/api/auth/signin/google"
-              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] text-xs tracking-[0.12em] uppercase rounded-sm hover:border-[#C8A96B] hover:text-[#C8A96B] transition-all duration-200"
+              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border border-white/30 lg:border-[#111111]/20 text-white lg:text-[#111111] text-xs tracking-[0.12em] uppercase rounded-sm hover:border-[#B8965C] hover:text-[#B8965C] transition-all duration-200"
             >
               <svg aria-hidden="true" className="w-4 h-4 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -201,7 +201,7 @@ export default function RegisterPage() {
 
             <p className="text-center text-[11px] tracking-wide text-white/50 lg:text-[#111111]/40 pt-1">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-[#C8A96B] hover:text-[#C8A96B]/70 transition-colors">
+              <Link href="/auth/login" className="text-[#B8965C] hover:text-[#B8965C]/70 transition-colors">
                 Sign in
               </Link>
             </p>

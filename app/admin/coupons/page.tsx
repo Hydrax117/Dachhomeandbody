@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="bg-white border border-[#e5e5e5] rounded p-4">
-      <p className="text-[10px] tracking-[0.2em] uppercase text-[#8b7355] mb-1">{label}</p>
+      <p className="text-[10px] tracking-[0.2em] uppercase text-[#8C8C8C] mb-1">{label}</p>
       <p className="font-serif text-2xl font-medium text-[#111111]">{value}</p>
     </div>
   )
@@ -50,7 +50,7 @@ export default async function AdminCouponsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">Coupons</h1>
-          <p className="text-sm text-[#8b7355] mt-1">
+          <p className="text-sm text-[#8C8C8C] mt-1">
             {coupons.length} coupon{coupons.length !== 1 ? "s" : ""} total
           </p>
         </div>
@@ -69,7 +69,7 @@ export default async function AdminCouponsPage() {
       {/* Table */}
       {coupons.length === 0 ? (
         <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
-          <p className="text-sm text-[#8b7355]">No coupons yet.</p>
+          <p className="text-sm text-[#8C8C8C]">No coupons yet.</p>
           <p className="text-xs text-[#aaa] mt-1">
             Create your first coupon using the button above.
           </p>
@@ -79,23 +79,23 @@ export default async function AdminCouponsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Code
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Discount
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Usage
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden md:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Expires
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Status
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Actions
                   </th>
                 </tr>

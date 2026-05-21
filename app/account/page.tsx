@@ -65,14 +65,14 @@ function QuickLink({
   return (
     <Link
       href={href}
-      className="group flex items-start gap-4 bg-white border border-[#e5e5e5] p-5 rounded hover:border-[#C8A96B] transition-colors"
+      className="group flex items-start gap-4 bg-white border border-[#e5e5e5] p-5 rounded hover:border-[#B8965C] transition-colors"
     >
-      <span className="text-[#C8A96B] mt-0.5 shrink-0">{icon}</span>
+      <span className="text-[#B8965C] mt-0.5 shrink-0">{icon}</span>
       <div>
-        <p className="text-sm font-medium text-[#111111] group-hover:text-[#C8A96B] transition-colors mb-0.5">
+        <p className="text-sm font-medium text-[#111111] group-hover:text-[#B8965C] transition-colors mb-0.5">
           {label}
         </p>
-        <p className="text-xs text-[#8b7355]">{description}</p>
+        <p className="text-xs text-[#8C8C8C]">{description}</p>
       </div>
     </Link>
   )
@@ -100,7 +100,7 @@ export default async function AccountOverviewPage() {
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
           Hello, {firstName}
         </h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           Welcome to your account dashboard
         </p>
       </div>
@@ -152,7 +152,7 @@ export default async function AccountOverviewPage() {
           {recentOrders.length > 0 && (
             <Link
               href="/account/orders"
-              className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors"
+              className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors"
             >
               View all →
             </Link>
@@ -162,13 +162,13 @@ export default async function AccountOverviewPage() {
         {recentOrders.length === 0 ? (
           <div className="bg-white border border-[#e5e5e5] rounded p-10 text-center">
             <div className="w-12 h-12 rounded-full bg-[#f5f0e8] flex items-center justify-center mx-auto mb-4">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96B" strokeWidth="1.5" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8965C" strokeWidth="1.5" aria-hidden="true">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
               </svg>
             </div>
             <p className="text-sm font-medium text-[#111111] mb-1">No orders yet</p>
-            <p className="text-xs text-[#8b7355] mb-5">
+            <p className="text-xs text-[#8C8C8C] mb-5">
               When you place an order, it will appear here.
             </p>
             <Link
@@ -182,32 +182,32 @@ export default async function AccountOverviewPage() {
           <div className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Order
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Date
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Status
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Total
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
                 {(recentOrders as OrderItem[]).map((order) => (
-                  <tr key={order.id} className="hover:bg-[#FAF8F5] transition-colors">
+                  <tr key={order.id} className="hover:bg-[#F8F5F2] transition-colors">
                     <td className="px-4 py-3">
                       <Link
                         href={`/account/orders/${order.id}`}
-                        className="font-medium text-[#111111] hover:text-[#C8A96B] transition-colors text-sm"
+                        className="font-medium text-[#111111] hover:text-[#B8965C] transition-colors text-sm"
                       >
                         #{order.orderNumber}
                       </Link>
-                      <p className="text-[11px] text-[#8b7355] mt-0.5 sm:hidden">
+                      <p className="text-[11px] text-[#8C8C8C] mt-0.5 sm:hidden">
                         {new Date(order.createdAt).toLocaleDateString("en-NG", {
                           day: "numeric",
                           month: "short",
@@ -215,7 +215,7 @@ export default async function AccountOverviewPage() {
                         })}
                       </p>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#8b7355] hidden sm:table-cell">
+                    <td className="px-4 py-3 text-xs text-[#8C8C8C] hidden sm:table-cell">
                       {new Date(order.createdAt).toLocaleDateString("en-NG", {
                         day: "numeric",
                         month: "short",

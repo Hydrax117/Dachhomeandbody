@@ -93,9 +93,9 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             }
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#e8e0d0] to-[#d4c9b0] flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#EBEBEB] to-[#C4C4C4] flex items-center justify-center">
             <div
-              className="w-20 h-32 rounded-full bg-[#C8A96B]/20 border border-[#C8A96B]/30"
+              className="w-20 h-32 rounded-full bg-[#B8965C]/20 border border-[#B8965C]/30"
               aria-hidden="true"
             />
           </div>
@@ -110,7 +110,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               <line x1="11" y1="8" x2="11" y2="14" />
               <line x1="8" y1="11" x2="14" y2="11" />
             </svg>
-            <span className="text-[9px] tracking-[0.15em] uppercase text-[#4a4a4a]">Zoom</span>
+            <span className="text-[9px] tracking-[0.15em] uppercase text-[#4A4A4A]">Zoom</span>
           </div>
         )}
 
@@ -120,7 +120,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             <button
               onClick={handlePrev}
               aria-label="Previous image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A96B]"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <polyline points="15 18 9 12 15 6" />
@@ -129,7 +129,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             <button
               onClick={handleNext}
               aria-label="Next image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A96B]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <polyline points="9 18 15 12 9 6" />
@@ -149,10 +149,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               onClick={() => setActiveIndex(i)}
               aria-label={`View image ${i + 1}`}
               aria-pressed={i === activeIndex}
-              className={`relative shrink-0 w-16 h-20 overflow-hidden border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A96B] ${
+              className={`relative shrink-0 w-16 h-20 overflow-hidden border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C] ${
                 i === activeIndex
-                  ? "border-[#C8A96B]"
-                  : "border-transparent hover:border-[#C8A96B]/40"
+                  ? "border-[#B8965C]"
+                  : "border-transparent hover:border-[#B8965C]/40"
               }`}
             >
               <Image

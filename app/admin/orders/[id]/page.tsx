@@ -83,7 +83,7 @@ function Section({
   return (
     <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
       <div className="px-5 py-4 border-b border-[#f0ece4]">
-        <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+        <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
           {title}
         </h2>
       </div>
@@ -135,7 +135,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
       <div>
         <Link
           href="/admin/orders"
-          className="inline-flex items-center gap-1.5 text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors mb-4"
         >
           <svg
             width="12"
@@ -156,7 +156,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
             <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
               Order #{order.orderNumber}
             </h1>
-            <p className="text-sm text-[#8b7355] mt-1">
+            <p className="text-sm text-[#8C8C8C] mt-1">
               Placed on {formatDate(order.createdAt)}
             </p>
           </div>
@@ -193,7 +193,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                           height="16"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#b8b0a8"
+                          stroke="#C4C4C4"
                           strokeWidth="1.5"
                           aria-hidden="true"
                         >
@@ -208,16 +208,16 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/admin/products`}
-                      className="text-sm font-medium text-[#111111] hover:text-[#C8A96B] transition-colors line-clamp-2"
+                      className="text-sm font-medium text-[#111111] hover:text-[#B8965C] transition-colors line-clamp-2"
                     >
                       {item.product.name}
                     </Link>
                     {item.product.sku && (
-                      <p className="text-[11px] text-[#b8b0a8] mt-0.5">
+                      <p className="text-[11px] text-[#C4C4C4] mt-0.5">
                         SKU: {item.product.sku}
                       </p>
                     )}
-                    <p className="text-xs text-[#8b7355] mt-1">
+                    <p className="text-xs text-[#8C8C8C] mt-1">
                       {formatCurrency(item.price)} × {item.quantity}
                     </p>
                   </div>
@@ -234,20 +234,20 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           <Section title="Order summary">
             <div className="px-5 py-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-[#8b7355]">Subtotal</span>
+                <span className="text-[#8C8C8C]">Subtotal</span>
                 <span className="text-[#111111]">{formatCurrency(order.subtotal)}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#C8A96B]">
+                  <span className="text-[#B8965C]">
                     Discount{order.couponCode ? ` (${order.couponCode})` : ""}
                   </span>
-                  <span className="text-[#C8A96B]">−{formatCurrency(order.discount)}</span>
+                  <span className="text-[#B8965C]">−{formatCurrency(order.discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-[#8b7355]">Shipping</span>
-                <span className="text-[#8b7355]">
+                <span className="text-[#8C8C8C]">Shipping</span>
+                <span className="text-[#8C8C8C]">
                   {order.shippingCost === 0 ? "Free" : formatCurrency(order.shippingCost)}
                 </span>
               </div>
@@ -271,12 +271,12 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                 {isRegistered ? (
                   <Link
                     href={`/admin/customers/${order.user!.id}`}
-                    className="text-xs text-[#C8A96B] hover:underline mt-0.5 inline-block"
+                    className="text-xs text-[#B8965C] hover:underline mt-0.5 inline-block"
                   >
                     View customer profile →
                   </Link>
                 ) : (
-                  <p className="text-[11px] text-[#b8b0a8] mt-0.5">Guest checkout</p>
+                  <p className="text-[11px] text-[#C4C4C4] mt-0.5">Guest checkout</p>
                 )}
               </div>
 
@@ -288,7 +288,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                     height="12"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#8b7355"
+                    stroke="#8C8C8C"
                     strokeWidth="2"
                     aria-hidden="true"
                     className="shrink-0"
@@ -298,7 +298,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                   </svg>
                   <a
                     href={`mailto:${customerEmail}`}
-                    className="text-xs text-[#111111] hover:text-[#C8A96B] transition-colors truncate"
+                    className="text-xs text-[#111111] hover:text-[#B8965C] transition-colors truncate"
                   >
                     {customerEmail}
                   </a>
@@ -310,7 +310,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                       height="12"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#8b7355"
+                      stroke="#8C8C8C"
                       strokeWidth="2"
                       aria-hidden="true"
                       className="shrink-0"
@@ -319,7 +319,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                     </svg>
                     <a
                       href={`tel:${shippingAddress.phone}`}
-                      className="text-xs text-[#111111] hover:text-[#C8A96B] transition-colors"
+                      className="text-xs text-[#111111] hover:text-[#B8965C] transition-colors"
                     >
                       {shippingAddress.phone}
                     </a>
@@ -333,22 +333,22 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           <Section title="Payment">
             <div className="px-5 py-4 space-y-2.5">
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b7355]">Status</span>
+                <span className="text-[#8C8C8C]">Status</span>
                 <span
                   className={`capitalize font-medium ${
-                    paymentStatusColors[order.paymentStatus] ?? "text-[#8b7355]"
+                    paymentStatusColors[order.paymentStatus] ?? "text-[#8C8C8C]"
                   }`}
                 >
                   {order.paymentStatus.toLowerCase()}
                 </span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b7355]">Method</span>
+                <span className="text-[#8C8C8C]">Method</span>
                 <span className="text-[#111111] capitalize">{order.paymentMethod}</span>
               </div>
               {order.paymentReference && (
                 <div className="flex justify-between text-xs gap-2">
-                  <span className="text-[#8b7355] shrink-0">Reference</span>
+                  <span className="text-[#8C8C8C] shrink-0">Reference</span>
                   <span className="text-[#111111] font-mono text-[10px] truncate">
                     {order.paymentReference}
                   </span>
@@ -361,7 +361,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           <Section title="Shipping address">
             <address className="px-5 py-4 not-italic">
               <p className="text-sm font-medium text-[#111111]">{shippingAddress.name}</p>
-              <p className="text-xs text-[#8b7355] mt-1 leading-relaxed">
+              <p className="text-xs text-[#8C8C8C] mt-1 leading-relaxed">
                 {shippingAddress.address}
                 <br />
                 {shippingAddress.city}
@@ -377,7 +377,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           <Section title="Timeline">
             <div className="px-5 py-4 space-y-2.5">
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b7355]">Placed</span>
+                <span className="text-[#8C8C8C]">Placed</span>
                 <span className="text-[#111111]">
                   {new Date(order.createdAt).toLocaleDateString("en-NG", {
                     day: "numeric",
@@ -388,7 +388,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
               </div>
               {order.shippedAt && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#8b7355]">Shipped</span>
+                  <span className="text-[#8C8C8C]">Shipped</span>
                   <span className="text-[#111111]">
                     {new Date(order.shippedAt).toLocaleDateString("en-NG", {
                       day: "numeric",
@@ -400,7 +400,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
               )}
               {order.deliveredAt && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#8b7355]">Delivered</span>
+                  <span className="text-[#8C8C8C]">Delivered</span>
                   <span className="text-[#111111]">
                     {new Date(order.deliveredAt).toLocaleDateString("en-NG", {
                       day: "numeric",
@@ -411,7 +411,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                 </div>
               )}
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b7355]">Last updated</span>
+                <span className="text-[#8C8C8C]">Last updated</span>
                 <span className="text-[#111111]">
                   {new Date(order.updatedAt).toLocaleDateString("en-NG", {
                     day: "numeric",
@@ -426,14 +426,14 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           {/* Admin actions — status update + refund */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
-              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                 Manage Order
               </h2>
             </div>
             <div className="px-5 py-4 space-y-4">
               <OrderStatusForm orderId={order.id} currentStatus={order.status} />
               <div className="border-t border-[#f0ece4] pt-4">
-                <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium mb-3">
+                <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium mb-3">
                   Refund
                 </p>
                 <RefundForm
@@ -447,7 +447,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
 
           <Link
             href="/admin/orders"
-            className="w-full text-center text-xs block px-4 py-2.5 border border-[#e5e5e5] text-[#8b7355] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+            className="w-full text-center text-xs block px-4 py-2.5 border border-[#e5e5e5] text-[#8C8C8C] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
           >
             Back to Orders
           </Link>

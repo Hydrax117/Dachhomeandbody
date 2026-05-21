@@ -37,23 +37,23 @@ function AddressSummary({
   onEdit: () => void
 }) {
   return (
-    <div className="mb-8 p-4 border border-[#E8DED3] rounded-sm bg-[#FAF8F5]">
+    <div className="mb-8 p-4 border border-[#EBEBEB] rounded-sm bg-[#F8F5F2]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-2">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-2">
             Shipping to
           </p>
           <p className="text-sm font-medium text-[#111111]">{address.name}</p>
-          <p className="text-xs text-[#8b7355] mt-0.5">
+          <p className="text-xs text-[#8C8C8C] mt-0.5">
             {address.address}, {address.city}
             {address.state ? `, ${address.state}` : ""} {address.postalCode}
           </p>
-          <p className="text-xs text-[#8b7355]">{address.phone}</p>
+          <p className="text-xs text-[#8C8C8C]">{address.phone}</p>
         </div>
         <button
           type="button"
           onClick={onEdit}
-          className="text-[10px] tracking-[0.12em] uppercase text-[#C8A96B] hover:text-[#b8965a] transition-colors shrink-0"
+          className="text-[10px] tracking-[0.12em] uppercase text-[#B8965C] hover:text-[#A07840] transition-colors shrink-0"
         >
           Edit
         </button>
@@ -158,8 +158,8 @@ export function PaymentMethodSelector({
           className={[
             "w-full text-left px-4 py-4 border rounded-sm transition-all duration-200",
             selectedMethod === "paystack"
-              ? "border-[#C8A96B] bg-[#C8A96B]/5"
-              : "border-[#E8DED3] hover:border-[#C8A96B]/50",
+              ? "border-[#B8965C] bg-[#B8965C]/5"
+              : "border-[#EBEBEB] hover:border-[#B8965C]/50",
           ].join(" ")}
         >
           <div className="flex items-center gap-3">
@@ -167,20 +167,20 @@ export function PaymentMethodSelector({
               className={[
                 "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
                 selectedMethod === "paystack"
-                  ? "border-[#C8A96B]"
-                  : "border-[#E8DED3]",
+                  ? "border-[#B8965C]"
+                  : "border-[#EBEBEB]",
               ].join(" ")}
               aria-hidden="true"
             >
               {selectedMethod === "paystack" && (
-                <div className="w-2 h-2 rounded-full bg-[#C8A96B]" />
+                <div className="w-2 h-2 rounded-full bg-[#B8965C]" />
               )}
             </div>
             <div>
               <p className="text-sm font-medium text-[#111111]">
                 Pay with Paystack
               </p>
-              <p className="text-xs text-[#8b7355] mt-0.5">
+              <p className="text-xs text-[#8C8C8C] mt-0.5">
                 Cards, bank transfer, USSD & more
               </p>
             </div>
@@ -195,20 +195,20 @@ export function PaymentMethodSelector({
       </div>
 
       {/* Order total recap */}
-      <div className="mb-6 p-4 border border-[#E8DED3] rounded-sm space-y-2">
+      <div className="mb-6 p-4 border border-[#EBEBEB] rounded-sm space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-[#8b7355]">Subtotal</span>
+          <span className="text-[#8C8C8C]">Subtotal</span>
           <span>₦{cart.subtotal.toLocaleString()}</span>
         </div>
         {cart.discount > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-[#C8A96B]">Discount</span>
-            <span className="text-[#C8A96B]">−₦{cart.discount.toLocaleString()}</span>
+            <span className="text-[#B8965C]">Discount</span>
+            <span className="text-[#B8965C]">−₦{cart.discount.toLocaleString()}</span>
           </div>
         )}
         <div className="flex justify-between text-sm">
-          <span className="text-[#8b7355]">Shipping</span>
-          <span className="text-[#8b7355]">Calculated by carrier</span>
+          <span className="text-[#8C8C8C]">Shipping</span>
+          <span className="text-[#8C8C8C]">Calculated by carrier</span>
         </div>
         <div className="divider" aria-hidden="true" />
         <div className="flex justify-between font-medium">
@@ -247,13 +247,13 @@ export function PaymentMethodSelector({
         type="button"
         onClick={onBack}
         disabled={isPending}
-        className="mt-4 w-full text-center text-xs tracking-[0.12em] uppercase text-[#8b7355] hover:text-[#C8A96B] transition-colors disabled:opacity-40"
+        className="mt-4 w-full text-center text-xs tracking-[0.12em] uppercase text-[#8C8C8C] hover:text-[#B8965C] transition-colors disabled:opacity-40"
       >
         ← Back to Shipping
       </button>
 
       {/* Trust signals */}
-      <p className="mt-6 text-[10px] text-center text-[#b8b0a8] tracking-wide">
+      <p className="mt-6 text-[10px] text-center text-[#C4C4C4] tracking-wide">
         Secured by Paystack · Your payment info is never stored
       </p>
     </div>

@@ -68,7 +68,7 @@ export default function ProductsToolbar({
           placeholder="Search products…"
           defaultValue={currentSearch}
           onChange={(e) => updateParams({ search: e.target.value, page: "1" })}
-          className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#C8A96B] transition-colors placeholder:text-[#aaa]"
+          className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#B8965C] transition-colors placeholder:text-[#aaa]"
           aria-label="Search products"
         />
       </div>
@@ -77,7 +77,7 @@ export default function ProductsToolbar({
       <select
         value={currentCategory}
         onChange={(e) => updateParams({ category: e.target.value, page: "1" })}
-        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
         aria-label="Filter by category"
       >
         <option value="">All Categories</option>
@@ -92,7 +92,7 @@ export default function ProductsToolbar({
       <select
         value={currentStock}
         onChange={(e) => updateParams({ stock: e.target.value, page: "1" })}
-        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
         aria-label="Filter by stock status"
       >
         <option value="">All Stock</option>
@@ -104,7 +104,7 @@ export default function ProductsToolbar({
       {hasFilters && (
         <button
           onClick={() => updateParams({ search: "", category: "", stock: "", page: "1" })}
-          className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors underline underline-offset-2"
+          className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors underline underline-offset-2"
         >
           Clear filters
         </button>

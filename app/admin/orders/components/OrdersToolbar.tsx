@@ -89,7 +89,7 @@ export default function OrdersToolbar({
             placeholder="Search by order #, customer name or email…"
             defaultValue={currentSearch}
             onChange={(e) => updateParams({ search: e.target.value, page: "1" })}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#C8A96B] transition-colors placeholder:text-[#aaa]"
+            className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#B8965C] transition-colors placeholder:text-[#aaa]"
             aria-label="Search orders"
           />
         </div>
@@ -98,7 +98,7 @@ export default function OrdersToolbar({
         <select
           value={currentStatus}
           onChange={(e) => updateParams({ status: e.target.value, page: "1" })}
-          className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+          className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
           aria-label="Filter by status"
         >
           {ORDER_STATUSES.map((s) => (
@@ -112,7 +112,7 @@ export default function OrdersToolbar({
         <select
           value={currentSort}
           onChange={(e) => updateParams({ sort: e.target.value, page: "1" })}
-          className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+          className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
           aria-label="Sort orders"
         >
           {SORT_OPTIONS.map((s) => (
@@ -135,7 +135,7 @@ export default function OrdersToolbar({
                 page: "1",
               })
             }
-            className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors underline underline-offset-2"
+            className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors underline underline-offset-2"
           >
             Clear filters
           </button>
@@ -145,7 +145,7 @@ export default function OrdersToolbar({
       {/* Date range row */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <label htmlFor="startDate" className="text-xs text-[#8b7355] shrink-0">
+          <label htmlFor="startDate" className="text-xs text-[#8C8C8C] shrink-0">
             From
           </label>
           <input
@@ -153,12 +153,12 @@ export default function OrdersToolbar({
             type="date"
             value={currentStartDate}
             onChange={(e) => updateParams({ startDate: e.target.value, page: "1" })}
-            className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+            className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
             aria-label="Start date"
           />
         </div>
         <div className="flex items-center gap-2">
-          <label htmlFor="endDate" className="text-xs text-[#8b7355] shrink-0">
+          <label htmlFor="endDate" className="text-xs text-[#8C8C8C] shrink-0">
             To
           </label>
           <input
@@ -166,7 +166,7 @@ export default function OrdersToolbar({
             type="date"
             value={currentEndDate}
             onChange={(e) => updateParams({ endDate: e.target.value, page: "1" })}
-            className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+            className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
             aria-label="End date"
           />
         </div>

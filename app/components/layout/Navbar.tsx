@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { logout } from "@/app/actions/auth"
 import { useFormStatus } from "react-dom"
@@ -25,38 +26,40 @@ interface MegaMenuColumn {
 // ---------------------------------------------------------------------------
 const shopMegaMenu: MegaMenuColumn[] = [
   {
-    heading: "Fragrances",
+    heading: "Home Fragrance",
     links: [
-      { label: "All Fragrances", href: "/shop" },
-      { label: "Eau de Parfum", href: "/shop?type=EAU_DE_PARFUM" },
-      { label: "Eau de Toilette", href: "/shop?type=EAU_DE_TOILETTE" },
-      { label: "Cologne", href: "/shop?type=COLOGNE" },
-      { label: "Body Mist", href: "/shop?type=BODY_MIST" },
+      { label: "All Home Fragrance", href: "/shop?category=home-fragrance" },
+      { label: "Reed Diffusers", href: "/shop?category=reed-diffusers" },
+      { label: "Scented Candles", href: "/shop?category=scented-candles" },
+      { label: "Room Sprays", href: "/shop?category=room-sprays" },
+      { label: "Wax Melts", href: "/shop?category=wax-melts" },
     ],
   },
   {
-    heading: "Collections",
+    heading: "Natural Skincare",
     links: [
-      { label: "Oud Collection", href: "/collections/oud" },
-      { label: "Floral Collection", href: "/collections/floral" },
-      { label: "Night Collection", href: "/collections/night" },
-      { label: "Home Fragrance", href: "/collections/home" },
+      { label: "All Skincare", href: "/shop?category=natural-skincare" },
+      { label: "Body Butters", href: "/shop?category=body-butters" },
+      { label: "Body Oils", href: "/shop?category=body-oils" },
+      { label: "Scrubs & Exfoliants", href: "/shop?category=scrubs" },
+      { label: "Cleansers & Soaps", href: "/shop?category=cleansers" },
     ],
   },
   {
-    heading: "Discover",
+    heading: "Gift Services",
     links: [
+      { label: "All Gift Sets", href: "/shop?category=gift-sets" },
+      { label: "Curated Gift Boxes", href: "/shop?category=gift-boxes" },
+      { label: "Custom Gifting", href: "/shop?category=custom-gifts" },
       { label: "Best Sellers", href: "/shop?sort=bestsellers" },
       { label: "New Arrivals", href: "/shop?sort=newest" },
-      { label: "Gift Sets", href: "/shop?category=gift-sets" },
-      { label: "Under ₦20,000", href: "/shop?priceMax=20000" },
     ],
   },
 ]
 
 const primaryLinks: NavLink[] = [
   { label: "Home", href: "/" },
-  { label: "Collections", href: "/collections" },
+  { label: "Shop", href: "/shop" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ]
@@ -70,7 +73,7 @@ function LogoutSubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full text-left px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors disabled:opacity-50"
+      className="w-full text-left px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#B8965C] transition-colors disabled:opacity-50"
     >
       {pending ? "Signing out…" : "Sign Out"}
     </button>
@@ -85,7 +88,7 @@ function CartIcon({ count, color, onClick }: { count: number; color: string; onC
     <button
       onClick={onClick}
       aria-label={`Cart, ${count} item${count !== 1 ? "s" : ""}`}
-      className="relative cursor-pointer hover:text-[#C8A96B] transition-colors"
+      className="relative cursor-pointer hover:text-[#B8965C] transition-colors"
       style={{ color }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -96,7 +99,7 @@ function CartIcon({ count, color, onClick }: { count: number; color: string; onC
       {count > 0 && (
         <span
           aria-hidden="true"
-          className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-0.5 rounded-full bg-[#C8A96B] text-[#111111] text-[9px] font-semibold flex items-center justify-center leading-none"
+          className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-0.5 rounded-full bg-[#B8965C] text-[#111111] text-[9px] font-semibold flex items-center justify-center leading-none"
         >
           {count > 99 ? "99+" : count}
         </span>
@@ -144,7 +147,7 @@ function AccountDropdown({ color }: { color: string }) {
       <Link
         href="/auth/login"
         aria-label="Sign in"
-        className="hidden lg:block hover:text-[#C8A96B] transition-colors"
+        className="hidden lg:block hover:text-[#B8965C] transition-colors"
         style={{ color }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -164,7 +167,7 @@ function AccountDropdown({ color }: { color: string }) {
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => setOpen((v) => !v)}
-        className="cursor-pointer hover:text-[#C8A96B] transition-colors"
+        className="cursor-pointer hover:text-[#B8965C] transition-colors"
         style={{ color }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -192,7 +195,7 @@ function AccountDropdown({ color }: { color: string }) {
               href="/account"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors"
+              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#B8965C] transition-colors"
             >
               My Account
             </Link>
@@ -200,7 +203,7 @@ function AccountDropdown({ color }: { color: string }) {
               href="/account/orders"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors"
+              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#B8965C] transition-colors"
             >
               Orders
             </Link>
@@ -208,7 +211,7 @@ function AccountDropdown({ color }: { color: string }) {
               href="/account/wishlist"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#C8A96B] transition-colors"
+              className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-white/80 hover:text-[#B8965C] transition-colors"
             >
               Wishlist
             </Link>
@@ -217,7 +220,7 @@ function AccountDropdown({ color }: { color: string }) {
                 href="/admin"
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-[#C8A96B] hover:text-[#b8965a] transition-colors"
+                className="block px-4 py-2.5 text-xs tracking-[0.12em] uppercase text-[#B8965C] hover:text-[#A07840] transition-colors"
               >
                 Admin Dashboard
               </Link>
@@ -240,11 +243,11 @@ function AccountDropdown({ color }: { color: string }) {
 // ---------------------------------------------------------------------------
 function MegaMenu({ onClose }: { onClose: () => void }) {
   return (
-    <div className="absolute left-0 right-0 bg-[#FAF8F5] border-t border-[#e5e5e5] shadow-lg z-40">
+    <div className="absolute left-0 right-0 bg-[#F8F5F2] border-t border-[#EBEBEB] shadow-lg z-40">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-3 gap-10">
         {shopMegaMenu.map((col) => (
           <div key={col.heading}>
-            <p className="text-[10px] tracking-[0.28em] uppercase text-[#8b7355] mb-5 font-medium">
+            <p className="text-[10px] tracking-[0.28em] uppercase text-[#B8965C] mb-5 font-medium">
               {col.heading}
             </p>
             <ul className="space-y-3">
@@ -253,7 +256,7 @@ function MegaMenu({ onClose }: { onClose: () => void }) {
                   <Link
                     href={link.href}
                     onClick={onClose}
-                    className="text-sm text-[#111111] hover:text-[#C8A96B] transition-colors duration-200"
+                    className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -302,17 +305,17 @@ function MobileMenu({
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className={`fixed top-0 right-0 h-full w-[min(320px,85vw)] bg-[#FAF8F5] z-50 lg:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-[min(320px,85vw)] bg-[#F8F5F2] z-50 lg:hidden flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 h-16 border-b border-[#e5e5e5] shrink-0">
+        <div className="flex items-center justify-between px-6 h-16 border-b border-[#EBEBEB] shrink-0">
           <span className="font-serif text-sm tracking-[0.18em] uppercase">Menu</span>
           <button
             aria-label="Close menu"
             onClick={onClose}
-            className="hover:text-[#C8A96B] transition-colors"
+            className="hover:text-[#B8965C] transition-colors"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -329,7 +332,7 @@ function MobileMenu({
               <Link
                 href="/"
                 onClick={onClose}
-                className="block py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#C8A96B] transition-colors border-b border-[#f0ece4]"
+                className="block py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#B8965C] transition-colors border-b border-[#EBEBEB]"
               >
                 Home
               </Link>
@@ -340,7 +343,7 @@ function MobileMenu({
               <button
                 aria-expanded={shopExpanded}
                 onClick={() => setShopExpanded((v) => !v)}
-                className="w-full flex items-center justify-between py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#C8A96B] transition-colors border-b border-[#f0ece4]"
+                className="w-full flex items-center justify-between py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#B8965C] transition-colors border-b border-[#EBEBEB]"
               >
                 <span>Shop</span>
                 <svg
@@ -365,14 +368,14 @@ function MobileMenu({
               >
                 {shopMegaMenu.map((col) => (
                   <div key={col.heading} className="pl-4 pt-3 pb-1">
-                    <p className="text-[10px] tracking-[0.25em] uppercase text-[#8b7355] mb-2">{col.heading}</p>
+                    <p className="text-[10px] tracking-[0.25em] uppercase text-[#B8965C] mb-2">{col.heading}</p>
                     <ul className="space-y-2 mb-3">
                       {col.links.map((link) => (
                         <li key={link.label}>
                           <Link
                             href={link.href}
                             onClick={onClose}
-                            className="text-sm text-[#4a4a4a] hover:text-[#C8A96B] transition-colors"
+                            className="text-sm text-[#4A4A4A] hover:text-[#B8965C] transition-colors"
                           >
                             {link.label}
                           </Link>
@@ -390,7 +393,7 @@ function MobileMenu({
                 <Link
                   href={link.href}
                   onClick={onClose}
-                  className="block py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#C8A96B] transition-colors border-b border-[#f0ece4]"
+                  className="block py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#B8965C] transition-colors border-b border-[#EBEBEB]"
                 >
                   {link.label}
                 </Link>
@@ -399,29 +402,29 @@ function MobileMenu({
           </ul>
 
           {/* Account section */}
-          <div className="px-6 mt-6 pt-6 border-t border-[#e5e5e5]">
+          <div className="px-6 mt-6 pt-6 border-t border-[#EBEBEB]">
             {session ? (
               <>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-[#8b7355] mb-4">Account</p>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-[#B8965C] mb-4">Account</p>
                 <ul className="space-y-1">
                   <li>
-                    <Link href="/account" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase hover:text-[#C8A96B] transition-colors">
+                    <Link href="/account" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase hover:text-[#B8965C] transition-colors">
                       My Account
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/orders" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase hover:text-[#C8A96B] transition-colors">
+                    <Link href="/account/orders" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase hover:text-[#B8965C] transition-colors">
                       Orders
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/wishlist" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase hover:text-[#C8A96B] transition-colors">
+                    <Link href="/account/wishlist" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase hover:text-[#B8965C] transition-colors">
                       Wishlist
                     </Link>
                   </li>
                   {session.user.role === "ADMIN" && (
                     <li>
-                      <Link href="/admin" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase text-[#C8A96B] hover:text-[#b8965a] transition-colors">
+                      <Link href="/admin" onClick={onClose} className="block py-2.5 text-xs tracking-[0.15em] uppercase text-[#B8965C] hover:text-[#A07840] transition-colors">
                         Admin Dashboard
                       </Link>
                     </li>
@@ -438,14 +441,14 @@ function MobileMenu({
                 <Link
                   href="/auth/login"
                   onClick={onClose}
-                  className="block text-center py-3 bg-[#111111] text-white text-xs tracking-[0.2em] uppercase hover:bg-[#C8A96B] hover:text-[#111111] transition-colors duration-300"
+                  className="block text-center py-3 bg-[#111111] text-white text-xs tracking-[0.2em] uppercase hover:bg-[#B8965C] hover:text-[#111111] transition-colors duration-300"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/auth/register"
                   onClick={onClose}
-                  className="block text-center py-3 border border-[#e5e5e5] text-xs tracking-[0.2em] uppercase hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors duration-300"
+                  className="block text-center py-3 border border-[#EBEBEB] text-xs tracking-[0.2em] uppercase hover:border-[#B8965C] hover:text-[#B8965C] transition-colors duration-300"
                 >
                   Create Account
                 </Link>
@@ -502,7 +505,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          useDarkText ? "bg-[#FAF8F5]/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
+          useDarkText ? "bg-[#F8F5F2]/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
         }`}
       >
         <nav
@@ -512,11 +515,19 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
           {/* Logo */}
           <Link
             href="/"
-            className="font-serif text-base lg:text-lg tracking-[0.22em] uppercase font-normal transition-colors duration-300 shrink-0"
-            style={{ color: useDarkText ? "#111111" : "#ffffff" }}
-            aria-label="Dachhomeandbody — Home"
+            className="shrink-0 flex items-center"
+            aria-label="DACH Home & Body — Home"
           >
-            Dachhomeandbody
+            <Image
+              src="/Dach Logo png (1).PNG"
+              alt="DACH Home & Body"
+              width={120}
+              height={48}
+              className={`h-10 lg:h-12 w-auto object-contain transition-all duration-300 ${
+                useDarkText ? "" : "brightness-0 invert"
+              }`}
+              priority
+            />
           </Link>
 
           {/* Desktop nav links */}
@@ -527,7 +538,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
           >
             {/* Home */}
             <li>
-              <Link href="/" className="hover:text-[#C8A96B] transition-colors duration-200">
+              <Link href="/" className="hover:text-[#B8965C] transition-colors duration-200">
                 Home
               </Link>
             </li>
@@ -541,7 +552,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
               <button
                 aria-haspopup="true"
                 aria-expanded={shopHovered}
-                className="flex items-center gap-1 hover:text-[#C8A96B] transition-colors duration-200"
+                className="flex items-center gap-1 hover:text-[#B8965C] transition-colors duration-200"
                 style={{ color: textColor }}
               >
                 Shop
@@ -566,7 +577,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  className="hover:text-[#C8A96B] transition-colors duration-200"
+                  className="hover:text-[#B8965C] transition-colors duration-200"
                 >
                   {link.label}
                 </Link>
@@ -580,7 +591,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             {!isAdmin && (
             <button
               aria-label="Search"
-              className="hidden lg:block cursor-pointer hover:text-[#C8A96B] transition-colors"
+              className="hidden lg:block cursor-pointer hover:text-[#B8965C] transition-colors"
               style={{ color: iconColor }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -595,7 +606,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             <Link
               href="/account/wishlist"
               aria-label="Wishlist"
-              className="hidden lg:block hover:text-[#C8A96B] transition-colors"
+              className="hidden lg:block hover:text-[#B8965C] transition-colors"
               style={{ color: iconColor }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -617,7 +628,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
-              className="lg:hidden hover:text-[#C8A96B] transition-colors"
+              className="lg:hidden hover:text-[#B8965C] transition-colors"
               style={{ color: iconColor }}
               onClick={() => setMobileOpen(true)}
             >

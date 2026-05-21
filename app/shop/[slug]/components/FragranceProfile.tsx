@@ -47,14 +47,14 @@ function NoteGroup({
   if (!notes.length) return null
   return (
     <div className="flex gap-6 items-start">
-      <span className="text-[10px] tracking-[0.2em] uppercase text-[#8b7355] w-24 shrink-0 pt-0.5">
+      <span className="text-[10px] tracking-[0.2em] uppercase text-[#8C8C8C] w-24 shrink-0 pt-0.5">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">
         {notes.map((note) => (
           <span
             key={note}
-            className="px-2.5 py-1 text-[11px] tracking-wide bg-[#f0ece4] text-[#4a4a4a] border border-[#e8ddd0]"
+            className="px-2.5 py-1 text-[11px] tracking-wide bg-[#f0ece4] text-[#4A4A4A] border border-[#EBEBEB]"
           >
             {note}
           </span>
@@ -76,12 +76,12 @@ function ScaleBar({
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] tracking-[0.2em] uppercase text-[#8b7355]">{label}</span>
-        <span className="text-[11px] text-[#4a4a4a]">{displayLabel}</span>
+        <span className="text-[10px] tracking-[0.2em] uppercase text-[#8C8C8C]">{label}</span>
+        <span className="text-[11px] text-[#4A4A4A]">{displayLabel}</span>
       </div>
-      <div className="h-0.5 bg-[#e8ddd0] w-full" role="presentation">
+      <div className="h-0.5 bg-[#EBEBEB] w-full" role="presentation">
         <div
-          className="h-full bg-[#C8A96B] transition-all duration-700"
+          className="h-full bg-[#B8965C] transition-all duration-700"
           style={{ width: `${value}%` }}
           aria-label={`${label}: ${displayLabel}`}
         />

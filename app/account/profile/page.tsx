@@ -62,7 +62,7 @@ export default async function ProfilePage() {
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
           Profile
         </h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           Manage your personal details and saved addresses
         </p>
       </div>

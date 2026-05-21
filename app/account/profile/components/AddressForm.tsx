@@ -104,7 +104,7 @@ export default function AddressForm({ address, onSuccess }: AddressFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="addr-state">State <span className="text-[#8b7355]">(optional)</span></Label>
+          <Label htmlFor="addr-state">State <span className="text-[#8C8C8C]">(optional)</span></Label>
           <Input
             id="addr-state"
             name="state"

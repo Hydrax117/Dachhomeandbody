@@ -12,17 +12,17 @@ export function Newsletter() {
   }
 
   return (
-    <section className="py-24 lg:py-32 bg-[#1a1208] text-white text-center px-6">
-      <p className="text-[#c9a96e] text-xs tracking-[0.3em] uppercase mb-4">Stay Connected</p>
+    <section className="py-24 lg:py-32 bg-[#0A0A0A] text-white text-center px-6">
+      <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-4">Stay Connected</p>
       <h2 className="font-serif text-white text-3xl lg:text-5xl font-medium mb-4">
-        Join the fragrance experience.
+        Join the DACH experience.
       </h2>
       <p className="text-white/50 text-sm lg:text-base max-w-md mx-auto mb-10">
-        Be the first to discover new scents and exclusive releases.
+        Be the first to discover new arrivals, exclusive offers, and curated gift ideas for the luxury &amp; wellness lifestyle.
       </p>
 
       {submitted ? (
-        <p className="text-[#c9a96e] tracking-wide">Thank you for joining us.</p>
+        <p className="text-[#B8965C] tracking-wide">Thank you for joining us.</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto">
           <input
@@ -32,11 +32,11 @@ export function Newsletter() {
             placeholder="Your email address"
             required
             aria-label="Email address for newsletter"
-            className="flex-1 bg-white/5 border border-white/20 px-5 py-4 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c9a96e] transition-colors"
+            className="flex-1 bg-white/5 border border-white/20 px-5 py-4 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#B8965C] transition-colors"
           />
           <button
             type="submit"
-            className="bg-[#c9a96e] text-[#1a1a1a] px-8 py-4 text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 whitespace-nowrap min-h-[52px]"
+            className="bg-[#B8965C] text-[#111111] px-8 py-4 text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#A07840] transition-colors duration-300 whitespace-nowrap min-h-[52px]"
           >
             Subscribe
           </button>

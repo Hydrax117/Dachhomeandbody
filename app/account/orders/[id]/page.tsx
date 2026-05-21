@@ -87,7 +87,7 @@ function TrackingTimeline({
           <p className="text-sm font-medium text-[#111111] capitalize">
             Order {status.toLowerCase()}
           </p>
-          <p className="text-xs text-[#8b7355] mt-0.5">
+          <p className="text-xs text-[#8C8C8C] mt-0.5">
             {new Date(createdAt).toLocaleDateString("en-NG", {
               day: "numeric",
               month: "long",
@@ -122,7 +122,7 @@ function TrackingTimeline({
               <div
                 className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 ${
                   isCompleted
-                    ? "bg-[#C8A96B] border-[#C8A96B]"
+                    ? "bg-[#B8965C] border-[#B8965C]"
                     : "bg-white border-[#e5e5e5]"
                 }`}
                 aria-hidden="true"
@@ -136,7 +136,7 @@ function TrackingTimeline({
               {index < TRACKING_STEPS.length - 1 && (
                 <div
                   className={`w-0.5 flex-1 mt-1 ${
-                    index < currentIndex ? "bg-[#C8A96B]" : "bg-[#e5e5e5]"
+                    index < currentIndex ? "bg-[#B8965C]" : "bg-[#e5e5e5]"
                   }`}
                 />
               )}
@@ -146,14 +146,14 @@ function TrackingTimeline({
             <div className="pt-0.5 pb-2">
               <p
                 className={`text-sm font-medium ${
-                  isCurrent ? "text-[#C8A96B]" : isCompleted ? "text-[#111111]" : "text-[#b8b0a8]"
+                  isCurrent ? "text-[#B8965C]" : isCompleted ? "text-[#111111]" : "text-[#C4C4C4]"
                 }`}
               >
                 {step.label}
               </p>
-              <p className="text-xs text-[#8b7355] mt-0.5">{step.description}</p>
+              <p className="text-xs text-[#8C8C8C] mt-0.5">{step.description}</p>
               {stepDate && isCompleted && (
-                <p className="text-[11px] text-[#b8b0a8] mt-1">
+                <p className="text-[11px] text-[#C4C4C4] mt-1">
                   {new Date(stepDate).toLocaleDateString("en-NG", {
                     day: "numeric",
                     month: "short",
@@ -236,7 +236,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
       <div>
         <Link
           href="/account/orders"
-          className="inline-flex items-center gap-1.5 text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors mb-4"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <polyline points="15 18 9 12 15 6" />
@@ -249,7 +249,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
             <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
               Order #{order.orderNumber}
             </h1>
-            <p className="text-sm text-[#8b7355] mt-1">
+            <p className="text-sm text-[#8C8C8C] mt-1">
               Placed on{" "}
               {new Date(order.createdAt).toLocaleDateString("en-NG", {
                 day: "numeric",
@@ -268,7 +268,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
           {/* Order items */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
-              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                 Items ordered ({order.items.length})
               </h2>
             </div>
@@ -291,7 +291,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8b0a8" strokeWidth="1.5" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" strokeWidth="1.5" aria-hidden="true">
                           <rect x="3" y="3" width="18" height="18" rx="2" />
                           <circle cx="8.5" cy="8.5" r="1.5" />
                           <polyline points="21 15 16 10 5 21" />
@@ -303,16 +303,16 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/shop/${item.product.slug}`}
-                      className="text-sm font-medium text-[#111111] hover:text-[#C8A96B] transition-colors line-clamp-2"
+                      className="text-sm font-medium text-[#111111] hover:text-[#B8965C] transition-colors line-clamp-2"
                     >
                       {item.product.name}
                     </Link>
                     {item.product.sku && (
-                      <p className="text-[11px] text-[#b8b0a8] mt-0.5">
+                      <p className="text-[11px] text-[#C4C4C4] mt-0.5">
                         SKU: {item.product.sku}
                       </p>
                     )}
-                    <p className="text-xs text-[#8b7355] mt-1">
+                    <p className="text-xs text-[#8C8C8C] mt-1">
                       {formatCurrency(item.price)} × {item.quantity}
                     </p>
                   </div>
@@ -328,26 +328,26 @@ export default async function OrderDetailPage({ params }: PageProps) {
           {/* Order totals */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
-              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                 Order summary
               </h2>
             </div>
             <div className="px-5 py-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-[#8b7355]">Subtotal</span>
+                <span className="text-[#8C8C8C]">Subtotal</span>
                 <span className="text-[#111111]">{formatCurrency(order.subtotal)}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#C8A96B]">
+                  <span className="text-[#B8965C]">
                     Discount{order.couponCode ? ` (${order.couponCode})` : ""}
                   </span>
-                  <span className="text-[#C8A96B]">−{formatCurrency(order.discount)}</span>
+                  <span className="text-[#B8965C]">−{formatCurrency(order.discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-[#8b7355]">Shipping</span>
-                <span className="text-[#8b7355]">
+                <span className="text-[#8C8C8C]">Shipping</span>
+                <span className="text-[#8C8C8C]">
                   {order.shippingCost === 0 ? "Free" : formatCurrency(order.shippingCost)}
                 </span>
               </div>
@@ -366,7 +366,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
           {/* Order tracking */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
-              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                 Order tracking
               </h2>
             </div>
@@ -378,7 +378,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
                 createdAt={order.createdAt}
               />
               {isActive && (
-                <p className="text-[11px] text-[#8b7355] mt-4 pt-4 border-t border-[#f0ece4]">
+                <p className="text-[11px] text-[#8C8C8C] mt-4 pt-4 border-t border-[#f0ece4]">
                   Estimated delivery:{" "}
                   <span className="font-medium text-[#111111]">
                     {estimatedDelivery(order.createdAt)}
@@ -391,13 +391,13 @@ export default async function OrderDetailPage({ params }: PageProps) {
           {/* Shipping address */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
-              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                 Shipping address
               </h2>
             </div>
             <address className="px-5 py-4 not-italic">
               <p className="text-sm font-medium text-[#111111]">{shippingAddress.name}</p>
-              <p className="text-xs text-[#8b7355] mt-1 leading-relaxed">
+              <p className="text-xs text-[#8C8C8C] mt-1 leading-relaxed">
                 {shippingAddress.address}
                 <br />
                 {shippingAddress.city}
@@ -406,24 +406,24 @@ export default async function OrderDetailPage({ params }: PageProps) {
                 <br />
                 {shippingAddress.country}
               </p>
-              <p className="text-xs text-[#8b7355] mt-1">{shippingAddress.phone}</p>
+              <p className="text-xs text-[#8C8C8C] mt-1">{shippingAddress.phone}</p>
             </address>
           </section>
 
           {/* Payment info */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
-              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+              <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                 Payment
               </h2>
             </div>
             <div className="px-5 py-4 space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b7355]">Method</span>
+                <span className="text-[#8C8C8C]">Method</span>
                 <span className="text-[#111111] capitalize">{order.paymentMethod}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-[#8b7355]">Status</span>
+                <span className="text-[#8C8C8C]">Status</span>
                 <span
                   className={`capitalize font-medium ${
                     order.paymentStatus === "PAID"
@@ -438,7 +438,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
               </div>
               {order.paymentReference && (
                 <div className="flex justify-between text-xs gap-2">
-                  <span className="text-[#8b7355] shrink-0">Reference</span>
+                  <span className="text-[#8C8C8C] shrink-0">Reference</span>
                   <span className="text-[#111111] font-mono text-[10px] truncate">
                     {order.paymentReference}
                   </span>

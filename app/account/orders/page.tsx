@@ -79,7 +79,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
           My Orders
         </h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           {total === 0
             ? "You haven't placed any orders yet."
             : `${total} order${total === 1 ? "" : "s"} total`}
@@ -95,7 +95,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
               height="22"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#C8A96B"
+              stroke="#B8965C"
               strokeWidth="1.5"
               aria-hidden="true"
             >
@@ -104,7 +104,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
             </svg>
           </div>
           <p className="text-sm font-medium text-[#111111] mb-1">No orders yet</p>
-          <p className="text-xs text-[#8b7355] mb-6">
+          <p className="text-xs text-[#8C8C8C] mb-6">
             When you place an order, it will appear here.
           </p>
           <Link href="/shop" className="btn-primary text-xs">
@@ -126,17 +126,17 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                 <Link
                   key={order.id}
                   href={`/account/orders/${order.id}`}
-                  className="block bg-white border border-[#e5e5e5] rounded hover:border-[#C8A96B] transition-colors group"
+                  className="block bg-white border border-[#e5e5e5] rounded hover:border-[#B8965C] transition-colors group"
                   aria-label={`Order ${order.orderNumber}`}
                 >
                   {/* Order header row */}
                   <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0ece4]">
                     <div className="flex items-center gap-4 min-w-0">
                       <div>
-                        <p className="text-sm font-medium text-[#111111] group-hover:text-[#C8A96B] transition-colors">
+                        <p className="text-sm font-medium text-[#111111] group-hover:text-[#B8965C] transition-colors">
                           #{order.orderNumber}
                         </p>
-                        <p className="text-[11px] text-[#8b7355] mt-0.5">
+                        <p className="text-[11px] text-[#8C8C8C] mt-0.5">
                           {new Date(order.createdAt).toLocaleDateString("en-NG", {
                             day: "numeric",
                             month: "long",
@@ -155,9 +155,9 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                         height="14"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#8b7355"
+                        stroke="#8C8C8C"
                         strokeWidth="1.5"
-                        className="group-hover:stroke-[#C8A96B] transition-colors"
+                        className="group-hover:stroke-[#B8965C] transition-colors"
                         aria-hidden="true"
                       >
                         <polyline points="9 18 15 12 9 6" />
@@ -189,7 +189,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                                   height="12"
                                   viewBox="0 0 24 24"
                                   fill="none"
-                                  stroke="#b8b0a8"
+                                  stroke="#C4C4C4"
                                   strokeWidth="1.5"
                                   aria-hidden="true"
                                 >
@@ -203,13 +203,13 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                         ))}
                         {order.items.length > 3 && (
                           <div className="w-9 h-10 rounded border border-[#e5e5e5] bg-[#f5f0e8] flex items-center justify-center shrink-0">
-                            <span className="text-[10px] text-[#8b7355]">
+                            <span className="text-[10px] text-[#8C8C8C]">
                               +{order.items.length - 3}
                             </span>
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-[#8b7355] truncate">
+                      <p className="text-xs text-[#8C8C8C] truncate">
                         {order.items.length === 1
                           ? order.items[0].product.name
                           : `${order.items.length} items`}
@@ -217,7 +217,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                     </div>
 
                     {shippingAddress?.city && (
-                      <p className="text-[11px] text-[#8b7355] shrink-0 hidden sm:block">
+                      <p className="text-[11px] text-[#8C8C8C] shrink-0 hidden sm:block">
                         {shippingAddress.city}
                         {shippingAddress.state ? `, ${shippingAddress.state}` : ""}
                       </p>
@@ -237,18 +237,18 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
               {page > 1 && (
                 <Link
                   href={`/account/orders?page=${page - 1}`}
-                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                 >
                   ← Previous
                 </Link>
               )}
-              <span className="text-xs text-[#8b7355]">
+              <span className="text-xs text-[#8C8C8C]">
                 Page {page} of {totalPages}
               </span>
               {page < totalPages && (
                 <Link
                   href={`/account/orders?page=${page + 1}`}
-                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                 >
                   Next →
                 </Link>

@@ -79,7 +79,7 @@ export default async function AdminCustomersPage({
       {/* Header */}
       <div>
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">Customers</h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           {total} customer{total !== 1 ? "s" : ""}
           {hasFilters ? " matching filters" : " total"}
         </p>
@@ -91,13 +91,13 @@ export default async function AdminCustomersPage({
       {/* Table */}
       {customers.length === 0 ? (
         <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             {hasFilters ? "No customers match your search." : "No customers yet."}
           </p>
           {hasFilters && (
             <Link
               href="/admin/customers"
-              className="inline-block mt-3 text-xs text-[#C8A96B] hover:underline"
+              className="inline-block mt-3 text-xs text-[#B8965C] hover:underline"
             >
               Clear filters →
             </Link>
@@ -108,30 +108,30 @@ export default async function AdminCustomersPage({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Customer
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Contact
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden md:table-cell">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Orders
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Total Spend
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Joined
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
                 {customers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-[#FAF8F5] transition-colors">
+                  <tr key={customer.id} className="hover:bg-[#F8F5F2] transition-colors">
                     {/* Name + avatar */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -145,7 +145,7 @@ export default async function AdminCustomersPage({
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-[11px] font-medium text-[#8b7355] uppercase">
+                            <span className="text-[11px] font-medium text-[#8C8C8C] uppercase">
                               {(customer.name ?? customer.email).charAt(0)}
                             </span>
                           )}
@@ -154,7 +154,7 @@ export default async function AdminCustomersPage({
                           <p className="text-sm font-medium text-[#111111] truncate max-w-[160px]">
                             {customer.name ?? "—"}
                           </p>
-                          <p className="text-[11px] text-[#8b7355] truncate max-w-[160px] sm:hidden">
+                          <p className="text-[11px] text-[#8C8C8C] truncate max-w-[160px] sm:hidden">
                             {customer.email}
                           </p>
                         </div>
@@ -167,7 +167,7 @@ export default async function AdminCustomersPage({
                         {customer.email}
                       </p>
                       {customer.phone && (
-                        <p className="text-[11px] text-[#8b7355] mt-0.5">{customer.phone}</p>
+                        <p className="text-[11px] text-[#8C8C8C] mt-0.5">{customer.phone}</p>
                       )}
                     </td>
 
@@ -185,7 +185,7 @@ export default async function AdminCustomersPage({
 
                     {/* Joined date */}
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className="text-xs text-[#8b7355]">
+                      <span className="text-xs text-[#8C8C8C]">
                         {formatDate(customer.createdAt)}
                       </span>
                     </td>
@@ -194,7 +194,7 @@ export default async function AdminCustomersPage({
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/customers/${customer.id}`}
-                        className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
+                        className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
                         aria-label={`View customer ${customer.name ?? customer.email}`}
                       >
                         View
@@ -208,15 +208,15 @@ export default async function AdminCustomersPage({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#FAF8F5]">
-              <p className="text-xs text-[#8b7355]">
+            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#F8F5F2]">
+              <p className="text-xs text-[#8C8C8C]">
                 Page {page} of {totalPages} — {total} customers
               </p>
               <div className="flex items-center gap-2">
                 {page > 1 && (
                   <Link
                     href={buildPageUrl(params, page - 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     ← Prev
                   </Link>
@@ -224,7 +224,7 @@ export default async function AdminCustomersPage({
                 {page < totalPages && (
                   <Link
                     href={buildPageUrl(params, page + 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     Next →
                   </Link>

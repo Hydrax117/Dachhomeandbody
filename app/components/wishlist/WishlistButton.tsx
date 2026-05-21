@@ -54,8 +54,8 @@ export function WishlistButton({
         width={size}
         height={size}
         viewBox="0 0 24 24"
-        fill={inWishlist ? "#C8A96B" : "none"}
-        stroke={inWishlist ? "#C8A96B" : "currentColor"}
+        fill={inWishlist ? "#B8965C" : "none"}
+        stroke={inWishlist ? "#B8965C" : "currentColor"}
         strokeWidth="1.5"
         aria-hidden="true"
         className="transition-all duration-200"

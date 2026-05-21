@@ -20,20 +20,29 @@ interface Product {
   category: { id: string; name: string; slug: string }
 }
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+  _count: { products: number }
+}
+
 interface ShopClientProps {
   products: Product[]
   total: number
   page: number
   totalPages: number
+  categories: Category[]
 }
 
-export function ShopClient({ products, total, page, totalPages }: ShopClientProps) {
+export function ShopClient({ products, total, page, totalPages, categories }: ShopClientProps) {
   const [filterOpen, setFilterOpen] = useState(false)
 
   return (
     <div className="flex gap-10 lg:gap-14">
       {/* Sidebar */}
       <FilterSidebar
+        categories={categories}
         mobileOpen={filterOpen}
         onMobileClose={() => setFilterOpen(false)}
       />
@@ -66,14 +75,14 @@ export function ShopClient({ products, total, page, totalPages }: ShopClientProp
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="w-16 h-16 rounded-full bg-[#e8ded3] flex items-center justify-center mb-6" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b7355" strokeWidth="1.5">
+      <div className="w-16 h-16 rounded-full bg-[#EBEBEB] flex items-center justify-center mb-6" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="1.5">
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.35-4.35" />
         </svg>
       </div>
       <h2 className="font-serif text-xl font-medium mb-2">No products found</h2>
-      <p className="text-sm text-[#8b7355] max-w-xs">
+      <p className="text-sm text-[#8C8C8C] max-w-xs">
         Try adjusting your filters or search term to find what you&apos;re looking for.
       </p>
     </div>

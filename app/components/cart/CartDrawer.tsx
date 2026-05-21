@@ -79,18 +79,18 @@ export function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label={`Shopping cart, ${itemCount} item${itemCount !== 1 ? "s" : ""}`}
-        className={`fixed top-0 right-0 h-full w-[min(420px,100vw)] bg-[#FAF8F5] z-50 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-[min(420px,100vw)] bg-[#F8F5F2] z-50 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 h-16 border-b border-[#e8ddd0] shrink-0">
+        <div className="flex items-center justify-between px-6 h-16 border-b border-[#EBEBEB] shrink-0">
           <div className="flex items-center gap-3">
             <h2 className="font-serif text-base tracking-[0.08em]">Your Cart</h2>
             {itemCount > 0 && (
               <span
                 aria-hidden="true"
-                className="min-w-[20px] h-5 px-1 rounded-full bg-[#C8A96B] text-[#111111] text-[10px] font-semibold flex items-center justify-center"
+                className="min-w-[20px] h-5 px-1 rounded-full bg-[#B8965C] text-[#111111] text-[10px] font-semibold flex items-center justify-center"
               >
                 {itemCount}
               </span>
@@ -133,7 +133,7 @@ export function CartDrawer() {
         {cart.items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-5">
             <div className="w-16 h-16 rounded-full bg-[#f0ece4] flex items-center justify-center" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C8A96B" strokeWidth="1.2" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B8965C" strokeWidth="1.2" aria-hidden="true">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
@@ -141,7 +141,7 @@ export function CartDrawer() {
             </div>
             <div>
               <p className="font-serif text-lg mb-1">Your cart is empty</p>
-              <p className="text-sm text-[#8b7355]">Discover our luxury fragrances</p>
+              <p className="text-sm text-[#8C8C8C]">Discover our luxury fragrances</p>
             </div>
             <Link
               href="/shop"
@@ -163,7 +163,7 @@ export function CartDrawer() {
             </div>
 
             {/* Summary footer */}
-            <div className="px-6 py-5 border-t border-[#e8ddd0] bg-[#FAF8F5] shrink-0">
+            <div className="px-6 py-5 border-t border-[#EBEBEB] bg-[#F8F5F2] shrink-0">
               <CartSummary onCheckout={closeCart} />
             </div>
           </>

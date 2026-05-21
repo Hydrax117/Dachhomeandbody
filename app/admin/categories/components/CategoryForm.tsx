@@ -62,7 +62,7 @@ export default function CategoryForm({
       <div>
         <label
           htmlFor="cat-name"
-          className="block text-xs tracking-[0.12em] uppercase text-[#8b7355] mb-1"
+          className="block text-xs tracking-[0.12em] uppercase text-[#8C8C8C] mb-1"
         >
           Name <span aria-hidden="true">*</span>
         </label>
@@ -73,7 +73,7 @@ export default function CategoryForm({
           required
           defaultValue={category?.name ?? ""}
           onChange={handleNameChange}
-          className="w-full border border-[#e5e5e5] rounded px-3 py-2 text-sm text-[#111111] focus:outline-none focus:border-[#C8A96B] transition-colors"
+          className="w-full border border-[#e5e5e5] rounded px-3 py-2 text-sm text-[#111111] focus:outline-none focus:border-[#B8965C] transition-colors"
           placeholder="e.g. Eau de Parfum"
         />
         {state.errors?.name && (
@@ -85,7 +85,7 @@ export default function CategoryForm({
       <div>
         <label
           htmlFor="cat-slug"
-          className="block text-xs tracking-[0.12em] uppercase text-[#8b7355] mb-1"
+          className="block text-xs tracking-[0.12em] uppercase text-[#8C8C8C] mb-1"
         >
           Slug <span aria-hidden="true">*</span>
         </label>
@@ -95,7 +95,7 @@ export default function CategoryForm({
           type="text"
           required
           defaultValue={category?.slug ?? ""}
-          className="w-full border border-[#e5e5e5] rounded px-3 py-2 text-sm text-[#111111] focus:outline-none focus:border-[#C8A96B] transition-colors font-mono"
+          className="w-full border border-[#e5e5e5] rounded px-3 py-2 text-sm text-[#111111] focus:outline-none focus:border-[#B8965C] transition-colors font-mono"
           placeholder="e.g. eau-de-parfum"
         />
         {state.errors?.slug && (
@@ -107,7 +107,7 @@ export default function CategoryForm({
       <div>
         <label
           htmlFor="cat-description"
-          className="block text-xs tracking-[0.12em] uppercase text-[#8b7355] mb-1"
+          className="block text-xs tracking-[0.12em] uppercase text-[#8C8C8C] mb-1"
         >
           Description
         </label>
@@ -116,7 +116,7 @@ export default function CategoryForm({
           name="description"
           rows={2}
           defaultValue={category?.description ?? ""}
-          className="w-full border border-[#e5e5e5] rounded px-3 py-2 text-sm text-[#111111] focus:outline-none focus:border-[#C8A96B] transition-colors resize-none"
+          className="w-full border border-[#e5e5e5] rounded px-3 py-2 text-sm text-[#111111] focus:outline-none focus:border-[#B8965C] transition-colors resize-none"
           placeholder="Optional short description"
         />
         {state.errors?.description && (
@@ -137,7 +137,7 @@ export default function CategoryForm({
           <button
             type="button"
             onClick={onCancel}
-            className="text-xs text-[#8b7355] hover:text-[#111111] transition-colors px-3 py-2.5"
+            className="text-xs text-[#8C8C8C] hover:text-[#111111] transition-colors px-3 py-2.5"
           >
             Cancel
           </button>

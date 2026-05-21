@@ -80,7 +80,7 @@ export default async function AdminProductsPage({
           <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
             Products
           </h1>
-          <p className="text-sm text-[#8b7355] mt-1">
+          <p className="text-sm text-[#8C8C8C] mt-1">
             {total} product{total !== 1 ? "s" : ""} total
           </p>
         </div>
@@ -107,7 +107,7 @@ export default async function AdminProductsPage({
       {/* Products table */}
       {products.length === 0 ? (
         <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             {search || categoryId || stockFilter
               ? "No products match your filters."
               : "No products yet."}
@@ -115,7 +115,7 @@ export default async function AdminProductsPage({
           {!search && !categoryId && !stockFilter && (
             <Link
               href="/admin/products/new"
-              className="inline-block mt-4 text-xs text-[#C8A96B] hover:underline"
+              className="inline-block mt-4 text-xs text-[#B8965C] hover:underline"
             >
               Add your first product →
             </Link>
@@ -126,30 +126,30 @@ export default async function AdminProductsPage({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Product
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden md:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Category
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Price
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Stock
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Status
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
                 {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-[#FAF8F5] transition-colors">
+                  <tr key={product.id} className="hover:bg-[#F8F5F2] transition-colors">
                     {/* Product name + SKU */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -175,14 +175,14 @@ export default async function AdminProductsPage({
                           <p className="font-medium text-[#111111] truncate max-w-[180px]">
                             {product.name}
                           </p>
-                          <p className="text-[11px] text-[#8b7355]">SKU: {product.sku}</p>
+                          <p className="text-[11px] text-[#8C8C8C]">SKU: {product.sku}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Category */}
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-[#8b7355] text-xs">{product.category.name}</span>
+                      <span className="text-[#8C8C8C] text-xs">{product.category.name}</span>
                     </td>
 
                     {/* Price */}
@@ -205,7 +205,7 @@ export default async function AdminProductsPage({
                     {/* Featured badge */}
                     <td className="px-4 py-3 hidden lg:table-cell">
                       {product.featured && (
-                        <span className="inline-block text-[10px] tracking-[0.12em] uppercase px-2 py-0.5 rounded border bg-[#fffbf0] text-[#C8A96B] border-[#C8A96B]/30">
+                        <span className="inline-block text-[10px] tracking-[0.12em] uppercase px-2 py-0.5 rounded border bg-[#fffbf0] text-[#B8965C] border-[#B8965C]/30">
                           Featured
                         </span>
                       )}
@@ -216,7 +216,7 @@ export default async function AdminProductsPage({
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/admin/products/${product.id}/edit`}
-                          className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
+                          className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
                           aria-label={`Edit ${product.name}`}
                         >
                           Edit
@@ -236,15 +236,15 @@ export default async function AdminProductsPage({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#FAF8F5]">
-              <p className="text-xs text-[#8b7355]">
+            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#F8F5F2]">
+              <p className="text-xs text-[#8C8C8C]">
                 Page {page} of {totalPages} — {total} products
               </p>
               <div className="flex items-center gap-2">
                 {page > 1 && (
                   <Link
                     href={buildPageUrl(params, page - 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     ← Prev
                   </Link>
@@ -252,7 +252,7 @@ export default async function AdminProductsPage({
                 {page < totalPages && (
                   <Link
                     href={buildPageUrl(params, page + 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     Next →
                   </Link>

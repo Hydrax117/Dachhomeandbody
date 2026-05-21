@@ -45,7 +45,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-sm text-[#8b7355]">
+      <div className="flex items-center justify-center h-40 text-sm text-[#8C8C8C]">
         No data for this period
       </div>
     )
@@ -73,8 +73,8 @@ export default function RevenueChart({ data }: RevenueChartProps) {
       >
         <defs>
           <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#C8A96B" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#C8A96B" stopOpacity="0" />
+            <stop offset="0%" stopColor="#B8965C" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#B8965C" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -85,7 +85,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
         <path
           d={linePath}
           fill="none"
-          stroke="#C8A96B"
+          stroke="#B8965C"
           strokeWidth="2"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -98,7 +98,7 @@ export default function RevenueChart({ data }: RevenueChartProps) {
             cx={p.x}
             cy={p.y}
             r="3"
-            fill="#C8A96B"
+            fill="#B8965C"
             stroke="white"
             strokeWidth="1.5"
           >

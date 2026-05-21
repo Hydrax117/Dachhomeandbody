@@ -45,9 +45,9 @@ function ReviewCard({ review }: { review: Review }) {
         )}
       </div>
 
-      <p className="text-[#4a4a4a] text-sm leading-relaxed mb-4">{review.comment}</p>
+      <p className="text-[#4A4A4A] text-sm leading-relaxed mb-4">{review.comment}</p>
 
-      <div className="flex items-center gap-2 text-[11px] text-[#8b7355]">
+      <div className="flex items-center gap-2 text-[11px] text-[#8C8C8C]">
         <span className="font-medium">{review.user.name ?? "Anonymous"}</span>
         <span aria-hidden="true">·</span>
         <time dateTime={new Date(review.createdAt).toISOString()}>{date}</time>
@@ -95,7 +95,7 @@ export async function ReviewsList({
         <h2 className="font-serif text-lg font-medium">
           Customer Reviews
           {reviewCount > 0 && (
-            <span className="text-[#8b7355] font-sans text-sm font-normal ml-2">
+            <span className="text-[#8C8C8C] font-sans text-sm font-normal ml-2">
               ({reviewCount})
             </span>
           )}
@@ -104,7 +104,7 @@ export async function ReviewsList({
         {averageRating && reviewCount > 0 && (
           <div className="flex items-center gap-2">
             <StarRating rating={Math.round(averageRating)} size={14} />
-            <span className="text-sm text-[#4a4a4a]">
+            <span className="text-sm text-[#4A4A4A]">
               {averageRating.toFixed(1)} / 5
             </span>
           </div>
@@ -112,7 +112,7 @@ export async function ReviewsList({
       </div>
 
       {reviews.length === 0 ? (
-        <p className="text-[#8b7355] text-sm py-6 text-center border border-dashed border-[#e8ddd0]">
+        <p className="text-[#8C8C8C] text-sm py-6 text-center border border-dashed border-[#EBEBEB]">
           No reviews yet. Be the first to share your experience.
         </p>
       ) : (
@@ -129,24 +129,24 @@ export async function ReviewsList({
         <h3 className="font-serif text-base font-medium mb-4">Write a Review</h3>
 
         {!userId ? (
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             Please{" "}
             <a
               href="/auth/login"
-              className="text-[#C8A96B] underline underline-offset-2 hover:text-[#111111] transition-colors duration-200"
+              className="text-[#B8965C] underline underline-offset-2 hover:text-[#111111] transition-colors duration-200"
             >
               sign in
             </a>{" "}
             to leave a review.
           </p>
         ) : hasReviewed ? (
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             You have already reviewed this product. Thank you for your feedback!
           </p>
         ) : canReview ? (
           <ReviewForm productId={productId} />
         ) : (
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             Only customers who have received this product can leave a review.
           </p>
         )}

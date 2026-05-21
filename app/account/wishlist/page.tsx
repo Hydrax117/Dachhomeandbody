@@ -32,7 +32,7 @@ export default async function WishlistPage() {
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
           My Wishlist
         </h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           {items.length === 0
             ? "No saved items yet."
             : `${items.length} saved item${items.length === 1 ? "" : "s"}`}

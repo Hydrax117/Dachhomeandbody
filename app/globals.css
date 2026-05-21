@@ -6,28 +6,55 @@
    ============================================================ */
 
 :root {
-  /* ── Primary Palette ── */
-  --color-matte-black:    #111111;
-  --color-warm-white:     #F8F5F2;
-  --color-soft-cream:     #FAF6F1;
-  --color-champagne-gold: #C8A96B;
-  --color-deep-coffee:    #4B3425;
+  /* ══════════════════════════════════════════════════════════
+     DACH HOME & BODY — Brand Color System
+     Primary:   Black  (#111111)
+     Secondary: Gold   (#B8965C) · Grey (#8C8C8C) · White (#FFFFFF / #F8F5F2)
+     Style:     Minimalist Luxury — Personal · Elegant · Memorable
+     ══════════════════════════════════════════════════════════ */
 
-  /* ── Secondary Palette ── */
-  --color-warm-gray:  #B8B0A8;
-  --color-soft-beige: #E8DED3;
-  --color-charcoal:   #1B1B1B;
+  /* ── Primary — Black ── */
+  --color-primary-black:  #111111;   /* Pure brand black — CTAs, headings, nav */
+  --color-primary-black-soft: #1A1A1A; /* Slightly lifted for cards, surfaces */
+  --color-primary-black-deep: #0A0A0A; /* Footer, darkest surfaces */
+
+  /* ── Secondary — Gold ── */
+  --color-gold:           #B8965C;   /* Brand gold — accents, highlights, hover states */
+  --color-gold-light:     #CBA96E;   /* Lighter gold — eyebrows, subtle accents */
+  --color-gold-pale:      #E8D5B0;   /* Very pale gold — tints, backgrounds */
+  --color-gold-deep:      #8C6E3A;   /* Deep gold — pressed states */
+
+  /* ── Secondary — Grey ── */
+  --color-grey:           #8C8C8C;   /* Mid grey — body text, muted elements */
+  --color-grey-light:     #C4C4C4;   /* Light grey — borders, dividers */
+  --color-grey-pale:      #EBEBEB;   /* Pale grey — subtle backgrounds */
+  --color-grey-dark:      #4A4A4A;   /* Dark grey — secondary text */
+
+  /* ── Secondary — White ── */
+  --color-white:          #FFFFFF;   /* Pure white */
+  --color-warm-white:     #F8F5F2;   /* Warm white — page background */
+  --color-soft-cream:     #FAF7F4;   /* Soft cream — section backgrounds */
+  --color-off-white:      #F2EDE8;   /* Off-white — card surfaces */
+
+  /* ── Legacy aliases (kept for backward compat) ── */
+  --color-matte-black:    var(--color-primary-black);
+  --color-champagne-gold: var(--color-gold);
+  --color-warm-gray:      var(--color-grey);
+  --color-soft-beige:     var(--color-grey-pale);
+  --color-charcoal:       var(--color-primary-black-soft);
+  --color-deep-coffee:    #3D2B1A;
 
   /* ── Semantic Aliases ── */
-  --color-background:  var(--color-soft-cream);
-  --color-foreground:  var(--color-matte-black);
-  --color-primary:     var(--color-matte-black);
-  --color-accent:      var(--color-champagne-gold);
-  --color-muted:       var(--color-warm-gray);
-  --color-border:      var(--color-soft-beige);
-  --color-surface:     var(--color-warm-white);
-  --color-error:       #c0392b;
-  --color-success:     #27ae60;
+  --color-background:  var(--color-warm-white);
+  --color-foreground:  var(--color-primary-black);
+  --color-primary:     var(--color-primary-black);
+  --color-secondary:   var(--color-gold);
+  --color-accent:      var(--color-gold);
+  --color-muted:       var(--color-grey);
+  --color-border:      var(--color-grey-pale);
+  --color-surface:     var(--color-soft-cream);
+  --color-error:       #B83232;
+  --color-success:     #2E7D52;
 
   /* ── Typography ── */
   --font-serif:   var(--font-playfair), var(--font-cormorant), "Playfair Display", "Cormorant Garamond", Georgia, serif;
@@ -85,13 +112,15 @@
   --radius-2xl:  1rem;
   --radius-full: 9999px;
 
-  /* ── Shadows — soft, warm, editorial ── */
-  --shadow-xs:  0 1px 3px 0 rgb(75 52 37 / 0.06);
-  --shadow-sm:  0 2px 8px 0 rgb(75 52 37 / 0.08);
-  --shadow-md:  0 4px 16px 0 rgb(75 52 37 / 0.10);
-  --shadow-lg:  0 8px 32px 0 rgb(75 52 37 / 0.12);
-  --shadow-xl:  0 16px 48px 0 rgb(75 52 37 / 0.14);
-  --shadow-2xl: 0 32px 64px 0 rgb(17 17 17 / 0.18);
+  /* ── Shadows — crisp, black-based, editorial ── */
+  --shadow-xs:  0 1px 3px 0 rgb(17 17 17 / 0.06);
+  --shadow-sm:  0 2px 8px 0 rgb(17 17 17 / 0.08);
+  --shadow-md:  0 4px 16px 0 rgb(17 17 17 / 0.10);
+  --shadow-lg:  0 8px 32px 0 rgb(17 17 17 / 0.12);
+  --shadow-xl:  0 16px 48px 0 rgb(17 17 17 / 0.14);
+  --shadow-2xl: 0 32px 64px 0 rgb(17 17 17 / 0.20);
+  /* Gold glow — for accent elements */
+  --shadow-gold: 0 0 24px 0 rgb(184 150 92 / 0.20);
 
   /* ── Transitions ── */
   --ease-luxury:  cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -113,23 +142,48 @@
 
 /* ── Tailwind v4 Theme Registration ── */
 @theme inline {
-  --color-matte-black:    var(--color-matte-black);
-  --color-warm-white:     var(--color-warm-white);
-  --color-soft-cream:     var(--color-soft-cream);
-  --color-champagne-gold: var(--color-champagne-gold);
-  --color-deep-coffee:    var(--color-deep-coffee);
-  --color-warm-gray:      var(--color-warm-gray);
-  --color-soft-beige:     var(--color-soft-beige);
-  --color-charcoal:       var(--color-charcoal);
-  --color-background:     var(--color-background);
-  --color-foreground:     var(--color-foreground);
-  --color-primary:        var(--color-primary);
-  --color-accent:         var(--color-accent);
-  --color-muted:          var(--color-muted);
-  --color-border:         var(--color-border);
-  --color-surface:        var(--color-surface);
-  --color-error:          var(--color-error);
-  --color-success:        var(--color-success);
+  /* Primary — Black */
+  --color-primary-black:       var(--color-primary-black);
+  --color-primary-black-soft:  var(--color-primary-black-soft);
+  --color-primary-black-deep:  var(--color-primary-black-deep);
+
+  /* Secondary — Gold */
+  --color-gold:                var(--color-gold);
+  --color-gold-light:          var(--color-gold-light);
+  --color-gold-pale:           var(--color-gold-pale);
+  --color-gold-deep:           var(--color-gold-deep);
+
+  /* Secondary — Grey */
+  --color-grey:                var(--color-grey);
+  --color-grey-light:          var(--color-grey-light);
+  --color-grey-pale:           var(--color-grey-pale);
+  --color-grey-dark:           var(--color-grey-dark);
+
+  /* Secondary — White */
+  --color-white:               var(--color-white);
+  --color-warm-white:          var(--color-warm-white);
+  --color-soft-cream:          var(--color-soft-cream);
+  --color-off-white:           var(--color-off-white);
+
+  /* Legacy aliases */
+  --color-matte-black:         var(--color-matte-black);
+  --color-champagne-gold:      var(--color-champagne-gold);
+  --color-warm-gray:           var(--color-warm-gray);
+  --color-soft-beige:          var(--color-soft-beige);
+  --color-charcoal:            var(--color-charcoal);
+  --color-deep-coffee:         var(--color-deep-coffee);
+
+  /* Semantic */
+  --color-background:          var(--color-background);
+  --color-foreground:          var(--color-foreground);
+  --color-primary:             var(--color-primary);
+  --color-secondary:           var(--color-secondary);
+  --color-accent:              var(--color-accent);
+  --color-muted:               var(--color-muted);
+  --color-border:              var(--color-border);
+  --color-surface:             var(--color-surface);
+  --color-error:               var(--color-error);
+  --color-success:             var(--color-success);
 
   --font-serif: var(--font-serif);
   --font-sans:  var(--font-sans);
@@ -188,23 +242,23 @@ img, video {
   display: block;
 }
 
-/* ── Focus — accessible, on-brand ── */
+/* ── Focus — accessible, on-brand gold ── */
 :focus-visible {
-  outline: 1.5px solid var(--color-champagne-gold);
+  outline: 1.5px solid var(--color-gold);
   outline-offset: 3px;
 }
 
-/* ── Selection ── */
+/* ── Selection — gold highlight ── */
 ::selection {
-  background-color: var(--color-champagne-gold);
-  color: var(--color-matte-black);
+  background-color: var(--color-gold);
+  color: var(--color-primary-black);
 }
 
-/* ── Scrollbar — minimal ── */
+/* ── Scrollbar — minimal, grey ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-soft-beige); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-warm-gray); }
+::-webkit-scrollbar-thumb { background: var(--color-grey-light); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-grey); }
 
 /* ============================================================
    TYPOGRAPHY UTILITIES
@@ -250,7 +304,7 @@ img, video {
   font-weight: 500;
   letter-spacing: var(--tracking-ultra);
   text-transform: uppercase;
-  color: var(--color-champagne-gold);
+  color: var(--color-gold);
 }
 
 /* Body copy */
@@ -258,7 +312,7 @@ img, video {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
-  color: var(--color-warm-gray);
+  color: var(--color-grey);
 }
 
 /* Caption */
@@ -266,7 +320,7 @@ img, video {
   font-family: var(--font-sans);
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-wider);
-  color: var(--color-warm-gray);
+  color: var(--color-grey);
 }
 
 /* Price */
@@ -291,21 +345,21 @@ img, video {
    BUTTON SYSTEM
    ============================================================ */
 
-/* Primary — matte black, white text, elegant hover */
+/* Primary — matte black, white text; gold on hover */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.875rem 2rem;
-  background-color: var(--color-matte-black);
+  background-color: var(--color-primary-black);
   color: var(--color-warm-white);
   font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: var(--tracking-ultra);
   text-transform: uppercase;
-  border: 1px solid var(--color-matte-black);
+  border: 1px solid var(--color-primary-black);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
@@ -318,9 +372,9 @@ img, video {
 }
 
 .btn-primary:hover {
-  background-color: var(--color-champagne-gold);
-  color: var(--color-matte-black);
-  border-color: var(--color-champagne-gold);
+  background-color: var(--color-gold);
+  color: var(--color-primary-black);
+  border-color: var(--color-gold);
 }
 
 .btn-primary:active {
@@ -333,7 +387,7 @@ img, video {
   pointer-events: none;
 }
 
-/* Secondary — transparent, thin border, soft hover glow */
+/* Secondary — transparent, thin grey border; gold on hover */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -347,7 +401,7 @@ img, video {
   font-weight: 500;
   letter-spacing: var(--tracking-ultra);
   text-transform: uppercase;
-  border: 1px solid var(--color-soft-beige);
+  border: 1px solid var(--color-grey-light);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
@@ -360,9 +414,9 @@ img, video {
 }
 
 .btn-secondary:hover {
-  border-color: var(--color-champagne-gold);
-  color: var(--color-champagne-gold);
-  box-shadow: 0 0 20px 0 rgb(200 169 107 / 0.15);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  box-shadow: var(--shadow-gold);
 }
 
 .btn-secondary:active {
@@ -375,7 +429,7 @@ img, video {
   pointer-events: none;
 }
 
-/* Ghost — for dark backgrounds */
+/* Ghost — for dark/black backgrounds */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -389,20 +443,22 @@ img, video {
   font-weight: 500;
   letter-spacing: var(--tracking-ultra);
   text-transform: uppercase;
-  border: 1px solid rgb(248 245 242 / 0.3);
+  border: 1px solid rgb(248 245 242 / 0.25);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     border-color var(--duration-base) var(--ease-luxury),
     background-color var(--duration-base) var(--ease-luxury),
+    color var(--duration-base) var(--ease-luxury),
     transform var(--duration-fast) var(--ease-out);
   white-space: nowrap;
   text-decoration: none;
 }
 
 .btn-ghost:hover {
-  border-color: rgb(248 245 242 / 0.7);
-  background-color: rgb(248 245 242 / 0.08);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  background-color: rgb(184 150 92 / 0.06);
 }
 
 .btn-ghost:active {
@@ -427,8 +483,8 @@ img, video {
 }
 
 .btn-icon:hover {
-  color: var(--color-champagne-gold);
-  background-color: rgb(200 169 107 / 0.08);
+  color: var(--color-gold);
+  background-color: rgb(184 150 92 / 0.08);
 }
 
 /* ============================================================
@@ -554,7 +610,7 @@ img, video {
   width: 100%;
   padding: 0.875rem 1rem;
   background-color: transparent;
-  border: 1px solid var(--color-soft-beige);
+  border: 1px solid var(--color-grey-light);
   border-radius: var(--radius-sm);
   color: var(--color-foreground);
   font-family: var(--font-sans);
@@ -567,13 +623,13 @@ img, video {
 }
 
 .input::placeholder {
-  color: var(--color-warm-gray);
+  color: var(--color-grey);
   opacity: 0.6;
 }
 
 .input:focus {
-  border-color: var(--color-champagne-gold);
-  box-shadow: 0 0 0 3px rgb(200 169 107 / 0.12);
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgb(184 150 92 / 0.12);
 }
 
 .input:disabled {
@@ -586,7 +642,7 @@ img, video {
 }
 
 .input--error:focus {
-  box-shadow: 0 0 0 3px rgb(192 57 43 / 0.12);
+  box-shadow: 0 0 0 3px rgb(184 50 50 / 0.12);
 }
 
 .label {
@@ -607,10 +663,10 @@ img, video {
   color: var(--color-error);
 }
 
-/* ── Dark surface inputs (for dark sections) ── */
+/* ── Dark surface inputs (for black sections) ── */
 .input-dark {
-  background-color: rgb(255 255 255 / 0.06);
-  border-color: rgb(255 255 255 / 0.15);
+  background-color: rgb(255 255 255 / 0.05);
+  border-color: rgb(255 255 255 / 0.12);
   color: var(--color-warm-white);
 }
 
@@ -619,8 +675,8 @@ img, video {
 }
 
 .input-dark:focus {
-  border-color: var(--color-champagne-gold);
-  box-shadow: 0 0 0 3px rgb(200 169 107 / 0.15);
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgb(184 150 92 / 0.15);
 }
 
 /* ============================================================
@@ -630,19 +686,19 @@ img, video {
 .divider {
   width: 100%;
   height: 1px;
-  background-color: var(--color-border);
+  background-color: var(--color-grey-pale);
 }
 
 .divider-gold {
   width: 2.5rem;
   height: 1px;
-  background-color: var(--color-champagne-gold);
+  background-color: var(--color-gold);
 }
 
 .divider-vertical {
   width: 1px;
   height: 1.5rem;
-  background-color: var(--color-border);
+  background-color: var(--color-grey-pale);
 }
 
 /* Decorative corner accent */
@@ -650,7 +706,7 @@ img, video {
   position: absolute;
   width: 5rem;
   height: 5rem;
-  border: 1px solid rgb(200 169 107 / 0.2);
+  border: 1px solid rgb(184 150 92 / 0.2);
   pointer-events: none;
 }
 
@@ -728,9 +784,9 @@ img, video {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-soft-beige) 25%,
-    var(--color-warm-white) 50%,
-    var(--color-soft-beige) 75%
+    var(--color-grey-pale) 25%,
+    var(--color-off-white) 50%,
+    var(--color-grey-pale) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -794,9 +850,14 @@ img, video {
 
 .surface-cream   { background-color: var(--color-soft-cream); }
 .surface-white   { background-color: var(--color-warm-white); }
-.surface-dark    { background-color: var(--color-matte-black); color: var(--color-warm-white); }
+.surface-offwhite { background-color: var(--color-off-white); }
+.surface-dark    { background-color: var(--color-primary-black); color: var(--color-warm-white); }
+.surface-black   { background-color: var(--color-primary-black-deep); color: var(--color-warm-white); }
+.surface-grey    { background-color: var(--color-grey-pale); }
+.surface-gold    { background-color: var(--color-gold); color: var(--color-primary-black); }
+/* Legacy */
 .surface-coffee  { background-color: var(--color-deep-coffee); color: var(--color-warm-white); }
-.surface-beige   { background-color: var(--color-soft-beige); }
+.surface-beige   { background-color: var(--color-off-white); }
 
 /* ============================================================
    BADGE / TAG
@@ -814,17 +875,23 @@ img, video {
 }
 
 .badge-gold {
-  background-color: rgb(200 169 107 / 0.12);
-  color: var(--color-champagne-gold);
-  border: 1px solid rgb(200 169 107 / 0.3);
+  background-color: rgb(184 150 92 / 0.10);
+  color: var(--color-gold);
+  border: 1px solid rgb(184 150 92 / 0.25);
 }
 
 .badge-dark {
-  background-color: var(--color-matte-black);
+  background-color: var(--color-primary-black);
   color: var(--color-warm-white);
 }
 
+.badge-grey {
+  background-color: var(--color-grey-pale);
+  color: var(--color-grey-dark);
+  border: 1px solid var(--color-grey-light);
+}
+
 .badge-cream {
-  background-color: var(--color-soft-beige);
-  color: var(--color-deep-coffee);
+  background-color: var(--color-off-white);
+  color: var(--color-grey-dark);
 }

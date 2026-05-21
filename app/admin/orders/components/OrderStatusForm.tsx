@@ -57,7 +57,7 @@ export default function OrderStatusForm({
       <div>
         <label
           htmlFor="order-status"
-          className="block text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium mb-2"
+          className="block text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium mb-2"
         >
           Order Status
         </label>
@@ -69,7 +69,7 @@ export default function OrderStatusForm({
             setMessage(null)
           }}
           disabled={isPending}
-          className={`w-full text-xs px-3 py-2 border rounded bg-white text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#C8A96B] focus:border-[#C8A96B] disabled:opacity-60 ${
+          className={`w-full text-xs px-3 py-2 border rounded bg-white text-[#111111] focus:outline-none focus:ring-1 focus:ring-[#B8965C] focus:border-[#B8965C] disabled:opacity-60 ${
             statusStyles[selected] ?? "border-[#e5e5e5]"
           }`}
         >

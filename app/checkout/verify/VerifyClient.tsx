@@ -36,15 +36,15 @@ export function VerifyClient({ orderNumber }: VerifyClientProps) {
   }, [clearCart, orderNumber, router])
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#FAF6F1] px-6">
+    <main className="min-h-screen flex items-center justify-center bg-[#F8F5F2] px-6">
       <div className="text-center max-w-sm">
-        <div className="w-16 h-16 rounded-full bg-[#C8A96B]/10 flex items-center justify-center mx-auto mb-6">
+        <div className="w-16 h-16 rounded-full bg-[#B8965C]/10 flex items-center justify-center mx-auto mb-6">
           <svg
             width="28"
             height="28"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#C8A96B"
+            stroke="#B8965C"
             strokeWidth="2"
             aria-hidden="true"
           >
@@ -54,7 +54,7 @@ export function VerifyClient({ orderNumber }: VerifyClientProps) {
         <p className="font-serif text-2xl font-light text-[#111111] mb-2">
           Payment confirmed
         </p>
-        <p className="text-sm text-[#8b7355]">Preparing your order{dots}</p>
+        <p className="text-sm text-[#8C8C8C]">Preparing your order{dots}</p>
       </div>
     </main>
   )

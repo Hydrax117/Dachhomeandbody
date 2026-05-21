@@ -38,7 +38,7 @@ function formatDate(date: Date) {
 
 function ChangeIndicator({ change }: { change: number }) {
   if (change === 0) {
-    return <span className="text-[#8b7355] text-xs">±0</span>
+    return <span className="text-[#8C8C8C] text-xs">±0</span>
   }
   if (change > 0) {
     return (
@@ -98,9 +98,9 @@ export default function StockManager({
   return (
     <div className="space-y-6">
       {/* Current stock summary */}
-      <div className="flex items-center gap-4 p-4 bg-[#FAF8F5] border border-[#e5e5e5] rounded-lg">
+      <div className="flex items-center gap-4 p-4 bg-[#F8F5F2] border border-[#e5e5e5] rounded-lg">
         <div>
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1">
             Current Stock
           </p>
           <p className="text-3xl font-serif font-medium text-[#111111]">
@@ -114,7 +114,7 @@ export default function StockManager({
 
       {/* Adjustment form */}
       <div className="bg-white border border-[#e5e5e5] rounded-lg p-5">
-        <h3 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-4">
+        <h3 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-4">
           Adjust Stock
         </h3>
 
@@ -140,7 +140,7 @@ export default function StockManager({
           <div>
             <label
               htmlFor="newStock"
-              className="block text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1.5"
+              className="block text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1.5"
             >
               New Stock Quantity <span className="text-red-500">*</span>
             </label>
@@ -155,7 +155,7 @@ export default function StockManager({
               aria-describedby={state.errors?.newStock ? "newStock-error" : undefined}
               className={[
                 "w-full max-w-[200px] px-3 py-2.5 border text-sm text-[#111111] bg-white rounded",
-                "focus:outline-none focus:ring-1 focus:ring-[#C8A96B] focus:border-[#C8A96B]",
+                "focus:outline-none focus:ring-1 focus:ring-[#B8965C] focus:border-[#B8965C]",
                 "placeholder-[#aaa] transition-colors",
                 state.errors?.newStock ? "border-red-400" : "border-[#e5e5e5]",
               ].join(" ")}
@@ -171,7 +171,7 @@ export default function StockManager({
           <div>
             <label
               htmlFor="notes"
-              className="block text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1.5"
+              className="block text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1.5"
             >
               Notes (optional)
             </label>
@@ -181,7 +181,7 @@ export default function StockManager({
               type="text"
               maxLength={500}
               placeholder="e.g. New shipment received, stock count correction…"
-              className="w-full px-3 py-2.5 border border-[#e5e5e5] text-sm text-[#111111] bg-white rounded focus:outline-none focus:ring-1 focus:ring-[#C8A96B] focus:border-[#C8A96B] placeholder-[#aaa] transition-colors"
+              className="w-full px-3 py-2.5 border border-[#e5e5e5] text-sm text-[#111111] bg-white rounded focus:outline-none focus:ring-1 focus:ring-[#B8965C] focus:border-[#B8965C] placeholder-[#aaa] transition-colors"
             />
           </div>
 
@@ -191,52 +191,52 @@ export default function StockManager({
 
       {/* Stock history */}
       <div className="bg-white border border-[#e5e5e5] rounded-lg overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#e5e5e5] bg-[#FAF8F5]">
-          <h3 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355]">
+        <div className="px-5 py-4 border-b border-[#e5e5e5] bg-[#F8F5F2]">
+          <h3 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C]">
             Stock History
           </h3>
         </div>
 
         {stockHistory.length === 0 ? (
           <div className="px-5 py-8 text-center">
-            <p className="text-sm text-[#8b7355]">No stock adjustments recorded yet.</p>
+            <p className="text-sm text-[#8C8C8C]">No stock adjustments recorded yet.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#e5e5e5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Date
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Change
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Before → After
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden md:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Reason
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     By
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Notes
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
                 {stockHistory.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-[#FAF8F5] transition-colors">
-                    <td className="px-4 py-3 text-xs text-[#8b7355] whitespace-nowrap">
+                  <tr key={entry.id} className="hover:bg-[#F8F5F2] transition-colors">
+                    <td className="px-4 py-3 text-xs text-[#8C8C8C] whitespace-nowrap">
                       {formatDate(entry.createdAt)}
                     </td>
                     <td className="px-4 py-3">
                       <ChangeIndicator change={entry.change} />
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className="text-xs text-[#8b7355]">
+                      <span className="text-xs text-[#8C8C8C]">
                         {entry.previousStock}
                       </span>
                       <span className="text-xs text-[#aaa] mx-1.5">→</span>
@@ -245,10 +245,10 @@ export default function StockManager({
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-xs text-[#8b7355]">{entry.reason}</span>
+                      <span className="text-xs text-[#8C8C8C]">{entry.reason}</span>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className="text-xs text-[#8b7355]">
+                      <span className="text-xs text-[#8C8C8C]">
                         {entry.user?.name ?? entry.user?.email ?? "System"}
                       </span>
                     </td>

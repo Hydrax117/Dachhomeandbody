@@ -56,8 +56,8 @@ function StepIndicator({ current }: { current: Step }) {
                   isActive
                     ? "bg-[#111111] text-[#F8F5F2]"
                     : isDone
-                    ? "bg-[#C8A96B] text-[#111111]"
-                    : "bg-[#E8DED3] text-[#8b7355]",
+                    ? "bg-[#B8965C] text-[#111111]"
+                    : "bg-[#EBEBEB] text-[#8C8C8C]",
                 ].join(" ")}
               >
                 {isDone ? (
@@ -71,14 +71,14 @@ function StepIndicator({ current }: { current: Step }) {
               <span
                 className={[
                   "text-[10px] tracking-[0.18em] uppercase font-medium transition-colors duration-300",
-                  isActive ? "text-[#111111]" : isDone ? "text-[#C8A96B]" : "text-[#b8b0a8]",
+                  isActive ? "text-[#111111]" : isDone ? "text-[#B8965C]" : "text-[#C4C4C4]",
                 ].join(" ")}
               >
                 {step.label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className="w-12 h-px bg-[#E8DED3] mx-4" aria-hidden="true" />
+              <div className="w-12 h-px bg-[#EBEBEB] mx-4" aria-hidden="true" />
             )}
           </div>
         )
@@ -104,10 +104,10 @@ export function CheckoutClient({
   // Empty cart guard
   if (cart.items.length === 0) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#FAF6F1] px-6 pt-20">
+      <main className="min-h-screen flex items-center justify-center bg-[#F8F5F2] px-6 pt-20">
         <div className="text-center max-w-sm">
           <p className="font-serif text-2xl font-light text-[#111111] mb-3">Your cart is empty</p>
-          <p className="text-sm text-[#8b7355] mb-8">Add some products before checking out.</p>
+          <p className="text-sm text-[#8C8C8C] mb-8">Add some products before checking out.</p>
           <Link href="/shop" className="btn-primary">
             Browse Products
           </Link>
@@ -127,11 +127,11 @@ export function CheckoutClient({
   }
 
   return (
-    <main className="min-h-screen bg-[#FAF6F1] pt-20 pb-16">
+    <main className="min-h-screen bg-[#F8F5F2] pt-20 pb-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
         {/* Header */}
-        <div className="py-8 border-b border-[#E8DED3] mb-10">
+        <div className="py-8 border-b border-[#EBEBEB] mb-10">
           <Link
             href="/"
             className="font-serif text-base lg:text-lg tracking-[0.22em] uppercase text-[#111111]"

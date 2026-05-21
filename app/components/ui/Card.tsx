@@ -57,11 +57,11 @@ export function ProductCard({
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{
-              background: "linear-gradient(135deg, #E8DED3 0%, #D4C9B0 100%)",
+              background: "linear-gradient(135deg, #EBEBEB 0%, #C4C4C4 100%)",
             }}
             aria-hidden="true"
           >
-            <div className="w-14 h-20 rounded-full border border-[#C8A96B]/30 bg-[#C8A96B]/10" />
+            <div className="w-14 h-20 rounded-full border border-[#B8965C]/30 bg-[#B8965C]/10" />
           </div>
         )}
 
@@ -116,7 +116,7 @@ export function CollectionCard({
   href = "/collections",
   imageSrc,
   imageAlt,
-  gradient = "linear-gradient(135deg, #2d1f0e 0%, #1a1208 100%)",
+  gradient = "linear-gradient(135deg, #2d1f0e 0%, #0A0A0A 100%)",
 }: CollectionCardProps) {
   return (
     <Link href={href} className="card-collection block aspect-[4/5]">
@@ -166,8 +166,8 @@ export function ReviewCard({ author, rating, text, verified }: ReviewCardProps) 
             width="12"
             height="12"
             viewBox="0 0 24 24"
-            fill={i < rating ? "#C8A96B" : "none"}
-            stroke="#C8A96B"
+            fill={i < rating ? "#B8965C" : "none"}
+            stroke="#B8965C"
             strokeWidth="1.5"
             aria-hidden="true"
           >

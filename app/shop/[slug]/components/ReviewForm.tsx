@@ -37,7 +37,7 @@ function StarSelector({ value, onChange, error }: StarSelectorProps) {
           onMouseEnter={() => setHovered(star)}
           onMouseLeave={() => setHovered(0)}
           className={[
-            "transition-transform duration-100 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A96B] rounded-sm",
+            "transition-transform duration-100 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C] rounded-sm",
             error ? "ring-1 ring-red-400 rounded" : "",
           ]
             .filter(Boolean)
@@ -47,8 +47,8 @@ function StarSelector({ value, onChange, error }: StarSelectorProps) {
             width="24"
             height="24"
             viewBox="0 0 24 24"
-            fill={star <= active ? "#C8A96B" : "none"}
-            stroke="#C8A96B"
+            fill={star <= active ? "#B8965C" : "none"}
+            stroke="#B8965C"
             strokeWidth="1.5"
             aria-hidden="true"
           >
@@ -77,14 +77,14 @@ export function ReviewForm({ productId }: ReviewFormProps) {
   if (state.success) {
     return (
       <div
-        className="border border-[#e8ddd0] rounded p-6 text-center"
+        className="border border-[#EBEBEB] rounded p-6 text-center"
         role="status"
         aria-live="polite"
       >
         <p className="font-serif text-base text-[#111111] mb-1">
           Thank you for your review!
         </p>
-        <p className="text-sm text-[#8b7355]">
+        <p className="text-sm text-[#8C8C8C]">
           Your review has been published.
         </p>
       </div>
@@ -117,7 +117,7 @@ export function ReviewForm({ productId }: ReviewFormProps) {
         <div>
           <Label htmlFor="review-title">
             Review Title{" "}
-            <span className="text-[#b8b0a8] font-normal">(optional)</span>
+            <span className="text-[#C4C4C4] font-normal">(optional)</span>
           </Label>
           <Input
             id="review-title"

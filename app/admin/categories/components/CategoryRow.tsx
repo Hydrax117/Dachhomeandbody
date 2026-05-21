@@ -53,12 +53,12 @@ export default function CategoryRow({ category, updateAction, deleteAction }: Ca
   }
 
   return (
-    <tr className="hover:bg-[#FAF8F5] transition-colors">
+    <tr className="hover:bg-[#F8F5F2] transition-colors">
       {/* Name */}
       <td className="px-4 py-3">
         <p className="font-medium text-[#111111] text-sm">{category.name}</p>
         {category.description && (
-          <p className="text-[11px] text-[#8b7355] mt-0.5 truncate max-w-[260px]">
+          <p className="text-[11px] text-[#8C8C8C] mt-0.5 truncate max-w-[260px]">
             {category.description}
           </p>
         )}
@@ -66,7 +66,7 @@ export default function CategoryRow({ category, updateAction, deleteAction }: Ca
 
       {/* Slug */}
       <td className="px-4 py-3 hidden sm:table-cell">
-        <span className="font-mono text-xs text-[#8b7355]">{category.slug}</span>
+        <span className="font-mono text-xs text-[#8C8C8C]">{category.slug}</span>
       </td>
 
       {/* Product count */}
@@ -79,7 +79,7 @@ export default function CategoryRow({ category, updateAction, deleteAction }: Ca
         <div className="flex items-center justify-end gap-2">
           {confirming ? (
             <>
-              <span className="text-[11px] text-[#8b7355]">Delete?</span>
+              <span className="text-[11px] text-[#8C8C8C]">Delete?</span>
               <button
                 onClick={handleDelete}
                 disabled={isPending}
@@ -91,7 +91,7 @@ export default function CategoryRow({ category, updateAction, deleteAction }: Ca
               <button
                 onClick={() => setConfirming(false)}
                 disabled={isPending}
-                className="text-xs text-[#8b7355] hover:text-[#111111] px-1.5 py-1 rounded hover:bg-[#f0ece4] transition-colors"
+                className="text-xs text-[#8C8C8C] hover:text-[#111111] px-1.5 py-1 rounded hover:bg-[#f0ece4] transition-colors"
               >
                 No
               </button>
@@ -103,14 +103,14 @@ export default function CategoryRow({ category, updateAction, deleteAction }: Ca
             <>
               <button
                 onClick={() => setEditing(true)}
-                className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
+                className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors px-2 py-1 rounded hover:bg-[#f0ece4]"
                 aria-label={`Edit ${category.name}`}
               >
                 Edit
               </button>
               <button
                 onClick={() => setConfirming(true)}
-                className="text-xs text-[#8b7355] hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-red-50"
+                className="text-xs text-[#8C8C8C] hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-red-50"
                 aria-label={`Delete ${category.name}`}
               >
                 Delete

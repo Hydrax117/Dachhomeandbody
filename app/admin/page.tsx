@@ -54,11 +54,11 @@ function StatCard({
   return (
     <div className="bg-white border border-[#e5e5e5] p-6 rounded">
       <div className="flex items-start justify-between mb-4">
-        <p className="text-xs tracking-[0.18em] uppercase text-[#8b7355]">{label}</p>
-        <span className="text-[#C8A96B]">{icon}</span>
+        <p className="text-xs tracking-[0.18em] uppercase text-[#8C8C8C]">{label}</p>
+        <span className="text-[#B8965C]">{icon}</span>
       </div>
       <p className="font-serif text-3xl font-medium text-[#111111]">{value}</p>
-      {sub && <p className="text-xs text-[#8b7355] mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-[#8C8C8C] mt-1">{sub}</p>}
     </div>
   )
 }
@@ -78,12 +78,12 @@ function QuickLink({
   return (
     <Link
       href={href}
-      className="group block bg-white border border-[#e5e5e5] p-5 rounded hover:border-[#C8A96B] transition-colors"
+      className="group block bg-white border border-[#e5e5e5] p-5 rounded hover:border-[#B8965C] transition-colors"
     >
-      <p className="text-sm font-medium text-[#111111] group-hover:text-[#C8A96B] transition-colors mb-1">
+      <p className="text-sm font-medium text-[#111111] group-hover:text-[#B8965C] transition-colors mb-1">
         {label}
       </p>
-      <p className="text-xs text-[#8b7355]">{description}</p>
+      <p className="text-xs text-[#8C8C8C]">{description}</p>
     </Link>
   )
 }
@@ -183,7 +183,7 @@ export default async function AdminDashboardPage({
           <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
             Dashboard
           </h1>
-          <p className="text-sm text-[#8b7355] mt-1">
+          <p className="text-sm text-[#8C8C8C] mt-1">
             Analytics for the {rangeLabel}
           </p>
         </div>
@@ -244,7 +244,7 @@ export default async function AdminDashboardPage({
 
       {/* Revenue trend chart */}
       <div className="bg-white border border-[#e5e5e5] rounded p-6">
-        <h2 className="text-xs tracking-[0.18em] uppercase text-[#8b7355] mb-4">
+        <h2 className="text-xs tracking-[0.18em] uppercase text-[#8C8C8C] mb-4">
           Revenue Trend
         </h2>
         <RevenueChartWrapper data={revenueByDay} />
@@ -254,11 +254,11 @@ export default async function AdminDashboardPage({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top products */}
         <div className="bg-white border border-[#e5e5e5] rounded p-6">
-          <h2 className="text-xs tracking-[0.18em] uppercase text-[#8b7355] mb-4">
+          <h2 className="text-xs tracking-[0.18em] uppercase text-[#8C8C8C] mb-4">
             Top Products by Sales
           </h2>
           {topProducts.length === 0 ? (
-            <p className="text-sm text-[#8b7355] py-4 text-center">No sales in this period</p>
+            <p className="text-sm text-[#8C8C8C] py-4 text-center">No sales in this period</p>
           ) : (
             <ol className="space-y-3">
               {topProducts.map((product, i) => {
@@ -271,17 +271,17 @@ export default async function AdminDashboardPage({
                       <div className="flex items-center justify-between mb-1">
                         <Link
                           href={`/admin/products`}
-                          className="text-sm text-[#111111] truncate hover:text-[#C8A96B] transition-colors"
+                          className="text-sm text-[#111111] truncate hover:text-[#B8965C] transition-colors"
                         >
                           {product.name}
                         </Link>
-                        <span className="text-xs text-[#8b7355] shrink-0 ml-2">
+                        <span className="text-xs text-[#8C8C8C] shrink-0 ml-2">
                           {product.totalQuantity} sold
                         </span>
                       </div>
                       <div className="h-1 bg-[#f0ece4] rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-[#C8A96B] rounded-full transition-all"
+                          className="h-full bg-[#B8965C] rounded-full transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -298,7 +298,7 @@ export default async function AdminDashboardPage({
 
         {/* Customer metrics */}
         <div className="bg-white border border-[#e5e5e5] rounded p-6">
-          <h2 className="text-xs tracking-[0.18em] uppercase text-[#8b7355] mb-4">
+          <h2 className="text-xs tracking-[0.18em] uppercase text-[#8C8C8C] mb-4">
             Customer Metrics
           </h2>
           <div className="space-y-4">
@@ -319,7 +319,7 @@ export default async function AdminDashboardPage({
                     cy="18"
                     r="15.9"
                     fill="none"
-                    stroke="#C8A96B"
+                    stroke="#B8965C"
                     strokeWidth="3"
                     strokeDasharray={`${customerMetrics.returningPercentage} ${100 - customerMetrics.returningPercentage}`}
                     strokeLinecap="round"
@@ -334,8 +334,8 @@ export default async function AdminDashboardPage({
               <div className="space-y-3">
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#C8A96B] shrink-0" />
-                    <span className="text-xs text-[#8b7355]">Returning orders</span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#B8965C] shrink-0" />
+                    <span className="text-xs text-[#8C8C8C]">Returning orders</span>
                   </div>
                   <p className="text-xl font-serif font-medium text-[#111111] pl-4">
                     {customerMetrics.returningCustomers.toLocaleString()}
@@ -344,7 +344,7 @@ export default async function AdminDashboardPage({
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#f0ece4] border border-[#e5e5e5] shrink-0" />
-                    <span className="text-xs text-[#8b7355]">New customers</span>
+                    <span className="text-xs text-[#8C8C8C]">New customers</span>
                   </div>
                   <p className="text-xl font-serif font-medium text-[#111111] pl-4">
                     {customerMetrics.newCustomers.toLocaleString()}
@@ -358,21 +358,21 @@ export default async function AdminDashboardPage({
 
       {/* Attention items */}
       {(alertStats.pendingOrders > 0 || alertStats.pendingReviews > 0 || alertStats.lowStockProducts > 0) && (
-        <div className="bg-[#fffbf0] border border-[#C8A96B]/30 rounded p-4">
-          <p className="text-xs tracking-[0.18em] uppercase text-[#8b7355] mb-3">Needs Attention</p>
+        <div className="bg-[#fffbf0] border border-[#B8965C]/30 rounded p-4">
+          <p className="text-xs tracking-[0.18em] uppercase text-[#8C8C8C] mb-3">Needs Attention</p>
           <div className="flex flex-wrap gap-4">
             {alertStats.pendingOrders > 0 && (
-              <Link href="/admin/orders?status=PENDING" className="text-sm text-[#111111] hover:text-[#C8A96B] transition-colors">
+              <Link href="/admin/orders?status=PENDING" className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors">
                 <span className="font-medium">{alertStats.pendingOrders}</span> pending order{alertStats.pendingOrders !== 1 ? "s" : ""}
               </Link>
             )}
             {alertStats.pendingReviews > 0 && (
-              <Link href="/admin/reviews" className="text-sm text-[#111111] hover:text-[#C8A96B] transition-colors">
+              <Link href="/admin/reviews" className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors">
                 <span className="font-medium">{alertStats.pendingReviews}</span> review{alertStats.pendingReviews !== 1 ? "s" : ""} to moderate
               </Link>
             )}
             {alertStats.lowStockProducts > 0 && (
-              <Link href="/admin/products?stock=low" className="text-sm text-[#111111] hover:text-[#C8A96B] transition-colors">
+              <Link href="/admin/products?stock=low" className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors">
                 <span className="font-medium">{alertStats.lowStockProducts}</span> low-stock product{alertStats.lowStockProducts !== 1 ? "s" : ""}
               </Link>
             )}
@@ -388,7 +388,7 @@ export default async function AdminDashboardPage({
           </h2>
           <Link
             href="/admin/orders"
-            className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors"
+            className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors"
           >
             View all →
           </Link>
@@ -396,23 +396,23 @@ export default async function AdminDashboardPage({
 
         {recentOrders.length === 0 ? (
           <div className="bg-white border border-[#e5e5e5] rounded p-8 text-center">
-            <p className="text-sm text-[#8b7355]">No orders yet.</p>
+            <p className="text-sm text-[#8C8C8C]">No orders yet.</p>
           </div>
         ) : (
           <div className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Order
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Customer
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Status
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Total
                   </th>
                 </tr>
@@ -422,15 +422,15 @@ export default async function AdminDashboardPage({
                   const customerName = order.user?.name ?? order.guestName ?? "Guest"
                   const customerEmail = order.user?.email ?? order.guestEmail ?? ""
                   return (
-                    <tr key={order.id} className="hover:bg-[#FAF8F5] transition-colors">
+                    <tr key={order.id} className="hover:bg-[#F8F5F2] transition-colors">
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="font-medium text-[#111111] hover:text-[#C8A96B] transition-colors"
+                          className="font-medium text-[#111111] hover:text-[#B8965C] transition-colors"
                         >
                           #{order.orderNumber}
                         </Link>
-                        <p className="text-[11px] text-[#8b7355] mt-0.5">
+                        <p className="text-[11px] text-[#8C8C8C] mt-0.5">
                           {new Date(order.createdAt).toLocaleDateString("en-NG", {
                             day: "numeric",
                             month: "short",
@@ -440,7 +440,7 @@ export default async function AdminDashboardPage({
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <p className="text-[#111111]">{customerName}</p>
-                        <p className="text-[11px] text-[#8b7355]">{customerEmail}</p>
+                        <p className="text-[11px] text-[#8C8C8C]">{customerEmail}</p>
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={order.status} />

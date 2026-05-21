@@ -79,11 +79,11 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
   const deliveryRange = estimatedDelivery(order.createdAt)
 
   return (
-    <main className="min-h-screen bg-[#FAF6F1] pt-20 pb-16">
+    <main className="min-h-screen bg-[#F8F5F2] pt-20 pb-16">
       <div className="max-w-2xl mx-auto px-6">
 
         {/* Header */}
-        <div className="py-8 border-b border-[#E8DED3] mb-10">
+        <div className="py-8 border-b border-[#EBEBEB] mb-10">
           <Link
             href="/"
             className="font-serif text-base tracking-[0.22em] uppercase text-[#111111]"
@@ -95,13 +95,13 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
 
         {/* Success icon */}
         <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-full bg-[#C8A96B]/10 flex items-center justify-center mx-auto mb-5">
+          <div className="w-16 h-16 rounded-full bg-[#B8965C]/10 flex items-center justify-center mx-auto mb-5">
             <svg
               width="28"
               height="28"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#C8A96B"
+              stroke="#B8965C"
               strokeWidth="2"
               aria-hidden="true"
             >
@@ -111,21 +111,21 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
           <h1 className="font-serif text-3xl font-light text-[#111111] mb-2">
             Order confirmed
           </h1>
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             Thank you for your purchase. We&apos;ll send you a confirmation email shortly.
           </p>
         </div>
 
         {/* Order number + delivery estimate */}
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="p-4 border border-[#E8DED3] rounded-sm bg-[#FAF8F5]">
-            <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1">
+          <div className="p-4 border border-[#EBEBEB] rounded-sm bg-[#F8F5F2]">
+            <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1">
               Order number
             </p>
             <p className="font-medium text-[#111111] text-sm">{order.orderNumber}</p>
           </div>
-          <div className="p-4 border border-[#E8DED3] rounded-sm bg-[#FAF8F5]">
-            <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1">
+          <div className="p-4 border border-[#EBEBEB] rounded-sm bg-[#F8F5F2]">
+            <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1">
               Estimated delivery
             </p>
             <p className="font-medium text-[#111111] text-sm">{deliveryRange}</p>
@@ -133,10 +133,10 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
         </div>
 
         {/* Order status */}
-        <div className="mb-8 p-4 border border-[#E8DED3] rounded-sm">
+        <div className="mb-8 p-4 border border-[#EBEBEB] rounded-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-1">
+              <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-1">
                 Status
               </p>
               <p className="text-sm font-medium text-[#111111] capitalize">
@@ -145,7 +145,7 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
             </div>
             <Link
               href="/account/orders"
-              className="text-[10px] tracking-[0.12em] uppercase text-[#C8A96B] hover:text-[#b8965a] transition-colors"
+              className="text-[10px] tracking-[0.12em] uppercase text-[#B8965C] hover:text-[#A07840] transition-colors"
             >
               Track order →
             </Link>
@@ -154,17 +154,17 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
 
         {/* Order items */}
         <div className="mb-8">
-          <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-4">
+          <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-4">
             Items ordered
           </h2>
           <ul className="space-y-3" aria-label="Order items">
             {order.items.map((item) => (
               <li
                 key={item.id}
-                className="flex items-center gap-4 p-3 border border-[#E8DED3] rounded-sm"
+                className="flex items-center gap-4 p-3 border border-[#EBEBEB] rounded-sm"
               >
                 {/* Product image */}
-                <div className="w-12 h-14 shrink-0 bg-[#E8DED3] rounded-sm overflow-hidden">
+                <div className="w-12 h-14 shrink-0 bg-[#EBEBEB] rounded-sm overflow-hidden">
                   {item.product.images[0] ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -174,7 +174,7 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8b0a8" strokeWidth="1.5" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4C4C4" strokeWidth="1.5" aria-hidden="true">
                         <rect x="3" y="3" width="18" height="18" rx="2" />
                         <circle cx="8.5" cy="8.5" r="1.5" />
                         <polyline points="21 15 16 10 5 21" />
@@ -187,7 +187,7 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
                   <p className="text-sm font-medium text-[#111111] truncate">
                     {item.product.name}
                   </p>
-                  <p className="text-xs text-[#8b7355] mt-0.5">
+                  <p className="text-xs text-[#8C8C8C] mt-0.5">
                     Qty: {item.quantity}
                   </p>
                 </div>
@@ -201,45 +201,45 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
         </div>
 
         {/* Order totals */}
-        <div className="mb-8 p-4 border border-[#E8DED3] rounded-sm space-y-2.5">
+        <div className="mb-8 p-4 border border-[#EBEBEB] rounded-sm space-y-2.5">
           <div className="flex justify-between text-sm">
-            <span className="text-[#8b7355]">Subtotal</span>
+            <span className="text-[#8C8C8C]">Subtotal</span>
             <span>₦{order.subtotal.toLocaleString()}</span>
           </div>
           {order.discount > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-[#C8A96B]">
+              <span className="text-[#B8965C]">
                 Discount{order.couponCode ? ` (${order.couponCode})` : ""}
               </span>
-              <span className="text-[#C8A96B]">−₦{order.discount.toLocaleString()}</span>
+              <span className="text-[#B8965C]">−₦{order.discount.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between text-sm">
-            <span className="text-[#8b7355]">Shipping</span>
-            <span className="text-[#8b7355]">
+            <span className="text-[#8C8C8C]">Shipping</span>
+            <span className="text-[#8C8C8C]">
               {order.shippingCost === 0 ? "Free" : `₦${order.shippingCost.toLocaleString()}`}
             </span>
           </div>
-          <div className="border-t border-[#E8DED3] pt-2.5 flex justify-between font-medium">
+          <div className="border-t border-[#EBEBEB] pt-2.5 flex justify-between font-medium">
             <span className="font-serif">Total</span>
             <span className="font-serif">₦{order.total.toLocaleString()}</span>
           </div>
         </div>
 
         {/* Shipping address */}
-        <div className="mb-10 p-4 border border-[#E8DED3] rounded-sm">
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] mb-3">
+        <div className="mb-10 p-4 border border-[#EBEBEB] rounded-sm">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] mb-3">
             Shipping to
           </p>
           <p className="text-sm font-medium text-[#111111]">{shippingAddress.name}</p>
-          <p className="text-xs text-[#8b7355] mt-1 leading-relaxed">
+          <p className="text-xs text-[#8C8C8C] mt-1 leading-relaxed">
             {shippingAddress.address}<br />
             {shippingAddress.city}
             {shippingAddress.state ? `, ${shippingAddress.state}` : ""}{" "}
             {shippingAddress.postalCode}<br />
             {shippingAddress.country}
           </p>
-          <p className="text-xs text-[#8b7355] mt-1">{shippingAddress.phone}</p>
+          <p className="text-xs text-[#8C8C8C] mt-1">{shippingAddress.phone}</p>
         </div>
 
         {/* Actions */}

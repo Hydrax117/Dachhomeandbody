@@ -27,10 +27,10 @@ export default async function AccountLayout({
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar — desktop only (mobile top bar is in AccountSidebar) */}
-        <header className="hidden lg:flex h-16 bg-[#FAF8F5] border-b border-[#e5e5e5] items-center justify-between px-6 shrink-0">
+        <header className="hidden lg:flex h-16 bg-[#F8F5F2] border-b border-[#e5e5e5] items-center justify-between px-6 shrink-0">
           <div />
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#8b7355]">
+            <span className="text-xs text-[#8C8C8C]">
               {session.user.name ?? session.user.email}
             </span>
             {session.user.image ? (
@@ -43,8 +43,8 @@ export default async function AccountLayout({
                 className="w-8 h-8 rounded-full object-cover border border-[#e5e5e5]"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-[#C8A96B]/20 border border-[#C8A96B]/30 flex items-center justify-center">
-                <span className="text-[10px] font-medium text-[#C8A96B] uppercase">
+              <div className="w-8 h-8 rounded-full bg-[#B8965C]/20 border border-[#B8965C]/30 flex items-center justify-center">
+                <span className="text-[10px] font-medium text-[#B8965C] uppercase">
                   {(session.user.name ?? session.user.email ?? "U").charAt(0)}
                 </span>
               </div>

@@ -61,7 +61,7 @@ export default async function EditProductPage({
       <div className="flex items-center gap-3">
         <Link
           href="/admin/products"
-          className="text-[#8b7355] hover:text-[#111111] transition-colors"
+          className="text-[#8C8C8C] hover:text-[#111111] transition-colors"
           aria-label="Back to products"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -72,7 +72,7 @@ export default async function EditProductPage({
           <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
             Edit Product
           </h1>
-          <p className="text-sm text-[#8b7355] mt-0.5">
+          <p className="text-sm text-[#8C8C8C] mt-0.5">
             {product.name}
           </p>
         </div>

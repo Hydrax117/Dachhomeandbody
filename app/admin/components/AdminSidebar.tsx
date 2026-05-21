@@ -167,7 +167,7 @@ function NavItem({ item }: { item: NavItem }) {
         aria-current={isActive ? "page" : undefined}
         className={`flex items-center gap-3 px-3 py-2.5 rounded text-sm transition-colors ${
           isActive
-            ? "bg-[#1a1208] text-[#C8A96B] font-medium"
+            ? "bg-[#0A0A0A] text-[#B8965C] font-medium"
             : "text-[#6b6b6b] hover:bg-[#f5f0e8] hover:text-[#111111]"
         }`}
       >
@@ -184,18 +184,18 @@ function NavItem({ item }: { item: NavItem }) {
 export default function AdminSidebar() {
   return (
     <aside
-      className="w-60 shrink-0 bg-[#FAF8F5] border-r border-[#e5e5e5] flex flex-col h-full"
+      className="w-60 shrink-0 bg-[#F8F5F2] border-r border-[#e5e5e5] flex flex-col h-full"
       aria-label="Admin navigation"
     >
       {/* Brand */}
       <div className="h-16 flex items-center px-5 border-b border-[#e5e5e5] shrink-0">
         <Link
           href="/admin"
-          className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111] hover:text-[#C8A96B] transition-colors"
+          className="font-serif text-sm tracking-[0.18em] uppercase text-[#111111] hover:text-[#B8965C] transition-colors"
         >
           Dachhomeandbody
         </Link>
-        <span className="ml-2 text-[9px] tracking-[0.15em] uppercase text-[#C8A96B] bg-[#C8A96B]/10 px-1.5 py-0.5 rounded">
+        <span className="ml-2 text-[9px] tracking-[0.15em] uppercase text-[#B8965C] bg-[#B8965C]/10 px-1.5 py-0.5 rounded">
           Admin
         </span>
       </div>

@@ -20,7 +20,7 @@ export default function DeleteProductButton({
   if (confirming) {
     return (
       <div className="flex items-center gap-1">
-        <span className="text-[11px] text-[#8b7355]">Delete?</span>
+        <span className="text-[11px] text-[#8C8C8C]">Delete?</span>
         <button
           onClick={() => {
             setError(null)
@@ -41,7 +41,7 @@ export default function DeleteProductButton({
         <button
           onClick={() => setConfirming(false)}
           disabled={isPending}
-          className="text-xs text-[#8b7355] hover:text-[#111111] px-1.5 py-1 rounded hover:bg-[#f0ece4] transition-colors"
+          className="text-xs text-[#8C8C8C] hover:text-[#111111] px-1.5 py-1 rounded hover:bg-[#f0ece4] transition-colors"
           aria-label="Cancel delete"
         >
           No
@@ -56,7 +56,7 @@ export default function DeleteProductButton({
   return (
     <button
       onClick={() => setConfirming(true)}
-      className="text-xs text-[#8b7355] hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-red-50"
+      className="text-xs text-[#8C8C8C] hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-red-50"
       aria-label={`Delete ${productName}`}
     >
       Delete

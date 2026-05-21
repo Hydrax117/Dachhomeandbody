@@ -29,22 +29,22 @@ export function CouponInput() {
 
   if (hasCoupon) {
     return (
-      <div className="flex items-center justify-between py-2.5 px-3 bg-[#f0ece4] border border-[#C8A96B]/30">
+      <div className="flex items-center justify-between py-2.5 px-3 bg-[#f0ece4] border border-[#B8965C]/30">
         <div className="flex items-center gap-2">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C8A96B" strokeWidth="2" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8965C" strokeWidth="2" aria-hidden="true">
             <polyline points="20 6 9 17 4 12" />
           </svg>
-          <span className="text-xs tracking-[0.12em] uppercase font-medium text-[#4a4a4a]">
+          <span className="text-xs tracking-[0.12em] uppercase font-medium text-[#4A4A4A]">
             {cart.couponCode}
           </span>
-          <span className="text-xs text-[#C8A96B]">
+          <span className="text-xs text-[#B8965C]">
             −₦{cart.discount.toLocaleString()}
           </span>
         </div>
         <button
           onClick={handleRemove}
           aria-label="Remove coupon"
-          className="text-[#b8b0a8] hover:text-[#c0392b] transition-colors duration-150 text-xs tracking-wide"
+          className="text-[#C4C4C4] hover:text-[#c0392b] transition-colors duration-150 text-xs tracking-wide"
         >
           Remove
         </button>

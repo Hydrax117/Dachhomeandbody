@@ -63,7 +63,7 @@ export default function PasswordForm() {
         </div>
       </div>
 
-      <p className="text-xs text-[#8b7355]">
+      <p className="text-xs text-[#8C8C8C]">
         Minimum 8 characters with at least one letter and one number.
       </p>
 

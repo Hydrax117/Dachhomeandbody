@@ -49,7 +49,7 @@ export default function ReviewModerationActions({
         <button
           onClick={handleReject}
           disabled={isPending}
-          className="text-xs text-[#8b7355] hover:text-red-600 transition-colors disabled:opacity-50"
+          className="text-xs text-[#8C8C8C] hover:text-red-600 transition-colors disabled:opacity-50"
           aria-label="Reject review"
         >
           Reject
@@ -68,7 +68,7 @@ export default function ReviewModerationActions({
         <button
           onClick={handleApprove}
           disabled={isPending}
-          className="text-xs text-[#8b7355] hover:text-green-700 transition-colors disabled:opacity-50"
+          className="text-xs text-[#8C8C8C] hover:text-green-700 transition-colors disabled:opacity-50"
           aria-label="Approve review"
         >
           Approve

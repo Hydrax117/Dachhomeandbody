@@ -59,7 +59,7 @@ export default function ProfileForm({ name, email, phone }: ProfileFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="phone">Phone Number <span className="text-[#8b7355]">(optional)</span></Label>
+        <Label htmlFor="phone">Phone Number <span className="text-[#8C8C8C]">(optional)</span></Label>
         <Input
           id="phone"
           name="phone"

@@ -72,7 +72,7 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
       : `${coupon.usageCount} uses`
 
   return (
-    <tr className="hover:bg-[#FAF8F5] transition-colors">
+    <tr className="hover:bg-[#F8F5F2] transition-colors">
       {/* Code */}
       <td className="px-4 py-3">
         <span className="font-mono text-sm font-medium text-[#111111]">{coupon.code}</span>
@@ -82,7 +82,7 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
       <td className="px-4 py-3">
         <span className="text-sm text-[#111111]">{discountLabel}</span>
         {coupon.minOrderValue != null && (
-          <p className="text-[11px] text-[#8b7355] mt-0.5">
+          <p className="text-[11px] text-[#8C8C8C] mt-0.5">
             Min: {formatCurrency(coupon.minOrderValue)}
           </p>
         )}
@@ -96,7 +96,7 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
       {/* Expiry */}
       <td className="px-4 py-3 hidden md:table-cell">
         {coupon.expiresAt ? (
-          <span className={`text-xs ${isExpired(coupon.expiresAt) ? "text-red-600" : "text-[#8b7355]"}`}>
+          <span className={`text-xs ${isExpired(coupon.expiresAt) ? "text-red-600" : "text-[#8C8C8C]"}`}>
             {new Date(coupon.expiresAt).toLocaleDateString("en-NG", {
               day: "numeric",
               month: "short",
@@ -126,7 +126,7 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
 
           {confirming ? (
             <>
-              <span className="text-[11px] text-[#8b7355]">Delete?</span>
+              <span className="text-[11px] text-[#8C8C8C]">Delete?</span>
               <button
                 onClick={handleDelete}
                 disabled={isPending}
@@ -138,7 +138,7 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
               <button
                 onClick={() => setConfirming(false)}
                 disabled={isPending}
-                className="text-xs text-[#8b7355] hover:text-[#111111] px-1.5 py-1 rounded hover:bg-[#f0ece4] transition-colors"
+                className="text-xs text-[#8C8C8C] hover:text-[#111111] px-1.5 py-1 rounded hover:bg-[#f0ece4] transition-colors"
               >
                 No
               </button>
@@ -151,8 +151,8 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
                   disabled={isPending}
                   className={`text-xs px-2 py-1 rounded transition-colors disabled:opacity-50 ${
                     coupon.active
-                      ? "text-[#8b7355] hover:text-red-600 hover:bg-red-50"
-                      : "text-[#8b7355] hover:text-green-700 hover:bg-green-50"
+                      ? "text-[#8C8C8C] hover:text-red-600 hover:bg-red-50"
+                      : "text-[#8C8C8C] hover:text-green-700 hover:bg-green-50"
                   }`}
                   aria-label={coupon.active ? `Deactivate coupon ${coupon.code}` : `Activate coupon ${coupon.code}`}
                 >
@@ -162,7 +162,7 @@ export default function CouponRow({ coupon, toggleAction, deleteAction }: Coupon
               <button
                 onClick={() => setConfirming(true)}
                 disabled={isPending}
-                className="text-xs text-[#8b7355] hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-red-50"
+                className="text-xs text-[#8C8C8C] hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-red-50"
                 aria-label={`Delete coupon ${coupon.code}`}
               >
                 Delete

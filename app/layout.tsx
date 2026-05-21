@@ -41,22 +41,27 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: {
-    default: "Dachhomeandbody — Luxury Fragrances & Body Care",
-    template: "%s | Dachhomeandbody",
+    default: "DACH Home & Body — Luxury Home Fragrance, Natural Skincare & Gift Services",
+    template: "%s | DACH Home & Body",
   },
   description:
-    "Crafted scents for unforgettable presence. Luxury fragrances and body care designed to leave a lasting impression.",
+    "Luxury home fragrance, natural skincare, and curated gift services crafted for the wellness lifestyle. Personal, elegant, and memorable — delivered across Abuja and Nigeria.",
   keywords: [
-    "luxury fragrance",
-    "perfume",
-    "body care",
-    "eau de parfum",
-    "Nigerian fragrance",
+    "luxury home fragrance",
+    "natural skincare",
+    "gift services",
+    "wellness lifestyle",
+    "Abuja fragrance",
+    "Nigerian luxury brand",
+    "DACH Home and Body",
+    "Dachhomeandbody",
+    "home scents",
+    "body care Nigeria",
   ],
   openGraph: {
     type: "website",
     locale: "en_NG",
-    siteName: "Dachhomeandbody",
+    siteName: "DACH Home & Body",
   },
 };
 
@@ -70,7 +75,7 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${cormorant.variable} ${inter.variable} ${manrope.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#FAF6F1] text-[#111111]">
+      <body className="min-h-full flex flex-col bg-[#F8F5F2] text-[#111111]">
         <Providers>
           <ConditionalNavbar />
           {children}

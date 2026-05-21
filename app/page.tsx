@@ -23,36 +23,36 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/40" aria-hidden="true" />
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-10 pointer-events-none"
-        style={{ background: "radial-gradient(circle, #C8A96B 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, #B8965C 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
       <div className="relative z-10 text-center px-6 max-w-3xl mx-auto pt-20">
-        <p className="text-[#C8A96B] text-[10px] tracking-[0.35em] uppercase mb-8 font-medium">
-          Luxury Fragrance House
+        <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-8 font-medium">
+          Luxury Home Fragrance &amp; Natural Skincare
         </p>
         <h1
           className="font-serif text-white font-light leading-[1.08] mb-7"
           style={{ fontSize: "clamp(2.75rem, 7vw, 5.5rem)" }}
         >
-          Crafted scents for<br />
-          <em className="not-italic text-[#C8A96B]">unforgettable</em> presence.
+          Personal, elegant,<br />
+          <em className="not-italic text-[#B8965C]">memorable</em>.
         </h1>
         <p className="text-white/55 text-sm lg:text-base max-w-md mx-auto mb-12 leading-[1.8] font-light tracking-wide">
-          Luxury fragrances designed to leave a lasting impression — on every room you enter, every memory you leave behind.
+          Luxury home fragrance, natural skincare, and curated gift services — crafted for the wellness lifestyle in Abuja and beyond.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/shop"
-            className="px-9 py-4 bg-[#C8A96B] text-[#111111] text-[10px] tracking-[0.25em] uppercase font-medium hover:bg-[#b8965a] transition-colors duration-300 min-w-[190px] text-center"
+            className="px-9 py-4 bg-[#B8965C] text-[#111111] text-[10px] tracking-[0.25em] uppercase font-medium hover:bg-[#A07840] transition-colors duration-300 min-w-[190px] text-center"
           >
             Shop Collection
           </Link>
           <Link
             href="/shop"
-            className="px-9 py-4 border border-white/25 text-white text-[10px] tracking-[0.25em] uppercase font-medium hover:border-white/60 hover:bg-white/5 transition-all duration-300 min-w-[190px] text-center"
+            className="px-9 py-4 border border-white/25 text-white text-[10px] tracking-[0.25em] uppercase font-medium hover:border-[#B8965C] hover:text-[#B8965C] transition-all duration-300 min-w-[190px] text-center"
           >
-            Discover Signature Scents
+            Explore Gift Services
           </Link>
         </div>
       </div>
@@ -100,7 +100,7 @@ function FeaturedCollections({ categories }: { categories: Category[] }) {
   return (
     <section className="py-24 lg:py-32 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-3">Explore</p>
+        <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-3">Explore</p>
         <h2 className="font-serif text-3xl lg:text-5xl font-medium">Our Collections</h2>
       </div>
 
@@ -126,7 +126,7 @@ function FeaturedCollections({ categories }: { categories: Category[] }) {
                 {/* Dark overlay so text stays readable over the photo */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden="true" />
                 <div className="relative z-10 p-8 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <p className="text-[#c9a96e] text-[10px] tracking-[0.25em] uppercase mb-2">
+                  <p className="text-[#B8965C] text-[10px] tracking-[0.25em] uppercase mb-2">
                     {cat._count.products} {cat._count.products === 1 ? "product" : "products"}
                   </p>
                   <h3 className="font-serif text-white text-xl lg:text-2xl font-medium mb-4">{cat.name}</h3>
@@ -169,7 +169,7 @@ function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/shop/${product.slug}`} className="group">
-      <div className="relative overflow-hidden bg-[#f0ece4] aspect-[3/4] mb-5">
+      <div className="relative overflow-hidden bg-[#EBEBEB] aspect-[3/4] mb-5">
         {product.images[0] ? (
           <Image
             src={product.images[0]}
@@ -179,18 +179,18 @@ function ProductCard({ product }: { product: Product }) {
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#e8e0d0] to-[#d4c9b0] flex items-center justify-center">
-            <div className="w-16 h-24 rounded-full bg-[#c9a96e]/20 border border-[#c9a96e]/30" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#EBEBEB] to-[#C4C4C4] flex items-center justify-center">
+            <div className="w-16 h-24 rounded-full bg-[#B8965C]/20 border border-[#B8965C]/30" />
           </div>
         )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 bg-[#1a1a1a] py-3 text-center">
+        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 bg-[#111111] py-3 text-center">
           <span className="text-white text-[10px] tracking-[0.2em] uppercase">View Product</span>
         </div>
       </div>
       <div>
         <h3 className="font-serif text-base font-medium mb-1">{product.name}</h3>
-        {notes && <p className="text-[#8b7355] text-xs tracking-wide mb-2">{notes}</p>}
+        {notes && <p className="text-[#8C8C8C] text-xs tracking-wide mb-2">{notes}</p>}
         <p className="text-sm font-medium">₦{product.price.toLocaleString()}</p>
       </div>
     </Link>
@@ -203,12 +203,12 @@ function BestSellers({ products }: { products: Product[] }) {
       <div className="px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-16">
           <div>
-            <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-3">Most Loved</p>
+            <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-3">Most Loved</p>
             <h2 className="font-serif text-3xl lg:text-5xl font-medium">Best Sellers</h2>
           </div>
           <Link
             href="/shop"
-            className="hidden sm:block text-xs tracking-[0.15em] uppercase border-b border-[#1a1a1a] pb-0.5 hover:text-[#8b7355] hover:border-[#8b7355] transition-colors duration-200"
+            className="hidden sm:block text-xs tracking-[0.15em] uppercase border-b border-[#111111] pb-0.5 hover:text-[#B8965C] hover:border-[#B8965C] transition-colors duration-200"
           >
             View All
           </Link>
@@ -221,7 +221,7 @@ function BestSellers({ products }: { products: Product[] }) {
             ))}
           </div>
         ) : (
-          <p className="text-[#8b7355] text-sm text-center py-12">No products available yet.</p>
+          <p className="text-[#B8965C] text-sm text-center py-12">No products available yet.</p>
         )}
       </div>
     </section>
@@ -237,7 +237,7 @@ function FeaturedProducts({ products }: { products: Product[] }) {
   return (
     <section className="py-24 lg:py-32 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-3">Curated</p>
+        <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-3">Curated</p>
         <h2 className="font-serif text-3xl lg:text-5xl font-medium">Featured</h2>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
@@ -267,24 +267,24 @@ function BrandStory() {
             />
             <div className="absolute inset-0 bg-black/20" aria-hidden="true" />
           </div>
-          <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#c9a96e]/10 border border-[#c9a96e]/20" aria-hidden="true" />
+          <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#B8965C]/10 border border-[#B8965C]/20" aria-hidden="true" />
         </div>
 
         <div className="lg:pl-8">
-          <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-6">Our Story</p>
+          <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-6">Our Story</p>
           <h2 className="font-serif text-3xl lg:text-5xl font-medium leading-[1.15] mb-8">
-            Fragrance is more than scent — it is{" "}
-            <em className="not-italic text-[#8b7355]">identity</em>.
+            Scent is more than fragrance — it is{" "}
+            <em className="not-italic text-[#B8965C]">feeling</em>.
           </h2>
-          <p className="text-[#6b6b6b] leading-relaxed mb-6">
-            At Dachhomeandbody, fragrance is more than scent — it is identity, emotion, and memory. Every bottle is crafted to inspire confidence, presence, and timeless elegance.
+          <p className="text-[#8C8C8C] leading-relaxed mb-6">
+            DACH Home &amp; Body was born from a love of luxury, wellness, and the art of gifting. Based in Abuja, we curate home fragrances, natural skincare, and bespoke gift services for those who appreciate the finer details.
           </p>
-          <p className="text-[#6b6b6b] leading-relaxed mb-10">
-            We source the finest raw materials from around the world, working with master perfumers to create compositions that transcend the ordinary and become part of who you are.
+          <p className="text-[#8C8C8C] leading-relaxed mb-10">
+            Every product is chosen to make you feel something — personal, elegant, and memorable. Whether it is a scent that transforms your space or a gift that says exactly the right thing, we are here for the moments that matter.
           </p>
           <Link
             href="/about"
-            className="inline-block text-xs tracking-[0.2em] uppercase border-b border-[#1a1a1a] pb-0.5 hover:text-[#8b7355] hover:border-[#8b7355] transition-colors duration-200"
+            className="inline-block text-xs tracking-[0.2em] uppercase border-b border-[#111111] pb-0.5 hover:text-[#B8965C] hover:border-[#B8965C] transition-colors duration-200"
           >
             Discover Our Story
           </Link>
@@ -298,16 +298,16 @@ function BrandStory() {
 // Customer Reviews
 // ---------------------------------------------------------------------------
 const reviews = [
-  { name: "Amara O.", rating: 5, text: "Absolutely divine. Noir Absolu is the most sophisticated scent I've ever worn. I receive compliments every single time." },
-  { name: "Chisom E.", rating: 5, text: "The packaging alone feels like a luxury gift. The fragrance lasts all day and into the evening. Worth every naira." },
-  { name: "Tunde A.", rating: 5, text: "Rose Éternelle is everything. Feminine, warm, and completely unique. I've never smelled anything quite like it." },
+  { name: "Amara O.", rating: 5, text: "The home fragrance collection is absolutely divine. My living room has never smelled this good — I receive compliments every time someone visits." },
+  { name: "Chisom E.", rating: 5, text: "I ordered a gift set for my mum and she was blown away. The packaging feels so luxurious and the skincare products are genuinely amazing. Worth every naira." },
+  { name: "Tunde A.", rating: 5, text: "DACH Home & Body is my go-to for gifts now. Everything feels personal and thoughtful. The delivery to Abuja was same day — couldn't ask for more." },
 ]
 
 function StarRating({ count }: { count: number }) {
   return (
     <div className="flex gap-0.5" aria-label={`${count} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < count ? "#c9a96e" : "none"} stroke="#c9a96e" strokeWidth="1.5">
+        <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < count ? "#B8965C" : "none"} stroke="#B8965C" strokeWidth="1.5">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
       ))}
@@ -319,16 +319,16 @@ function CustomerReviews() {
   return (
     <section className="py-24 lg:py-32 px-6 lg:px-12 max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-3">Testimonials</p>
+        <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-3">Testimonials</p>
         <h2 className="font-serif text-3xl lg:text-5xl font-medium">What Our Clients Say</h2>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 lg:gap-10">
         {reviews.map((r) => (
-          <div key={r.name} className="bg-white p-8 border border-[#e5e5e5]">
+          <div key={r.name} className="bg-white p-8 border border-[#EBEBEB]">
             <StarRating count={r.rating} />
-            <p className="text-[#4a4a4a] leading-relaxed mt-5 mb-6 text-sm">&ldquo;{r.text}&rdquo;</p>
-            <p className="text-xs tracking-[0.15em] uppercase font-medium text-[#1a1a1a]">{r.name}</p>
+            <p className="text-[#4A4A4A] leading-relaxed mt-5 mb-6 text-sm">&ldquo;{r.text}&rdquo;</p>
+            <p className="text-xs tracking-[0.15em] uppercase font-medium text-[#111111]">{r.name}</p>
           </div>
         ))}
       </div>
@@ -353,9 +353,9 @@ function SocialGrid() {
     <section className="py-24 lg:py-32 bg-white">
       <div className="px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-[#8b7355] text-xs tracking-[0.3em] uppercase mb-3">Follow Along</p>
+          <p className="text-[#B8965C] text-xs tracking-[0.3em] uppercase mb-3">Follow Along</p>
           <h2 className="font-serif text-3xl lg:text-4xl font-medium mb-2">@dachhomeandbody</h2>
-          <p className="text-[#6b6b6b] text-sm">Join our fragrance community</p>
+          <p className="text-[#8C8C8C] text-sm">Join our luxury &amp; wellness community</p>
         </div>
 
         <div className="grid grid-cols-3 lg:grid-cols-6 gap-1.5">
@@ -382,21 +382,39 @@ function SocialGrid() {
 // ---------------------------------------------------------------------------
 function Footer() {
   return (
-    <footer className="bg-[#0d0b08] text-white/60 py-16 px-6 lg:px-12">
+    <footer className="bg-[#111111] text-white/60 py-16 px-6 lg:px-12">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div className="col-span-2 lg:col-span-1">
-            <p className="font-serif text-white text-lg tracking-[0.15em] uppercase mb-4">Dachhomeandbody</p>
-            <p className="text-sm leading-relaxed text-white/40 max-w-xs">
-              Luxury fragrances crafted for those who understand the power of scent.
+            <p className="font-serif text-white text-lg tracking-[0.15em] uppercase mb-4">DACH Home &amp; Body</p>
+            <p className="text-sm leading-relaxed text-white/40 max-w-xs mb-4">
+              Luxury home fragrance, natural skincare, and curated gift services. Based in Abuja, FCT.
             </p>
+            <div className="space-y-2 text-xs text-white/40">
+              <p>
+                <a href="tel:07064313141" className="hover:text-white/70 transition-colors duration-200">
+                  07064313141
+                </a>
+              </p>
+              <p>
+                <a href="mailto:adachadzarma@gmail.com" className="hover:text-white/70 transition-colors duration-200">
+                  adachadzarma@gmail.com
+                </a>
+              </p>
+            </div>
           </div>
 
           <div>
             <p className="text-white text-[10px] tracking-[0.25em] uppercase mb-5">Shop</p>
             <ul className="space-y-3 text-sm">
-              {["All Fragrances", "Collections", "Best Sellers", "New Arrivals", "Gift Sets"].map((l) => (
-                <li key={l}><Link href="/shop" className="hover:text-white transition-colors duration-200">{l}</Link></li>
+              {[
+                { label: "Home Fragrance", href: "/shop?category=home-fragrance" },
+                { label: "Natural Skincare", href: "/shop?category=natural-skincare" },
+                { label: "Gift Services", href: "/shop?category=gift-sets" },
+                { label: "Best Sellers", href: "/shop?sort=bestsellers" },
+                { label: "New Arrivals", href: "/shop?sort=newest" },
+              ].map((l) => (
+                <li key={l.label}><Link href={l.href} className="hover:text-white transition-colors duration-200">{l.label}</Link></li>
               ))}
             </ul>
           </div>
@@ -417,11 +435,19 @@ function Footer() {
                 <li key={l}><Link href="#" className="hover:text-white transition-colors duration-200">{l}</Link></li>
               ))}
             </ul>
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <p className="text-white text-[10px] tracking-[0.25em] uppercase mb-3">Delivery</p>
+              <p className="text-xs text-white/40 leading-relaxed">
+                Abuja: Same day<br />
+                <span className="text-white/25">(except custom orders)</span><br />
+                Nationwide: 3–5 business days
+              </p>
+            </div>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/30">© {new Date().getFullYear()} Dachhomeandbody. All rights reserved.</p>
+          <p className="text-xs text-white/30">© {new Date().getFullYear()} DACH Home &amp; Body. All rights reserved.</p>
 
           <div className="flex items-center gap-5">
             {[

@@ -77,7 +77,7 @@ export default function ReviewsToolbar({
           placeholder="Search by product or reviewer…"
           defaultValue={currentSearch}
           onChange={(e) => updateParams({ search: e.target.value, page: "1" })}
-          className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#C8A96B] transition-colors placeholder:text-[#aaa]"
+          className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e5e5] rounded bg-white focus:outline-none focus:border-[#B8965C] transition-colors placeholder:text-[#aaa]"
           aria-label="Search reviews"
         />
       </div>
@@ -86,7 +86,7 @@ export default function ReviewsToolbar({
       <select
         value={currentStatus}
         onChange={(e) => updateParams({ status: e.target.value, page: "1" })}
-        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
         aria-label="Filter by status"
       >
         {REVIEW_STATUSES.map((s) => (
@@ -100,7 +100,7 @@ export default function ReviewsToolbar({
       <select
         value={currentSort}
         onChange={(e) => updateParams({ sort: e.target.value, page: "1" })}
-        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#C8A96B] transition-colors text-[#111111]"
+        className="text-sm border border-[#e5e5e5] rounded bg-white px-3 py-2 focus:outline-none focus:border-[#B8965C] transition-colors text-[#111111]"
         aria-label="Sort reviews"
       >
         {SORT_OPTIONS.map((s) => (
@@ -116,7 +116,7 @@ export default function ReviewsToolbar({
           onClick={() =>
             updateParams({ search: "", status: "", sort: "newest", page: "1" })
           }
-          className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors underline underline-offset-2"
+          className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors underline underline-offset-2"
         >
           Clear filters
         </button>

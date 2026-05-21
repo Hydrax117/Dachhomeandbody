@@ -9,7 +9,7 @@ export function Eyebrow({ dark, className = "", children, ...props }: EyebrowPro
     <p
       className={[
         "text-eyebrow",
-        dark ? "text-[#C8A96B]" : "",
+        dark ? "text-[#B8965C]" : "",
         className,
       ]
         .filter(Boolean)

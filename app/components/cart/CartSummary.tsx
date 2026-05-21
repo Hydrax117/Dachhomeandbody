@@ -27,20 +27,20 @@ export function CartSummary({ showCheckoutButton = true, onCheckout }: CartSumma
       {/* Totals */}
       <div className="space-y-2.5 pt-1">
         <div className="flex justify-between text-sm">
-          <span className="text-[#8b7355]">Subtotal</span>
+          <span className="text-[#8C8C8C]">Subtotal</span>
           <span className="font-medium">₦{cart.subtotal.toLocaleString()}</span>
         </div>
 
         {hasDiscount && (
           <div className="flex justify-between text-sm">
-            <span className="text-[#C8A96B]">Discount ({cart.couponCode})</span>
-            <span className="text-[#C8A96B] font-medium">−₦{cart.discount.toLocaleString()}</span>
+            <span className="text-[#B8965C]">Discount ({cart.couponCode})</span>
+            <span className="text-[#B8965C] font-medium">−₦{cart.discount.toLocaleString()}</span>
           </div>
         )}
 
         <div className="flex justify-between text-sm">
-          <span className="text-[#8b7355]">Shipping</span>
-          <span className="text-[#8b7355]">
+          <span className="text-[#8C8C8C]">Shipping</span>
+          <span className="text-[#8C8C8C]">
             {shippingCost === 0 ? "Calculated at checkout" : `₦${shippingCost.toLocaleString()}`}
           </span>
         </div>
@@ -78,7 +78,7 @@ export function CartSummary({ showCheckoutButton = true, onCheckout }: CartSumma
       )}
 
       {/* Trust signals */}
-      <p className="text-[10px] text-center text-[#b8b0a8] tracking-wide pt-1">
+      <p className="text-[10px] text-center text-[#C4C4C4] tracking-wide pt-1">
         Secure checkout · Free returns
       </p>
     </div>

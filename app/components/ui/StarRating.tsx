@@ -13,8 +13,8 @@ export function StarRating({ rating, max = 5, size = 12 }: StarRatingProps) {
           width={size}
           height={size}
           viewBox="0 0 24 24"
-          fill={i < rating ? "#C8A96B" : "none"}
-          stroke="#C8A96B"
+          fill={i < rating ? "#B8965C" : "none"}
+          stroke="#B8965C"
           strokeWidth="1.5"
           aria-hidden="true"
         >

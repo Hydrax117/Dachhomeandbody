@@ -57,8 +57,8 @@ function StarRating({ rating }: { rating: number }) {
           width="12"
           height="12"
           viewBox="0 0 24 24"
-          fill={i < rating ? "#C8A96B" : "none"}
-          stroke={i < rating ? "#C8A96B" : "#d1d5db"}
+          fill={i < rating ? "#B8965C" : "none"}
+          stroke={i < rating ? "#B8965C" : "#d1d5db"}
           strokeWidth="1.5"
           aria-hidden="true"
         >
@@ -119,7 +119,7 @@ export default async function AdminReviewsPage({
       {/* Header */}
       <div>
         <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">Reviews</h1>
-        <p className="text-sm text-[#8b7355] mt-1">
+        <p className="text-sm text-[#8C8C8C] mt-1">
           {total} review{total !== 1 ? "s" : ""}
           {status ? ` with status: ${status.toLowerCase()}` : ""}
           {hasFilters ? " matching filters" : ""}
@@ -146,8 +146,8 @@ export default async function AdminReviewsPage({
               href={href}
               className={`px-4 py-2.5 text-sm transition-colors border-b-2 -mb-px ${
                 isActive
-                  ? "border-[#C8A96B] text-[#111111] font-medium"
-                  : "border-transparent text-[#8b7355] hover:text-[#111111]"
+                  ? "border-[#B8965C] text-[#111111] font-medium"
+                  : "border-transparent text-[#8C8C8C] hover:text-[#111111]"
               }`}
               aria-current={isActive ? "page" : undefined}
             >
@@ -167,7 +167,7 @@ export default async function AdminReviewsPage({
       {/* Table */}
       {reviews.length === 0 ? (
         <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
-          <p className="text-sm text-[#8b7355]">
+          <p className="text-sm text-[#8C8C8C]">
             {hasFilters || status
               ? "No reviews match your filters."
               : "No reviews yet."}
@@ -175,7 +175,7 @@ export default async function AdminReviewsPage({
           {(hasFilters || status) && (
             <Link
               href="/admin/reviews"
-              className="inline-block mt-3 text-xs text-[#C8A96B] hover:underline"
+              className="inline-block mt-3 text-xs text-[#B8965C] hover:underline"
             >
               Clear filters →
             </Link>
@@ -186,33 +186,33 @@ export default async function AdminReviewsPage({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5] bg-[#FAF8F5]">
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                <tr className="border-b border-[#e5e5e5] bg-[#F8F5F2]">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Product
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden sm:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
                     Reviewer
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Rating
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden md:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Review
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Status
                   </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium hidden lg:table-cell">
+                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     Date
                   </th>
-                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+                  <th className="text-right px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
                 {reviews.map((review: AdminReviewRow) => (
-                  <tr key={review.id} className="hover:bg-[#FAF8F5] transition-colors">
+                  <tr key={review.id} className="hover:bg-[#F8F5F2] transition-colors">
                     {/* Product */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -231,7 +231,7 @@ export default async function AdminReviewsPage({
                             href={`/shop/${review.product.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm font-medium text-[#111111] hover:text-[#C8A96B] transition-colors truncate block max-w-[140px]"
+                            className="text-sm font-medium text-[#111111] hover:text-[#B8965C] transition-colors truncate block max-w-[140px]"
                           >
                             {review.product.name}
                           </Link>
@@ -247,7 +247,7 @@ export default async function AdminReviewsPage({
                       <p className="text-xs text-[#111111] truncate max-w-[160px]">
                         {review.user.name ?? "—"}
                       </p>
-                      <p className="text-[11px] text-[#8b7355] truncate max-w-[160px]">
+                      <p className="text-[11px] text-[#8C8C8C] truncate max-w-[160px]">
                         {review.user.email}
                       </p>
                     </td>
@@ -264,7 +264,7 @@ export default async function AdminReviewsPage({
                           {review.title}
                         </p>
                       )}
-                      <p className="text-xs text-[#8b7355] line-clamp-2">{review.comment}</p>
+                      <p className="text-xs text-[#8C8C8C] line-clamp-2">{review.comment}</p>
                     </td>
 
                     {/* Status */}
@@ -274,7 +274,7 @@ export default async function AdminReviewsPage({
 
                     {/* Date */}
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className="text-xs text-[#8b7355]">
+                      <span className="text-xs text-[#8C8C8C]">
                         {new Date(review.createdAt).toLocaleDateString("en-NG", {
                           day: "numeric",
                           month: "short",
@@ -298,15 +298,15 @@ export default async function AdminReviewsPage({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#FAF8F5]">
-              <p className="text-xs text-[#8b7355]">
+            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#F8F5F2]">
+              <p className="text-xs text-[#8C8C8C]">
                 Page {page} of {totalPages} — {total} reviews
               </p>
               <div className="flex items-center gap-2">
                 {page > 1 && (
                   <Link
                     href={buildPageUrl(params, page - 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     ← Prev
                   </Link>
@@ -314,7 +314,7 @@ export default async function AdminReviewsPage({
                 {page < totalPages && (
                   <Link
                     href={buildPageUrl(params, page + 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#C8A96B] hover:text-[#C8A96B] transition-colors"
+                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
                   >
                     Next →
                   </Link>

@@ -65,7 +65,7 @@ function Section({
   return (
     <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
       <div className="px-5 py-4 border-b border-[#f0ece4]">
-        <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+        <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
           {title}
         </h2>
       </div>
@@ -104,7 +104,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
       <div>
         <Link
           href="/admin/customers"
-          className="inline-flex items-center gap-1.5 text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors mb-4"
         >
           <svg
             width="12"
@@ -131,14 +131,14 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-lg font-medium text-[#8b7355]">{initials}</span>
+              <span className="text-lg font-medium text-[#8C8C8C]">{initials}</span>
             )}
           </div>
           <div>
             <h1 className="font-serif text-2xl lg:text-3xl font-medium text-[#111111]">
               {customer.name ?? "Unnamed Customer"}
             </h1>
-            <p className="text-sm text-[#8b7355] mt-0.5">
+            <p className="text-sm text-[#8C8C8C] mt-0.5">
               Customer since {formatDate(customer.createdAt)}
             </p>
           </div>
@@ -148,7 +148,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-[#e5e5e5] rounded px-5 py-4">
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
             Total Orders
           </p>
           <p className="font-serif text-2xl font-medium text-[#111111] mt-1">
@@ -156,7 +156,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
           </p>
         </div>
         <div className="bg-white border border-[#e5e5e5] rounded px-5 py-4">
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
             Total Spend
           </p>
           <p className="font-serif text-2xl font-medium text-[#111111] mt-1">
@@ -164,7 +164,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
           </p>
         </div>
         <div className="bg-white border border-[#e5e5e5] rounded px-5 py-4 col-span-2 sm:col-span-1">
-          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
+          <p className="text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
             Avg. Order Value
           </p>
           <p className="font-serif text-2xl font-medium text-[#111111] mt-1">
@@ -182,13 +182,13 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
           <Section title="Profile">
             <dl className="px-5 py-4 space-y-3">
               <div>
-                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#b8b0a8] font-medium mb-0.5">
+                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#C4C4C4] font-medium mb-0.5">
                   Full name
                 </dt>
                 <dd className="text-sm text-[#111111]">{customer.name ?? "—"}</dd>
               </div>
               <div>
-                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#b8b0a8] font-medium mb-0.5">
+                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#C4C4C4] font-medium mb-0.5">
                   Role
                 </dt>
                 <dd className="text-sm text-[#111111] capitalize">
@@ -196,13 +196,13 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                 </dd>
               </div>
               <div>
-                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#b8b0a8] font-medium mb-0.5">
+                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#C4C4C4] font-medium mb-0.5">
                   Member since
                 </dt>
                 <dd className="text-sm text-[#111111]">{formatDate(customer.createdAt)}</dd>
               </div>
               <div>
-                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#b8b0a8] font-medium mb-0.5">
+                <dt className="text-[10px] tracking-[0.12em] uppercase text-[#C4C4C4] font-medium mb-0.5">
                   Last updated
                 </dt>
                 <dd className="text-sm text-[#111111]">{formatDate(customer.updatedAt)}</dd>
@@ -220,7 +220,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                   height="14"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#8b7355"
+                  stroke="#8C8C8C"
                   strokeWidth="2"
                   aria-hidden="true"
                   className="shrink-0 mt-0.5"
@@ -229,12 +229,12 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
                 <div className="min-w-0">
-                  <p className="text-[10px] tracking-[0.12em] uppercase text-[#b8b0a8] font-medium mb-0.5">
+                  <p className="text-[10px] tracking-[0.12em] uppercase text-[#C4C4C4] font-medium mb-0.5">
                     Email
                   </p>
                   <a
                     href={`mailto:${customer.email}`}
-                    className="text-sm text-[#111111] hover:text-[#C8A96B] transition-colors break-all"
+                    className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors break-all"
                   >
                     {customer.email}
                   </a>
@@ -248,7 +248,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                   height="14"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#8b7355"
+                  stroke="#8C8C8C"
                   strokeWidth="2"
                   aria-hidden="true"
                   className="shrink-0 mt-0.5"
@@ -256,18 +256,18 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
                 <div>
-                  <p className="text-[10px] tracking-[0.12em] uppercase text-[#b8b0a8] font-medium mb-0.5">
+                  <p className="text-[10px] tracking-[0.12em] uppercase text-[#C4C4C4] font-medium mb-0.5">
                     Phone
                   </p>
                   {customer.phone ? (
                     <a
                       href={`tel:${customer.phone}`}
-                      className="text-sm text-[#111111] hover:text-[#C8A96B] transition-colors"
+                      className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors"
                     >
                       {customer.phone}
                     </a>
                   ) : (
-                    <span className="text-sm text-[#b8b0a8]">Not provided</span>
+                    <span className="text-sm text-[#C4C4C4]">Not provided</span>
                   )}
                 </div>
               </div>
@@ -280,7 +280,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
           <Section title={`Order history (${customer._count.orders})`}>
             {customer.orders.length === 0 ? (
               <div className="px-5 py-10 text-center">
-                <p className="text-sm text-[#8b7355]">No orders yet.</p>
+                <p className="text-sm text-[#8C8C8C]">No orders yet.</p>
               </div>
             ) : (
               <ul aria-label="Customer order history">
@@ -298,13 +298,13 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                         <div className="flex items-center gap-2 flex-wrap">
                           <Link
                             href={`/admin/orders/${order.id}`}
-                            className="text-sm font-medium text-[#111111] hover:text-[#C8A96B] transition-colors"
+                            className="text-sm font-medium text-[#111111] hover:text-[#B8965C] transition-colors"
                           >
                             #{order.orderNumber}
                           </Link>
                           <StatusBadge status={order.status} />
                         </div>
-                        <p className="text-xs text-[#8b7355] mt-1">
+                        <p className="text-xs text-[#8C8C8C] mt-1">
                           {formatDate(order.createdAt)} ·{" "}
                           {order.items.reduce((sum, i) => sum + i.quantity, 0)}{" "}
                           item
@@ -336,7 +336,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                                       height="10"
                                       viewBox="0 0 24 24"
                                       fill="none"
-                                      stroke="#b8b0a8"
+                                      stroke="#C4C4C4"
                                       strokeWidth="1.5"
                                       aria-hidden="true"
                                     >
@@ -349,7 +349,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                               </div>
                             ))}
                             {order.items.length > 4 && (
-                              <span className="text-[11px] text-[#8b7355]">
+                              <span className="text-[11px] text-[#8C8C8C]">
                                 +{order.items.length - 4} more
                               </span>
                             )}
@@ -363,7 +363,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
                         </p>
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="text-xs text-[#8b7355] hover:text-[#C8A96B] transition-colors mt-1 inline-block"
+                          className="text-xs text-[#8C8C8C] hover:text-[#B8965C] transition-colors mt-1 inline-block"
                           aria-label={`View order ${order.orderNumber}`}
                         >
                           View →
