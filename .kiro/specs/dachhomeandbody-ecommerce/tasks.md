@@ -6,6 +6,25 @@ This implementation plan breaks down the luxury e-commerce platform into discret
 
 The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, PostgreSQL, and integrates with external services (Cloudinary, Paystack, Resend, Auth.js).
 
+## Task Dependency Graph
+
+```json
+{
+  "waves": [
+    { "wave": 1, "tasks": ["1"] },
+    { "wave": 2, "tasks": ["2", "3"] },
+    { "wave": 3, "tasks": ["4", "5", "6"] },
+    { "wave": 4, "tasks": ["7"] },
+    { "wave": 5, "tasks": ["8", "9", "10", "11"] },
+    { "wave": 6, "tasks": ["12", "13", "14", "15", "16", "17"] },
+    { "wave": 7, "tasks": ["18"] },
+    { "wave": 8, "tasks": ["19", "20", "21", "22", "23"] },
+    { "wave": 9, "tasks": ["24", "25"] },
+    { "wave": 10, "tasks": ["26"] }
+  ]
+}
+```
+
 ## Tasks
 
 - [x] 1. Project setup and core infrastructure
@@ -27,20 +46,18 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - _Requirements: 1.1, 1.2, 1.3, 22.2_
 
   - [x] 2.2 Write property tests for authentication
-
     - **Property 1: User registration creates authenticated session**
     - **Property 2: Valid credentials authenticate users**
     - **Property 86: Passwords are hashed before storage**
     - **Validates: Requirements 1.1, 1.2, 22.2**
 
-  - [x] 2.3 Implement password reset flow 
+  - [x] 2.3 Implement password reset flow
     - Create password reset token generation
     - Build password reset email template
     - Implement reset token validation and password update
     - _Requirements: 1.4, 16.4_
 
   - [x] 2.4 Write property test for password reset
-
     - **Property 4: Password reset generates secure tokens**
     - **Validates: Requirements 1.4**
 
@@ -51,13 +68,12 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - _Requirements: 1.5, 1.6, 22.5_
 
   - [x] 2.6 Write property tests for authorization
-
     - **Property 5: Admin routes require admin role**
     - **Property 89: Protected endpoints require authentication**
     - **Validates: Requirements 1.5, 22.5**
 
   - [x] 2.7 Build authentication UI components
-    - Create login page with email/password 
+    - Create login page with email/password
     - Create registration page with validation
     - Create password reset request and confirmation pages
     - Implement logout functionality
@@ -77,8 +93,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Create admin product CRUD operations
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 8.1, 8.3, 8.4, 12.2, 12.3, 12.4_
 
-  - [-] 3.3 Write property tests for product queries
-
+  - [ ]* 3.3 Write property tests for product queries
     - **Property 8: Product filters match all criteria**
     - **Property 9: Product sorting orders correctly**
     - **Property 10: Search matches across multiple fields**
@@ -91,17 +106,18 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Create admin order queries with filters
     - _Requirements: 4.4, 5.1, 5.2, 9.1, 9.3_
 
-  - [ ] 3.5 Implement review data access functions
-    - Create createReview, approveReview, rejectReview
-    - Create getProductReviews with approved filter
-    - Implement average rating calculation
+  - [x] 3.5 Implement review data access functions
+    - Create getAdminReviews with filters, sorting, pagination
+    - Create approveReview with product rating recalculation
+    - Create rejectReview with product rating recalculation
+    - Implement average rating calculation via transaction
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
   - [ ]* 3.6 Write property test for review calculations
     - **Property 35: Average rating calculation is accurate**
     - **Validates: Requirements 6.5**
 
-  - [ ] 3.7 Implement coupon data access functions
+  - [x] 3.7 Implement coupon data access functions
     - Create validateCoupon with all validation rules
     - Create admin coupon CRUD operations
     - Implement usage tracking and auto-deactivation
@@ -175,7 +191,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 13: Fragrance notes are organized by type**
     - **Validates: Requirements 2.5, 2.7, 2.8**
 
-  - [x] 5.4 Create reusable product components
+  - [x] 5.5 Create reusable product components
     - Build ProductCard component for grid display
     - Create ProductGallery with zoom and swipe support
     - Build FragranceProfile visualization component
@@ -220,7 +236,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
   - Test cart operations
   - Ask the user if questions arise
 
-- [x] 8. Checkout and payment flow 
+- [x] 8. Checkout and payment flow
   - [x] 8.1 Create checkout page with multi-step form
     - Build checkout layout with order summary
     - Create shipping address form with validation
@@ -299,8 +315,8 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
   - [x] 10.1 Implement review submission
     - Create review form component
     - Add rating input (star selector)
-    - Implement review submission with pending status
-    - Check purchase verification
+    - Implement review submission with purchase verification
+    - Check purchase verification (DELIVERED order required)
     - _Requirements: 6.1, 6.6_
 
   - [ ]* 10.2 Write property tests for reviews
@@ -308,8 +324,8 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 36: Purchase verification marks reviews**
     - **Validates: Requirements 6.1, 6.6**
 
-  - [ ] 10.3 Display reviews on product pages
-    - Show approved reviews sorted by date
+  - [x] 10.3 Display reviews on product pages
+    - Show approved reviews sorted by date via ReviewsList component
     - Display average rating with star visualization
     - Add verified purchase badges
     - _Requirements: 6.4, 6.5_
@@ -318,13 +334,14 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 34: Review status determines visibility**
     - **Validates: Requirements 6.3, 6.4**
 
-- [ ] 11. Homepage and content sections
-  - [ ] 11.1 Create homepage layout
-    - Build hero section with video/image support
-    - Add featured collections section
-    - Create best sellers section
-    - Add new arrivals section
-    - Build testimonials section
+- [x] 11. Homepage and content sections
+  - [x] 11.1 Create homepage layout
+    - Build hero section with cinematic image and CTA
+    - Add featured collections section (real categories from DB)
+    - Create best sellers section (real products from DB)
+    - Add featured products section
+    - Build brand story section
+    - Add customer testimonials section
     - Add newsletter signup form
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
 
@@ -382,25 +399,25 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 47: Fragrance profile validation**
     - **Validates: Requirements 8.1, 8.7**
 
-  - [x] 13.3 Implement product edit functionality
+  - [x] 13.4 Implement product edit functionality
     - Load existing product data
     - Allow updating all product fields
     - Support image reordering and deletion
     - Handle featured product toggle
     - _Requirements: 8.3, 8.5, 17.3, 17.4_
 
-  - [ ]* 13.4 Write property tests for product updates
+  - [ ]* 13.5 Write property tests for product updates
     - **Property 43: Product updates persist immediately**
     - **Property 68: Image reordering persists**
     - **Validates: Requirements 8.3, 17.4**
 
-  - [x] 13.5 Implement product deletion
+  - [x] 13.6 Implement product deletion
     - Add soft delete functionality
     - Hide deleted products from customer views
     - Maintain order history references
     - _Requirements: 8.4_
 
-  - [ ]* 13.6 Write property test for soft delete
+  - [ ]* 13.7 Write property test for soft delete
     - **Property 44: Product deletion is soft delete**
     - **Validates: Requirements 8.4**
 
@@ -460,10 +477,10 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 23.2, 23.4**
 
   - [x] 15.4 Implement review moderation
-    - Create review moderation page
-    - Display pending reviews
+    - Create review moderation page with pending/all reviews
+    - Display reviews with product and user info
     - Add approve/reject actions
-    - Update product ratings on approval
+    - Update product ratings on approval/rejection
     - _Requirements: 6.2, 6.3_
 
   - [ ]* 15.5 Write property test for review moderation
@@ -471,7 +488,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Validates: Requirements 6.2**
 
 - [ ] 16. Admin coupon and category management
-  - [ ] 16.1 Create coupon management page
+  - [x] 16.1 Create coupon management page
     - Display all coupons in table
     - Show usage stats and status
     - Add create coupon form
@@ -528,10 +545,10 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
 
 - [ ] 19. Error handling and validation
   - [x] 19.1 Implement global error handling
-    - Create error boundary components
+    - Create error boundary components (error.tsx, global-error.tsx)
     - Add API error handling middleware
     - Implement toast notification system
-    - Set up error logging
+    - Set up error logging via instrumentation.ts
     - _Requirements: 21.1, 21.2, 21.3, 21.4_
 
   - [ ]* 19.2 Write property tests for error handling
