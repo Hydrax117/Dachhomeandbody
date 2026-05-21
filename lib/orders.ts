@@ -491,3 +491,51 @@ export async function updateOrderStatus(
 
   return updated
 }
+
+/**
+ * Process a refund for an order.
+ * Updates order status to REFUNDED, payment status to REFUNDED,
+ * and restores stock for all items.
+ * Requirements: 9.4
+ */
+export async function processRefund(
+  id: string,
+  refundAmount: number,
+  notes?: string
+): Promise<{ orderNumber: string }> {
+  return prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id },
+      select: {
+        status: true,
+        orderNumber: true,
+        items: { select: { productId: true, quantity: true } },
+      },
+    })
+
+    if (!order) throw new Error("Order not found")
+    if (order.status === "REFUNDED") throw new Error("Order has already been refunded")
+
+    // Restore stock if order was not already cancelled
+    if (order.status !== "CANCELLED") {
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        })
+      }
+    }
+
+    const updated = await tx.order.update({
+      where: { id },
+      data: {
+        status: "REFUNDED",
+        paymentStatus: "REFUNDED",
+        notes: notes ?? null,
+      },
+      select: { orderNumber: true },
+    })
+
+    return updated
+  })
+}

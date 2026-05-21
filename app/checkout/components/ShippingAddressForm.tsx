@@ -201,6 +201,27 @@ export function ShippingAddressForm({
     }
   }
 
+  function validateField(key: keyof ShippingAddress | "email") {
+    if (key === "email") {
+      if (!isAuthenticated) {
+        const result = GuestEmailSchema.safeParse(email)
+        if (!result.success) {
+          setErrors((prev) => ({
+            ...prev,
+            email: result.error.issues[0]?.message ?? "Invalid email",
+          }))
+        }
+      }
+      return
+    }
+    const singleField = AddressSchema.pick({ [key]: true } as Record<typeof key, true>)
+    const result = singleField.safeParse({ [key]: fields[key] })
+    if (!result.success) {
+      const msg = result.error.issues[0]?.message
+      if (msg) setErrors((prev) => ({ ...prev, [key]: msg }))
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const newErrors: FieldErrors = {}
@@ -262,6 +283,7 @@ export function ShippingAddressForm({
                 setEmail(e.target.value)
                 if (errors.email) setErrors((p) => ({ ...p, email: undefined }))
               }}
+              onBlur={() => validateField("email")}
               placeholder="you@example.com"
               className={inputCls("email")}
               aria-describedby={errors.email ? "email-error" : undefined}
@@ -290,6 +312,7 @@ export function ShippingAddressForm({
               autoComplete="name"
               value={fields.name}
               onChange={(e) => setField("name", e.target.value)}
+              onBlur={() => validateField("name")}
               placeholder="Jane Doe"
               className={inputCls("name")}
               aria-describedby={errors.name ? "name-error" : undefined}
@@ -302,6 +325,7 @@ export function ShippingAddressForm({
               autoComplete="tel"
               value={fields.phone}
               onChange={(e) => setField("phone", e.target.value)}
+              onBlur={() => validateField("phone")}
               placeholder="+234 800 000 0000"
               className={inputCls("phone")}
               aria-describedby={errors.phone ? "phone-error" : undefined}
@@ -316,6 +340,7 @@ export function ShippingAddressForm({
             autoComplete="street-address"
             value={fields.address}
             onChange={(e) => setField("address", e.target.value)}
+            onBlur={() => validateField("address")}
             placeholder="123 Victoria Island"
             className={inputCls("address")}
             aria-describedby={errors.address ? "address-error" : undefined}
@@ -330,6 +355,7 @@ export function ShippingAddressForm({
               autoComplete="address-level2"
               value={fields.city}
               onChange={(e) => setField("city", e.target.value)}
+              onBlur={() => validateField("city")}
               placeholder="Lagos"
               className={inputCls("city")}
               aria-describedby={errors.city ? "city-error" : undefined}
@@ -356,6 +382,7 @@ export function ShippingAddressForm({
               autoComplete="postal-code"
               value={fields.postalCode}
               onChange={(e) => setField("postalCode", e.target.value)}
+              onBlur={() => validateField("postalCode")}
               placeholder="100001"
               className={inputCls("postalCode")}
               aria-describedby={errors.postalCode ? "postalCode-error" : undefined}

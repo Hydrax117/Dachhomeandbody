@@ -1,13 +1,14 @@
 "use server"
 
 import { auth } from "@/lib/auth"
-import { updateOrderStatus, getOrder } from "@/lib/orders"
+import { updateOrderStatus, processRefund, getOrder } from "@/lib/orders"
 import {
   sendShippingNotificationEmail,
   sendDeliveryConfirmationEmail,
 } from "@/lib/email"
 import { type OrderStatus } from "@prisma/client"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
 
 const VALID_STATUSES: OrderStatus[] = [
   "PENDING",
@@ -85,5 +86,62 @@ export async function updateOrderStatusAction(
   } catch (err) {
     console.error("Failed to update order status:", err)
     return { success: false, error: "Failed to update order status" }
+  }
+}
+
+// ── Refund schema ──────────────────────────────────────────────────────────
+
+const refundSchema = z.object({
+  refundAmount: z
+    .number({ error: "Refund amount must be a number" })
+    .positive("Refund amount must be greater than 0"),
+  notes: z.string().max(500, "Notes must be 500 characters or less").optional(),
+})
+
+export type RefundFormState = {
+  errors?: Partial<Record<"refundAmount" | "notes" | "_form", string[]>>
+  success?: boolean
+}
+
+/**
+ * Admin server action: process a refund for an order.
+ * Updates status to REFUNDED, payment status to REFUNDED, restores stock.
+ * Requirements: 9.4
+ */
+export async function processRefundAction(
+  orderId: string,
+  _prev: RefundFormState,
+  formData: FormData
+): Promise<RefundFormState> {
+  const session = await auth()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { errors: { _form: ["Unauthorized"] } }
+  }
+
+  const parsed = refundSchema.safeParse({
+    refundAmount: Number(formData.get("refundAmount")),
+    notes: formData.get("notes") ? String(formData.get("notes")) : undefined,
+  })
+
+  if (!parsed.success) {
+    const fieldErrors: RefundFormState["errors"] = {}
+    for (const [key, msgs] of Object.entries(parsed.error.flatten().fieldErrors)) {
+      ;(fieldErrors as Record<string, string[]>)[key] = msgs as string[]
+    }
+    return { errors: fieldErrors }
+  }
+
+  try {
+    await processRefund(orderId, parsed.data.refundAmount, parsed.data.notes)
+
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath("/admin/orders")
+    revalidatePath("/shop", "layout")
+    revalidatePath("/admin/products")
+
+    return { success: true }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to process refund"
+    return { errors: { _form: [msg] } }
   }
 }

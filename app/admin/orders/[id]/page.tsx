@@ -12,6 +12,7 @@ import { getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
 import OrderStatusForm from "../components/OrderStatusForm"
+import RefundForm from "../components/RefundForm"
 
 type OrderDetail = NonNullable<Awaited<ReturnType<typeof getOrder>>>
 type OrderItem = OrderDetail["items"][number]
@@ -422,15 +423,25 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
             </div>
           </Section>
 
-          {/* Admin actions — status update */}
+          {/* Admin actions — status update + refund */}
           <section className="bg-white border border-[#e5e5e5] rounded overflow-hidden">
             <div className="px-5 py-4 border-b border-[#f0ece4]">
               <h2 className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium">
                 Manage Order
               </h2>
             </div>
-            <div className="px-5 py-4">
+            <div className="px-5 py-4 space-y-4">
               <OrderStatusForm orderId={order.id} currentStatus={order.status} />
+              <div className="border-t border-[#f0ece4] pt-4">
+                <p className="text-[10px] tracking-[0.18em] uppercase text-[#8b7355] font-medium mb-3">
+                  Refund
+                </p>
+                <RefundForm
+                  orderId={order.id}
+                  orderTotal={order.total}
+                  currentStatus={order.status}
+                />
+              </div>
             </div>
           </section>
 

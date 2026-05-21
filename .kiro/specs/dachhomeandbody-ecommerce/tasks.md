@@ -447,7 +447,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - Update order timestamps (shippedAt, deliveredAt)
     - _Requirements: 5.5, 9.2_
 
-  - [ ] 14.5 Add refund processing
+  - [x] 14.5 Add refund processing
     - Create refund form
     - Update order status to refunded
     - Record refund amount
@@ -556,7 +556,7 @@ The implementation uses Next.js 14+ (App Router), TypeScript, Prisma ORM, Postgr
     - **Property 85: Invalid data prevents submission**
     - **Validates: Requirements 21.1, 21.5**
 
-  - [ ] 19.3 Add client-side validation
+  - [x] 19.3 Add client-side validation
     - Implement Zod schemas for all forms
     - Add real-time validation on blur
     - Display inline error messages
