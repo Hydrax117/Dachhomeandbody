@@ -274,7 +274,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   compareAtPrice={p.compareAtPrice}
                   images={p.images}
                   stock={p.stock}
-                  fragranceType={p.fragranceType}
                   averageRating={p.averageRating}
                   reviewCount={p.reviewCount}
                   category={p.category}
