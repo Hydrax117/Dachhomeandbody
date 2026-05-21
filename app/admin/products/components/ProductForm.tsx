@@ -41,8 +41,26 @@ interface ProductFormProps {
 
 // ── Step definitions ───────────────────────────────────────────────────────
 
-const STEPS = ["Basic Info", "Fragrance Profile", "Images & Stock"] as const
+const STEPS = ["Basic Info", "Product Details", "Images & Stock"] as const
 type Step = 0 | 1 | 2
+
+// ── Category type detection ────────────────────────────────────────────────
+
+type ProductLineType = "fragrance" | "skincare" | "gift" | "general"
+
+function detectProductLine(categoryName: string): ProductLineType {
+  const name = categoryName.toLowerCase()
+  if (name.includes("fragrance") || name.includes("candle") || name.includes("diffuser") || name.includes("room spray") || name.includes("wax melt") || name.includes("scent")) {
+    return "fragrance"
+  }
+  if (name.includes("skincare") || name.includes("skin") || name.includes("body butter") || name.includes("body oil") || name.includes("scrub") || name.includes("cleanser") || name.includes("soap") || name.includes("lotion") || name.includes("cream") || name.includes("serum")) {
+    return "skincare"
+  }
+  if (name.includes("gift") || name.includes("set") || name.includes("box") || name.includes("bundle")) {
+    return "gift"
+  }
+  return "general"
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -114,10 +132,12 @@ function BasicInfoStep({
   categories,
   errors,
   initialData,
+  onCategoryChange,
 }: {
   categories: Category[]
   errors: CreateProductState["errors"]
   initialData?: ProductInitialData
+  onCategoryChange: (name: string) => void
 }) {
   const [slug, setSlug] = useState(initialData?.slug ?? "")
   const [nameVal, setNameVal] = useState(initialData?.name ?? "")
@@ -125,7 +145,6 @@ function BasicInfoStep({
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value
     setNameVal(val)
-    // Only auto-generate slug in create mode (when slug is empty or was auto-generated)
     if (!initialData) {
       setSlug(slugify(val))
     }
@@ -140,7 +159,7 @@ function BasicInfoStep({
           id="name" name="name" type="text" required
           value={nameVal}
           onChange={handleNameChange}
-          placeholder="e.g. Oud Noir Eau de Parfum"
+          placeholder="e.g. Rose & Shea Body Butter"
           className={inputCls(errors?.name?.[0])}
         />
         <FieldError message={errors?.name?.[0]} />
@@ -153,7 +172,7 @@ function BasicInfoStep({
           id="slug" name="slug" type="text" required
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          placeholder="oud-noir-eau-de-parfum"
+          placeholder="rose-shea-body-butter"
           className={inputCls(errors?.slug?.[0])}
         />
         <FieldError message={errors?.slug?.[0]} />
@@ -202,6 +221,10 @@ function BasicInfoStep({
           <select
             id="categoryId" name="categoryId" required
             defaultValue={initialData?.categoryId ?? ""}
+            onChange={(e) => {
+              const selected = categories.find((c) => c.id === e.target.value)
+              onCategoryChange(selected?.name ?? "")
+            }}
             className={selectCls(errors?.categoryId?.[0])}
           >
             <option value="">Select a category…</option>
@@ -216,28 +239,6 @@ function BasicInfoStep({
           </span>
         </div>
         <FieldError message={errors?.categoryId?.[0]} />
-      </div>
-
-      {/* Gender */}
-      <div>
-        <Label htmlFor="gender">Gender</Label>
-        <div className="relative">
-          <select
-            id="gender" name="gender"
-            defaultValue={initialData?.gender ?? ""}
-            className={selectCls()}
-          >
-            <option value="">Select…</option>
-            <option value="UNISEX">Unisex</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
-          </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </span>
-        </div>
       </div>
 
       {/* Featured */}
@@ -255,135 +256,180 @@ function BasicInfoStep({
   )
 }
 
-// ── Step 2: Fragrance Profile ──────────────────────────────────────────────
+// ── Step 2: Product Details (adapts to product line) ──────────────────────
 
-function FragranceProfileStep({
+function ProductDetailsStep({
   errors,
   initialData,
+  productLine,
 }: {
   errors: CreateProductState["errors"]
   initialData?: ProductInitialData
+  productLine: ProductLineType
 }) {
-  return (
-    <div className="space-y-5">
-      {/* Fragrance Type */}
-      <div>
-        <Label htmlFor="fragranceType">Fragrance Type</Label>
-        <div className="relative">
-          <select
-            id="fragranceType" name="fragranceType"
-            defaultValue={initialData?.fragranceType ?? ""}
-            className={selectCls()}
-          >
-            <option value="">Select type…</option>
-            <option value="PERFUME">Perfume</option>
-            <option value="EAU_DE_PARFUM">Eau de Parfum</option>
-            <option value="EAU_DE_TOILETTE">Eau de Toilette</option>
-            <option value="COLOGNE">Cologne</option>
-            <option value="BODY_MIST">Body Mist</option>
-          </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </span>
+  // ── Fragrance fields ──
+  if (productLine === "fragrance") {
+    return (
+      <div className="space-y-5">
+        <p className="text-xs text-[#8C8C8C] bg-[#F8F5F2] border border-[#EBEBEB] rounded px-3 py-2">
+          Home fragrance product — fill in scent profile details below.
+        </p>
+
+        {/* Fragrance Type */}
+        <div>
+          <Label htmlFor="fragranceType">Fragrance Type</Label>
+          <div className="relative">
+            <select id="fragranceType" name="fragranceType" defaultValue={initialData?.fragranceType ?? ""} className={selectCls()}>
+              <option value="">Select type…</option>
+              <option value="PERFUME">Perfume</option>
+              <option value="EAU_DE_PARFUM">Eau de Parfum</option>
+              <option value="EAU_DE_TOILETTE">Eau de Toilette</option>
+              <option value="COLOGNE">Cologne</option>
+              <option value="BODY_MIST">Body Mist</option>
+            </select>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+            </span>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {(["topNotes", "heartNotes", "baseNotes"] as const).map((field, i) => (
+            <div key={field}>
+              <Label htmlFor={field}>{["Top Notes", "Heart Notes", "Base Notes"][i]}</Label>
+              <input id={field} name={field} type="text" defaultValue={initialData?.[field]?.join(", ") ?? ""} placeholder={["Bergamot, Lemon", "Rose, Jasmine", "Oud, Sandalwood"][i]} className={inputCls(errors?.[field]?.[0])} />
+              <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
+              <FieldError message={errors?.[field]?.[0]} />
+            </div>
+          ))}
+        </div>
+
+        {/* Longevity + Strength */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="longevity">Longevity</Label>
+            <div className="relative">
+              <select id="longevity" name="longevity" defaultValue={initialData?.longevity ?? ""} className={selectCls()}>
+                <option value="">Select…</option>
+                <option value="SHORT">Short (1–3 hrs)</option>
+                <option value="MODERATE">Moderate (3–6 hrs)</option>
+                <option value="LONG">Long (6–12 hrs)</option>
+                <option value="VERY_LONG">Very Long (12+ hrs)</option>
+              </select>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+              </span>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="strength">Strength</Label>
+            <div className="relative">
+              <select id="strength" name="strength" defaultValue={initialData?.strength ?? ""} className={selectCls()}>
+                <option value="">Select…</option>
+                <option value="LIGHT">Light</option>
+                <option value="MODERATE">Moderate</option>
+                <option value="STRONG">Strong</option>
+                <option value="VERY_STRONG">Very Strong</option>
+              </select>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mood Tags */}
+        <div>
+          <Label htmlFor="moodTags">Mood Tags</Label>
+          <input id="moodTags" name="moodTags" type="text" defaultValue={initialData?.moodTags?.join(", ") ?? ""} placeholder="Romantic, Cosy, Fresh" className={inputCls()} />
+          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
         </div>
       </div>
+    )
+  }
 
-      {/* Notes */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+  // ── Skincare fields ──
+  if (productLine === "skincare") {
+    return (
+      <div className="space-y-5">
+        <p className="text-xs text-[#8C8C8C] bg-[#F8F5F2] border border-[#EBEBEB] rounded px-3 py-2">
+          Natural skincare product — fill in ingredients and usage details below.
+        </p>
+
+        {/* Key Ingredients */}
         <div>
-          <Label htmlFor="topNotes">Top Notes</Label>
-          <input
-            id="topNotes" name="topNotes" type="text"
-            defaultValue={initialData?.topNotes?.join(", ") ?? ""}
-            placeholder="Bergamot, Lemon, Pepper"
-            className={inputCls(errors?.topNotes?.[0])}
-          />
-          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
+          <Label htmlFor="topNotes">Key Ingredients</Label>
+          <input id="topNotes" name="topNotes" type="text" defaultValue={initialData?.topNotes?.join(", ") ?? ""} placeholder="Shea Butter, Rosehip Oil, Vitamin E" className={inputCls(errors?.topNotes?.[0])} />
+          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated — these appear on the product page</p>
           <FieldError message={errors?.topNotes?.[0]} />
         </div>
+
+        {/* Skin Type */}
         <div>
-          <Label htmlFor="heartNotes">Heart Notes</Label>
-          <input
-            id="heartNotes" name="heartNotes" type="text"
-            defaultValue={initialData?.heartNotes?.join(", ") ?? ""}
-            placeholder="Rose, Jasmine, Iris"
-            className={inputCls(errors?.heartNotes?.[0])}
-          />
+          <Label htmlFor="heartNotes">Suitable For (Skin Type)</Label>
+          <input id="heartNotes" name="heartNotes" type="text" defaultValue={initialData?.heartNotes?.join(", ") ?? ""} placeholder="Dry Skin, Sensitive Skin, All Skin Types" className={inputCls()} />
           <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
-          <FieldError message={errors?.heartNotes?.[0]} />
         </div>
+
+        {/* How to Use */}
         <div>
-          <Label htmlFor="baseNotes">Base Notes</Label>
-          <input
-            id="baseNotes" name="baseNotes" type="text"
-            defaultValue={initialData?.baseNotes?.join(", ") ?? ""}
-            placeholder="Oud, Sandalwood, Musk"
-            className={inputCls(errors?.baseNotes?.[0])}
-          />
+          <Label htmlFor="baseNotes">How to Use</Label>
+          <input id="baseNotes" name="baseNotes" type="text" defaultValue={initialData?.baseNotes?.join(", ") ?? ""} placeholder="Apply to clean skin, Massage gently, Leave overnight" className={inputCls()} />
+          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated steps</p>
+        </div>
+
+        {/* Scent / Fragrance note */}
+        <div>
+          <Label htmlFor="moodTags">Scent / Tags</Label>
+          <input id="moodTags" name="moodTags" type="text" defaultValue={initialData?.moodTags?.join(", ") ?? ""} placeholder="Unscented, Light Floral, Natural" className={inputCls()} />
           <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
-          <FieldError message={errors?.baseNotes?.[0]} />
         </div>
       </div>
+    )
+  }
 
-      {/* Longevity + Strength */}
-      <div className="grid grid-cols-2 gap-4">
+  // ── Gift / Bundle fields ──
+  if (productLine === "gift") {
+    return (
+      <div className="space-y-5">
+        <p className="text-xs text-[#8C8C8C] bg-[#F8F5F2] border border-[#EBEBEB] rounded px-3 py-2">
+          Gift set or bundle — describe what&apos;s included below.
+        </p>
+
+        {/* What's included */}
         <div>
-          <Label htmlFor="longevity">Longevity</Label>
-          <div className="relative">
-            <select
-              id="longevity" name="longevity"
-              defaultValue={initialData?.longevity ?? ""}
-              className={selectCls()}
-            >
-              <option value="">Select…</option>
-              <option value="SHORT">Short (1–3 hrs)</option>
-              <option value="MODERATE">Moderate (3–6 hrs)</option>
-              <option value="LONG">Long (6–12 hrs)</option>
-              <option value="VERY_LONG">Very Long (12+ hrs)</option>
-            </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </span>
-          </div>
-          <FieldError message={errors?.longevity?.[0]} />
+          <Label htmlFor="topNotes">What&apos;s Included</Label>
+          <input id="topNotes" name="topNotes" type="text" defaultValue={initialData?.topNotes?.join(", ") ?? ""} placeholder="Reed Diffuser, Scented Candle, Body Butter" className={inputCls()} />
+          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated items in the set</p>
         </div>
+
+        {/* Occasion */}
         <div>
-          <Label htmlFor="strength">Strength</Label>
-          <div className="relative">
-            <select
-              id="strength" name="strength"
-              defaultValue={initialData?.strength ?? ""}
-              className={selectCls()}
-            >
-              <option value="">Select…</option>
-              <option value="LIGHT">Light</option>
-              <option value="MODERATE">Moderate</option>
-              <option value="STRONG">Strong</option>
-              <option value="VERY_STRONG">Very Strong</option>
-            </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </span>
-          </div>
-          <FieldError message={errors?.strength?.[0]} />
+          <Label htmlFor="heartNotes">Occasion / Recipient</Label>
+          <input id="heartNotes" name="heartNotes" type="text" defaultValue={initialData?.heartNotes?.join(", ") ?? ""} placeholder="Birthday, Anniversary, Self-care, Corporate" className={inputCls()} />
+          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
+        </div>
+
+        {/* Mood Tags */}
+        <div>
+          <Label htmlFor="moodTags">Tags</Label>
+          <input id="moodTags" name="moodTags" type="text" defaultValue={initialData?.moodTags?.join(", ") ?? ""} placeholder="Luxury, Wellness, Personalised" className={inputCls()} />
+          <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
         </div>
       </div>
+    )
+  }
 
-      {/* Mood Tags */}
+  // ── General / fallback ──
+  return (
+    <div className="space-y-5">
+      <p className="text-xs text-[#8C8C8C] bg-[#F8F5F2] border border-[#EBEBEB] rounded px-3 py-2">
+        Select a category on the previous step to see relevant product detail fields.
+      </p>
       <div>
-        <Label htmlFor="moodTags">Mood Tags</Label>
-        <input
-          id="moodTags" name="moodTags" type="text"
-          defaultValue={initialData?.moodTags?.join(", ") ?? ""}
-          placeholder="Romantic, Mysterious, Fresh"
-          className={inputCls()}
-        />
+        <Label htmlFor="moodTags">Tags</Label>
+        <input id="moodTags" name="moodTags" type="text" defaultValue={initialData?.moodTags?.join(", ") ?? ""} placeholder="Add relevant tags…" className={inputCls()} />
         <p className="mt-1 text-[10px] text-[#aaa]">Comma-separated</p>
       </div>
     </div>
@@ -599,8 +645,22 @@ export default function ProductForm({ categories, action, initialData, mode = "c
   const [step, setStep] = useState<Step>(0)
   const [state, formAction] = useActionState(action, {})
 
+  // Detect product line from selected category to show relevant Step 2 fields
+  const initialCategory = categories.find((c) => c.id === initialData?.categoryId)
+  const [selectedCategoryName, setSelectedCategoryName] = useState(initialCategory?.name ?? "")
+  const productLine = detectProductLine(selectedCategoryName)
+
+  // Step 2 label adapts to product line
+  const step2Label =
+    productLine === "fragrance" ? "Fragrance Profile" :
+    productLine === "skincare"  ? "Skincare Details" :
+    productLine === "gift"      ? "Gift Details" :
+    "Product Details"
+
+  const stepLabels: [string, string, string] = ["Basic Info", step2Label, "Images & Stock"]
+
   const stepErrors: Record<Step, (keyof NonNullable<CreateProductState["errors"]>)[]> = {
-    0: ["name", "slug", "description", "price", "compareAtPrice", "categoryId", "gender"],
+    0: ["name", "slug", "description", "price", "compareAtPrice", "categoryId"],
     1: ["fragranceType", "topNotes", "heartNotes", "baseNotes", "longevity", "strength"],
     2: ["images", "sku", "stock"],
   }
@@ -614,7 +674,7 @@ export default function ProductForm({ categories, action, initialData, mode = "c
     <form action={formAction} noValidate>
       {/* Step indicator */}
       <div className="flex items-center gap-0 mb-8">
-        {STEPS.map((label, i) => {
+        {stepLabels.map((label, i) => {
           const isActive = step === i
           const isDone = step > i
           const hasErr = hasStepError(i as Step)
@@ -641,7 +701,7 @@ export default function ProductForm({ categories, action, initialData, mode = "c
                 </span>
                 <span className="tracking-[0.1em] uppercase hidden sm:inline">{label}</span>
               </button>
-              {i < STEPS.length - 1 && (
+              {i < stepLabels.length - 1 && (
                 <div className="w-8 h-px bg-[#e5e5e5] mx-1" aria-hidden="true" />
               )}
             </div>
@@ -659,14 +719,23 @@ export default function ProductForm({ categories, action, initialData, mode = "c
       {/* Step content — all steps stay mounted so FormData includes all fields */}
       <div className="bg-white border border-[#e5e5e5] rounded-lg p-6 mb-6">
         <h2 className="font-serif text-lg font-medium text-[#111111] mb-5">
-          {STEPS[step]}
+          {stepLabels[step]}
         </h2>
 
         <div className={step === 0 ? undefined : "hidden"} aria-hidden={step !== 0}>
-          <BasicInfoStep categories={categories} errors={state.errors} initialData={initialData} />
+          <BasicInfoStep
+            categories={categories}
+            errors={state.errors}
+            initialData={initialData}
+            onCategoryChange={setSelectedCategoryName}
+          />
         </div>
         <div className={step === 1 ? undefined : "hidden"} aria-hidden={step !== 1}>
-          <FragranceProfileStep errors={state.errors} initialData={initialData} />
+          <ProductDetailsStep
+            errors={state.errors}
+            initialData={initialData}
+            productLine={productLine}
+          />
         </div>
         <div className={step === 2 ? undefined : "hidden"} aria-hidden={step !== 2}>
           <ImagesAndStockStep errors={state.errors} initialData={initialData} />
@@ -685,10 +754,10 @@ export default function ProductForm({ categories, action, initialData, mode = "c
         </button>
 
         <div className="flex items-center gap-3">
-          {step < STEPS.length - 1 ? (
+          {step < stepLabels.length - 1 ? (
             <button
               type="button"
-              onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1) as Step)}
+              onClick={() => setStep((s) => Math.min(stepLabels.length - 1, s + 1) as Step)}
               className="inline-flex items-center gap-2 bg-[#111111] text-white text-xs tracking-[0.12em] uppercase px-6 py-3 rounded hover:bg-[#1a1a1a] transition-colors"
             >
               Next →
