@@ -92,6 +92,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   stockHistory  StockHistory[]
+  giftOrders    GiftOrder[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -179,6 +180,7 @@ model Product {
   wishlistItems   WishlistItem[]
   cartItems       CartItem[]
   stockHistory    StockHistory[]
+  giftOrderItems  GiftOrderItem[]
   
   deleted         Boolean         @default(false)
   
@@ -354,4 +356,126 @@ model StockHistory {
   @@index([productId])
   @@index([userId])
   @@index([createdAt])
+}
+
+// ── Gift Box Feature ───────────────────────────────────────────────────────
+
+enum GiftBoxTheme {
+  SIGNATURE_CREAM   // cream textured, black satin ribbon, gold embossed
+  NOIR_LUXURY       // matte black rigid, velvet interior, gold foil
+  ROMANTIC_BLUSH    // nude/blush tones, silk ribbon, floral insert
+}
+
+enum GiftCardStyle {
+  MINIMAL
+  ROMANTIC
+  BIRTHDAY
+  LUXURY_GOLD
+}
+
+enum GiftRibbonStyle {
+  BLACK_SATIN
+  IVORY_SILK
+  BLUSH_RIBBON
+  GOLD_VELVET
+}
+
+enum GiftOrderStatus {
+  DRAFT
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model GiftBox {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  description String
+  image       String
+  maxItems    Int
+  price       Float        // base box price
+  theme       GiftBoxTheme
+  active      Boolean      @default(true)
+  sortOrder   Int          @default(0)
+
+  giftOrders  GiftOrder[]
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([theme])
+  @@index([active])
+}
+
+model GiftCustomization {
+  id           String          @id @default(cuid())
+  message      String?         @db.VarChar(200)
+  cardStyle    GiftCardStyle   @default(MINIMAL)
+  ribbonStyle  GiftRibbonStyle @default(BLACK_SATIN)
+  deliveryDate DateTime?
+  anonymous    Boolean         @default(false)
+
+  giftOrder    GiftOrder?
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model GiftOrder {
+  id               String          @id @default(cuid())
+  orderNumber      String          @unique
+  userId           String?
+  user             User?           @relation(fields: [userId], references: [id])
+
+  // Guest support
+  guestEmail       String?
+  guestName        String?
+
+  giftBoxId        String
+  giftBox          GiftBox         @relation(fields: [giftBoxId], references: [id])
+
+  customizationId  String          @unique
+  customization    GiftCustomization @relation(fields: [customizationId], references: [id])
+
+  items            GiftOrderItem[]
+
+  subtotal         Float
+  boxPrice         Float
+  total            Float
+
+  shippingAddress  Json
+
+  status           GiftOrderStatus @default(DRAFT)
+  paymentStatus    PaymentStatus   @default(PENDING)
+  paymentMethod    String?
+  paymentReference String?
+
+  notes            String?
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model GiftOrderItem {
+  id           String    @id @default(cuid())
+  giftOrderId  String
+  giftOrder    GiftOrder @relation(fields: [giftOrderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product   @relation(fields: [productId], references: [id])
+  quantity     Int       @default(1)
+  price        Float     // price at time of order
+
+  createdAt    DateTime  @default(now())
+
+  @@index([giftOrderId])
+  @@index([productId])
 }

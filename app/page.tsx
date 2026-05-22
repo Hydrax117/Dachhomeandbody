@@ -49,10 +49,10 @@ function Hero() {
             Shop Collection
           </Link>
           <Link
-            href="/shop"
+            href="/gift-box"
             className="px-9 py-4 border border-white/25 text-white text-[10px] tracking-[0.25em] uppercase font-medium hover:border-[#B8965C] hover:text-[#B8965C] transition-all duration-300 min-w-[190px] text-center"
           >
-            Explore Gift Services
+            Build a Gift Box
           </Link>
         </div>
       </div>
