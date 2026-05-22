@@ -15,6 +15,7 @@ import {
 export const metadata: Metadata = { title: "My Gift Orders" }
 
 type GiftOrderItem = Awaited<ReturnType<typeof getUserGiftOrders>>[number]
+type GiftOrderLineItem = GiftOrderItem["items"][number]
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
@@ -196,7 +197,7 @@ export default async function GiftOrdersPage() {
 
                     {/* Products */}
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {order.items.slice(0, 4).map((item) => (
+                      {order.items.slice(0, 4).map((item: GiftOrderLineItem) => (
                         <div
                           key={item.id}
                           className="relative w-8 h-10 overflow-hidden bg-[#F2EDE8] border border-[#e5e5e5]"
