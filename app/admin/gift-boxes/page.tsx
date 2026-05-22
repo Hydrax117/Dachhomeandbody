@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { getAdminGiftBoxes } from "@/lib/gift-boxes"
-import { GIFT_BOX_THEME_META } from "@/lib/gift-boxes"
+import { getAdminGiftBoxes, GIFT_BOX_THEME_META } from "@/lib/gift-boxes"
 import DeleteGiftBoxButton from "./components/DeleteGiftBoxButton"
 
 export const metadata: Metadata = { title: "Gift Boxes" }
+
+type GiftBoxRow = Awaited<ReturnType<typeof getAdminGiftBoxes>>["data"][number]
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
@@ -102,7 +103,7 @@ export default async function AdminGiftBoxesPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
-                {giftBoxes.map((box) => {
+                {giftBoxes.map((box: GiftBoxRow) => {
                   const meta = GIFT_BOX_THEME_META[box.theme]
                   const orderCount =
                     "_count" in box

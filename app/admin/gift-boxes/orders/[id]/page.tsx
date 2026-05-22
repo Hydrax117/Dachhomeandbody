@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { getGiftOrder } from "@/lib/gift-boxes"
 import {
+  getGiftOrder,
   GIFT_BOX_THEME_META,
   GIFT_CARD_STYLE_META,
   GIFT_RIBBON_STYLE_META,
@@ -13,6 +13,9 @@ import {
 import GiftOrderStatusForm from "../../components/GiftOrderStatusForm"
 
 export const metadata: Metadata = { title: "Gift Order" }
+
+type GiftOrderData = NonNullable<Awaited<ReturnType<typeof getGiftOrder>>>
+type GiftOrderLineItem = GiftOrderData["items"][number]
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
@@ -130,7 +133,7 @@ export default async function AdminGiftOrderDetailPage({
               </p>
             </div>
             <div className="divide-y divide-[#f0ece4]">
-              {order.items.map((item) => (
+              {order.items.map((item: GiftOrderLineItem) => (
                 <div key={item.id} className="p-4 flex items-center gap-3">
                   <div className="relative w-10 h-12 shrink-0 overflow-hidden bg-[#F2EDE8]">
                     {item.product.images[0] && (

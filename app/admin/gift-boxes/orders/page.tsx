@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { getAdminGiftOrders } from "@/lib/gift-boxes"
-import type { GiftOrderStatus } from "@/lib/gift-boxes"
+import { getAdminGiftOrders, type GiftOrderStatus } from "@/lib/gift-boxes"
 
 export const metadata: Metadata = { title: "Gift Orders" }
+
+type GiftOrderRow = Awaited<ReturnType<typeof getAdminGiftOrders>>["data"][number]
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
@@ -139,7 +140,7 @@ export default async function AdminGiftOrdersPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0ece4]">
-                {orders.map((order) => {
+                {orders.map((order: GiftOrderRow) => {
                   const customer =
                     order.user?.name ??
                     order.user?.email ??
