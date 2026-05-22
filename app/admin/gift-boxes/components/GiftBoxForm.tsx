@@ -1,8 +1,7 @@
 "use client"
 
 import { useActionState, useState } from "react"
-import { GiftBoxTheme } from "@prisma/client"
-import { GIFT_BOX_THEME_META } from "@/lib/gift-boxes"
+import { GIFT_BOX_THEME_META, type GiftBoxTheme } from "@/lib/gift-boxes"
 import type { GiftBoxFormState } from "@/app/actions/gift-boxes"
 
 interface GiftBoxFormProps {
