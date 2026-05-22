@@ -16,8 +16,6 @@ export const metadata: Metadata = { title: "My Gift Orders" }
 
 type GiftOrderItem = Awaited<ReturnType<typeof getUserGiftOrders>>[number]
 
-export const metadata: Metadata = { title: "My Gift Orders" }
-
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
     style: "currency",
