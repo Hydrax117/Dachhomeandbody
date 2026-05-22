@@ -3,14 +3,18 @@ import Link from "next/link"
 import Image from "next/image"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { getUserGiftOrders } from "@/lib/gift-boxes"
 import {
+  getUserGiftOrders,
   GIFT_BOX_THEME_META,
   GIFT_CARD_STYLE_META,
   GIFT_RIBBON_STYLE_META,
   type GiftBoxTheme,
   type GiftOrderStatus,
 } from "@/lib/gift-boxes"
+
+export const metadata: Metadata = { title: "My Gift Orders" }
+
+type GiftOrderItem = Awaited<ReturnType<typeof getUserGiftOrders>>[number]
 
 export const metadata: Metadata = { title: "My Gift Orders" }
 
@@ -129,7 +133,7 @@ export default async function GiftOrdersPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {orders.map((order) => {
+          {orders.map((order: GiftOrderItem) => {
             const meta = GIFT_BOX_THEME_META[order.giftBox.theme as GiftBoxTheme]
             const address = order.shippingAddress as Record<string, string>
 
