@@ -10,11 +10,46 @@ import {
   GIFT_RIBBON_STYLE_META,
   type GiftBoxTheme,
   type GiftOrderStatus,
+  type GiftCardStyle,
+  type GiftRibbonStyle,
 } from "@/lib/gift-boxes"
 
 export const metadata: Metadata = { title: "My Gift Orders" }
 
-type GiftOrderItem = Awaited<ReturnType<typeof getUserGiftOrders>>[number]
+interface GiftOrderItem {
+  id: string
+  orderNumber: string
+  guestEmail: string | null
+  subtotal: number
+  boxPrice: number
+  total: number
+  status: GiftOrderStatus
+  createdAt: Date
+  shippingAddress: unknown
+  giftBox: { id: string; title: string; image: string; theme: GiftBoxTheme }
+  customization: {
+    id: string
+    message: string | null
+    cardStyle: GiftCardStyle
+    ribbonStyle: GiftRibbonStyle
+    deliveryDate: Date | null
+    anonymous: boolean
+  }
+  items: {
+    id: string
+    quantity: number
+    price: number
+    product: {
+      id: string
+      name: string
+      slug: string
+      images: string[]
+      price: number
+    }
+  }[]
+  user: { id: string; name: string | null; email: string } | null
+}
+
 type GiftOrderLineItem = GiftOrderItem["items"][number]
 
 const formatCurrency = (n: number) =>

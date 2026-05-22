@@ -4,7 +4,21 @@ import { getAdminGiftOrders, type GiftOrderStatus } from "@/lib/gift-boxes"
 
 export const metadata: Metadata = { title: "Gift Orders" }
 
-type GiftOrderRow = Awaited<ReturnType<typeof getAdminGiftOrders>>["data"][number]
+// Explicit inline type — avoids build-time Prisma resolution issues
+interface GiftOrderRow {
+  id: string
+  orderNumber: string
+  guestEmail: string | null
+  subtotal: number
+  boxPrice: number
+  total: number
+  status: GiftOrderStatus
+  paymentStatus: string
+  createdAt: Date
+  items: { id: string }[]
+  giftBox: { id: string; title: string; image: string }
+  user: { id: string; name: string | null; email: string } | null
+}
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {

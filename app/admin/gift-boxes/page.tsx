@@ -1,11 +1,23 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { getAdminGiftBoxes, GIFT_BOX_THEME_META } from "@/lib/gift-boxes"
+import { getAdminGiftBoxes, GIFT_BOX_THEME_META, type GiftBoxTheme } from "@/lib/gift-boxes"
 import DeleteGiftBoxButton from "./components/DeleteGiftBoxButton"
 
 export const metadata: Metadata = { title: "Gift Boxes" }
 
-type GiftBoxRow = Awaited<ReturnType<typeof getAdminGiftBoxes>>["data"][number]
+interface GiftBoxRow {
+  id: string
+  title: string
+  slug: string
+  description: string
+  image: string
+  maxItems: number
+  price: number
+  theme: GiftBoxTheme
+  active: boolean
+  sortOrder: number
+  _count?: { giftOrders: number }
+}
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
