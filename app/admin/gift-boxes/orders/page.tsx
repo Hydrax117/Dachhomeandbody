@@ -68,7 +68,7 @@ export default async function AdminGiftOrdersPage({
   const { data: orders, total, totalPages } = await getAdminGiftOrders(
     { status, search },
     { page, pageSize: 20 }
-  )
+  ) as { data: GiftOrderRow[]; total: number; totalPages: number; page: number; pageSize: number }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

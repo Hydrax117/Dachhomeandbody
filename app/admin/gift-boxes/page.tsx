@@ -40,7 +40,7 @@ export default async function AdminGiftBoxesPage({
   const { data: giftBoxes, total, totalPages } = await getAdminGiftBoxes({
     page,
     pageSize: 20,
-  })
+  }) as { data: GiftBoxRow[]; total: number; totalPages: number; page: number; pageSize: number }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

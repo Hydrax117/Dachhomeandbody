@@ -9,12 +9,57 @@ import {
   GIFT_RIBBON_STYLE_META,
   type GiftBoxTheme,
   type GiftOrderStatus,
+  type GiftCardStyle,
+  type GiftRibbonStyle,
 } from "@/lib/gift-boxes"
 import GiftOrderStatusForm from "../../components/GiftOrderStatusForm"
 
 export const metadata: Metadata = { title: "Gift Order" }
 
-type GiftOrderData = NonNullable<Awaited<ReturnType<typeof getGiftOrder>>>
+interface GiftOrderData {
+  id: string
+  orderNumber: string
+  guestEmail: string | null
+  guestName: string | null
+  subtotal: number
+  boxPrice: number
+  total: number
+  status: GiftOrderStatus
+  paymentStatus: string
+  paymentMethod: string | null
+  paymentReference: string | null
+  shippingAddress: unknown
+  notes: string | null
+  createdAt: Date
+  updatedAt: Date
+  giftBox: { id: string; title: string; image: string; theme: GiftBoxTheme }
+  customization: {
+    id: string
+    message: string | null
+    cardStyle: GiftCardStyle
+    ribbonStyle: GiftRibbonStyle
+    deliveryDate: Date | null
+    anonymous: boolean
+  }
+  items: {
+    id: string
+    quantity: number
+    price: number
+    product: {
+      id: string
+      name: string
+      slug: string
+      images: string[]
+      price: number
+      topNotes: string[]
+      heartNotes: string[]
+      baseNotes: string[]
+      moodTags: string[]
+    }
+  }[]
+  user: { id: string; name: string | null; email: string } | null
+}
+
 type GiftOrderLineItem = GiftOrderData["items"][number]
 
 const formatCurrency = (n: number) =>
@@ -40,7 +85,7 @@ export default async function AdminGiftOrderDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const order = await getGiftOrder(id)
+  const order = await getGiftOrder(id) as GiftOrderData | null
   if (!order) notFound()
 
   const meta = GIFT_BOX_THEME_META[order.giftBox.theme as GiftBoxTheme]

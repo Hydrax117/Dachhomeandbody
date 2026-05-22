@@ -131,7 +131,7 @@ export default async function GiftOrdersPage() {
     redirect("/auth/login?callbackUrl=/account/gift-orders")
   }
 
-  const orders = await getUserGiftOrders(session.user.id)
+  const orders = await getUserGiftOrders(session.user.id) as GiftOrderItem[]
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
