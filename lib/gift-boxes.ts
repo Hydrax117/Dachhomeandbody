@@ -5,14 +5,7 @@
  */
 
 import { z } from "zod"
-import {
-  GiftBoxTheme,
-  GiftCardStyle,
-  GiftRibbonStyle,
-  GiftOrderStatus,
-  PaymentStatus,
-  type Prisma,
-} from "@prisma/client"
+import { type Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import {
   buildPaginationArgs,
@@ -21,10 +14,46 @@ import {
 } from "@/lib/db"
 
 // ---------------------------------------------------------------------------
-// Types
+// Enum definitions — defined here to avoid build-time Prisma resolution issues
 // ---------------------------------------------------------------------------
 
-export type { GiftBoxTheme, GiftCardStyle, GiftRibbonStyle, GiftOrderStatus }
+export const GiftBoxTheme = {
+  SIGNATURE_CREAM: "SIGNATURE_CREAM",
+  NOIR_LUXURY: "NOIR_LUXURY",
+  ROMANTIC_BLUSH: "ROMANTIC_BLUSH",
+} as const
+export type GiftBoxTheme = (typeof GiftBoxTheme)[keyof typeof GiftBoxTheme]
+
+export const GiftCardStyle = {
+  MINIMAL: "MINIMAL",
+  ROMANTIC: "ROMANTIC",
+  BIRTHDAY: "BIRTHDAY",
+  LUXURY_GOLD: "LUXURY_GOLD",
+} as const
+export type GiftCardStyle = (typeof GiftCardStyle)[keyof typeof GiftCardStyle]
+
+export const GiftRibbonStyle = {
+  BLACK_SATIN: "BLACK_SATIN",
+  IVORY_SILK: "IVORY_SILK",
+  BLUSH_RIBBON: "BLUSH_RIBBON",
+  GOLD_VELVET: "GOLD_VELVET",
+} as const
+export type GiftRibbonStyle = (typeof GiftRibbonStyle)[keyof typeof GiftRibbonStyle]
+
+export const GiftOrderStatus = {
+  DRAFT: "DRAFT",
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  PROCESSING: "PROCESSING",
+  SHIPPED: "SHIPPED",
+  DELIVERED: "DELIVERED",
+  CANCELLED: "CANCELLED",
+} as const
+export type GiftOrderStatus = (typeof GiftOrderStatus)[keyof typeof GiftOrderStatus]
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 export interface GiftBoxFilters {
   active?: boolean
@@ -110,7 +139,7 @@ export const giftBoxCreateSchema = z.object({
   image: z.string().url(),
   maxItems: z.number().int().min(1).max(20),
   price: z.number().nonnegative(),
-  theme: z.nativeEnum(GiftBoxTheme),
+  theme: z.enum(["SIGNATURE_CREAM", "NOIR_LUXURY", "ROMANTIC_BLUSH"]),
   active: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
 })
@@ -119,8 +148,8 @@ export const giftBoxUpdateSchema = giftBoxCreateSchema.partial()
 
 export const giftCustomizationSchema = z.object({
   message: z.string().max(200).optional(),
-  cardStyle: z.nativeEnum(GiftCardStyle).default("MINIMAL"),
-  ribbonStyle: z.nativeEnum(GiftRibbonStyle).default("BLACK_SATIN"),
+  cardStyle: z.enum(["MINIMAL", "ROMANTIC", "BIRTHDAY", "LUXURY_GOLD"]).default("MINIMAL"),
+  ribbonStyle: z.enum(["BLACK_SATIN", "IVORY_SILK", "BLUSH_RIBBON", "GOLD_VELVET"]).default("BLACK_SATIN"),
   deliveryDate: z.coerce.date().optional(),
   anonymous: z.boolean().default(false),
 })
