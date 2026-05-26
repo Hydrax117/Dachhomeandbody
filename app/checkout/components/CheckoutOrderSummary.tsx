@@ -3,8 +3,18 @@
 import Image from "next/image"
 import { useCart } from "@/app/components/cart/CartContext"
 
-export function CheckoutOrderSummary() {
+interface CheckoutOrderSummaryProps {
+  /** null = shipping step (show "Calculated at next step"), number = payment step */
+  shippingCost: number | null
+}
+
+export function CheckoutOrderSummary({ shippingCost }: CheckoutOrderSummaryProps) {
   const { cart } = useCart()
+
+  const displayTotal =
+    shippingCost !== null
+      ? Math.max(0, cart.subtotal - cart.discount + shippingCost)
+      : cart.total
 
   return (
     <div className="bg-[#F8F5F2] border border-[#EBEBEB] rounded-sm p-6">
@@ -83,7 +93,13 @@ export function CheckoutOrderSummary() {
 
         <div className="flex justify-between text-sm">
           <span className="text-[#8C8C8C]">Shipping</span>
-          <span className="text-[#8C8C8C]">Calculated at next step</span>
+          {shippingCost === null ? (
+            <span className="text-[#8C8C8C]">Calculated at next step</span>
+          ) : shippingCost === 0 ? (
+            <span className="text-[#8C8C8C]">Free</span>
+          ) : (
+            <span>₦{shippingCost.toLocaleString()}</span>
+          )}
         </div>
 
         <div className="divider" aria-hidden="true" />
@@ -91,7 +107,7 @@ export function CheckoutOrderSummary() {
         <div className="flex justify-between">
           <span className="font-serif text-base font-medium">Total</span>
           <span className="font-serif text-base font-medium">
-            ₦{cart.total.toLocaleString()}
+            ₦{displayTotal.toLocaleString()}
           </span>
         </div>
       </div>

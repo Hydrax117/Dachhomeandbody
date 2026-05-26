@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { z } from "zod"
 import type { SavedAddress } from "./CheckoutClient"
 
@@ -10,8 +10,8 @@ const AddressSchema = z.object({
   name: z.string().min(2, "Full name is required"),
   phone: z.string().min(7, "Phone number is required"),
   address: z.string().min(5, "Street address is required"),
-  city: z.string().min(2, "City is required"),
-  state: z.string().optional(),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
   postalCode: z.string().min(3, "Postal code is required"),
   country: z.string().min(2, "Country is required"),
 })
@@ -29,7 +29,7 @@ interface ShippingAddressFormProps {
   userName: string | null
   savedAddresses: SavedAddress[]
   initialEmail: string
-  onSubmit: (address: ShippingAddress, email: string) => void
+  onSubmit: (address: ShippingAddress, email: string, shippingCost: number) => void
 }
 
 // ── Saved address selector ─────────────────────────────────────────────────
@@ -122,6 +122,74 @@ function Field({
   )
 }
 
+// ── Nigerian state/city selects (lazy-loaded) ──────────────────────────────
+
+import { nigerianStates, getCitiesForState } from "@/lib/nigeria-states"
+
+function NigeriaSelects({
+  selectedState,
+  selectedCity,
+  onStateChange,
+  onCityChange,
+  stateError,
+  cityError,
+}: {
+  selectedState: string
+  selectedCity: string
+  onStateChange: (s: string) => void
+  onCityChange: (c: string) => void
+  stateError?: string
+  cityError?: string
+}) {
+  const cities = selectedState ? getCitiesForState(selectedState) : []
+
+  return (
+    <>
+      <Field id="state" label="State" error={stateError}>
+        <select
+          id="state"
+          value={selectedState}
+          onChange={(e) => {
+            onStateChange(e.target.value)
+            onCityChange("") // reset city on state change
+          }}
+          className={`input${stateError ? " input--error" : ""}`}
+          aria-describedby={stateError ? "state-error" : undefined}
+          required
+        >
+          <option value="">Select state…</option>
+          {nigerianStates.map((s) => (
+            <option key={s.code} value={s.name}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field id="city" label="City" error={cityError}>
+        <select
+          id="city"
+          value={selectedCity}
+          onChange={(e) => onCityChange(e.target.value)}
+          className={`input${cityError ? " input--error" : ""}`}
+          disabled={!selectedState}
+          aria-describedby={cityError ? "city-error" : undefined}
+          required
+        >
+          <option value="">
+            {selectedState ? "Select city…" : "Select state first"}
+          </option>
+          {cities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
+      </Field>
+    </>
+  )
+}
+
 // ── Main form ──────────────────────────────────────────────────────────────
 
 export function ShippingAddressForm({
@@ -139,6 +207,10 @@ export function ShippingAddressForm({
 
   const [email, setEmail] = useState(initialEmail || userEmail || "")
   const [errors, setErrors] = useState<FieldErrors>({})
+
+  // Shipping fee state
+  const [shippingFee, setShippingFee] = useState<number | null>(null)
+  const [feeLoading, setFeeLoading] = useState(false)
 
   // Form field state — pre-fill from default address if available
   const [fields, setFields] = useState<ShippingAddress>(() => {
@@ -164,12 +236,40 @@ export function ShippingAddressForm({
     }
   })
 
+  // Fetch shipping fee whenever state changes
+  const fetchShippingFee = useCallback(async (state: string) => {
+    if (!state) {
+      setShippingFee(null)
+      return
+    }
+    setFeeLoading(true)
+    try {
+      const res = await fetch(`/api/shipping-fee?state=${encodeURIComponent(state)}`)
+      if (res.ok) {
+        const data = (await res.json()) as { fee: number | null }
+        setShippingFee(data.fee)
+      }
+    } catch {
+      // silently ignore — fee will show as TBD
+    } finally {
+      setFeeLoading(false)
+    }
+  }, [])
+
+  // Fetch fee on mount if a state is already selected
+  useEffect(() => {
+    if (fields.state) {
+      fetchShippingFee(fields.state)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function handleSavedSelect(id: string | null) {
     setSelectedSavedId(id)
     if (id) {
       const addr = savedAddresses.find((a) => a.id === id)
       if (addr) {
-        setFields({
+        const newFields = {
           name: addr.name,
           phone: addr.phone,
           address: addr.address,
@@ -177,8 +277,10 @@ export function ShippingAddressForm({
           state: addr.state ?? "",
           postalCode: addr.postalCode,
           country: addr.country,
-        })
+        }
+        setFields(newFields)
         setErrors({})
+        fetchShippingFee(newFields.state)
       }
     } else {
       setFields({
@@ -190,15 +292,21 @@ export function ShippingAddressForm({
         postalCode: "",
         country: "Nigeria",
       })
+      setShippingFee(null)
     }
   }
 
   function setField(key: keyof ShippingAddress, value: string) {
     setFields((prev) => ({ ...prev, [key]: value }))
-    // Clear error on change
     if (errors[key]) {
       setErrors((prev) => ({ ...prev, [key]: undefined }))
     }
+  }
+
+  function handleStateChange(state: string) {
+    setField("state", state)
+    setField("city", "")
+    fetchShippingFee(state)
   }
 
   function validateField(key: keyof ShippingAddress | "email") {
@@ -226,7 +334,6 @@ export function ShippingAddressForm({
     e.preventDefault()
     const newErrors: FieldErrors = {}
 
-    // Validate email for guests
     if (!isAuthenticated) {
       const emailResult = GuestEmailSchema.safeParse(email)
       if (!emailResult.success) {
@@ -234,7 +341,6 @@ export function ShippingAddressForm({
       }
     }
 
-    // Validate address fields
     const addressResult = AddressSchema.safeParse(fields)
     if (!addressResult.success) {
       const fieldErrors = addressResult.error.flatten().fieldErrors as Partial<
@@ -251,7 +357,8 @@ export function ShippingAddressForm({
       return
     }
 
-    onSubmit(fields, isAuthenticated ? (userEmail ?? email) : email)
+    const cost = shippingFee ?? 0
+    onSubmit(fields, isAuthenticated ? (userEmail ?? email) : email, cost)
   }
 
   const inputCls = (field: keyof ShippingAddress | "email") =>
@@ -302,7 +409,7 @@ export function ShippingAddressForm({
         />
       )}
 
-      {/* Address fields — always shown (pre-filled when saved address selected) */}
+      {/* Address fields */}
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field id="name" label="Full Name" error={errors.name}>
@@ -347,32 +454,33 @@ export function ShippingAddressForm({
           />
         </Field>
 
+        {/* State + City dropdowns (Nigerian states from states.json) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field id="city" label="City" error={errors.city}>
-            <input
-              id="city"
-              type="text"
-              autoComplete="address-level2"
-              value={fields.city}
-              onChange={(e) => setField("city", e.target.value)}
-              onBlur={() => validateField("city")}
-              placeholder="Lagos"
-              className={inputCls("city")}
-              aria-describedby={errors.city ? "city-error" : undefined}
-            />
-          </Field>
-          <Field id="state" label="State / Province" error={errors.state}>
-            <input
-              id="state"
-              type="text"
-              autoComplete="address-level1"
-              value={fields.state ?? ""}
-              onChange={(e) => setField("state", e.target.value)}
-              placeholder="Lagos State"
-              className="input"
-            />
-          </Field>
+          <NigeriaSelects
+            selectedState={fields.state ?? ""}
+            selectedCity={fields.city}
+            onStateChange={handleStateChange}
+            onCityChange={(city) => setField("city", city)}
+            stateError={errors.state}
+            cityError={errors.city}
+          />
         </div>
+
+        {/* Shipping fee preview */}
+        {fields.state && (
+          <div className="px-4 py-3 bg-[#F8F5F2] border border-[#EBEBEB] rounded-sm text-sm flex items-center justify-between">
+            <span className="text-[#8C8C8C]">Shipping to {fields.state}</span>
+            <span className="font-medium text-[#111111]">
+              {feeLoading
+                ? "Calculating…"
+                : shippingFee === null
+                ? "Contact us for rate"
+                : shippingFee === 0
+                ? "Free"
+                : `₦${shippingFee.toLocaleString()}`}
+            </span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field id="postalCode" label="Postal Code" error={errors.postalCode}>

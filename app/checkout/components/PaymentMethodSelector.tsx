@@ -11,6 +11,7 @@ interface PaymentMethodSelectorProps {
   shippingAddress: ShippingAddress
   guestEmail: string
   isAuthenticated: boolean
+  shippingCost: number
   onBack: () => void
 }
 
@@ -68,6 +69,7 @@ export function PaymentMethodSelector({
   shippingAddress,
   guestEmail,
   isAuthenticated,
+  shippingCost,
   onBack,
 }: PaymentMethodSelectorProps) {
   const router = useRouter()
@@ -75,6 +77,9 @@ export function PaymentMethodSelector({
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("paystack")
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Total = subtotal - discount + shipping
+  const orderTotal = Math.max(0, cart.subtotal - cart.discount + shippingCost)
 
   async function handlePay() {
     setError(null)
@@ -97,7 +102,8 @@ export function PaymentMethodSelector({
           couponCode: cart.couponCode ?? null,
           subtotal: cart.subtotal,
           discount: cart.discount,
-          total: cart.total,
+          shippingCost,
+          total: orderTotal,
         }
 
         const callbackUrl = `${window.location.origin}/checkout/verify`
@@ -107,7 +113,7 @@ export function PaymentMethodSelector({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email,
-            amount: cart.total,
+            amount: orderTotal,
             metadata,
             callbackUrl,
           }),
@@ -208,12 +214,14 @@ export function PaymentMethodSelector({
         )}
         <div className="flex justify-between text-sm">
           <span className="text-[#8C8C8C]">Shipping</span>
-          <span className="text-[#8C8C8C]">Calculated by carrier</span>
+          <span className={shippingCost === 0 ? "text-[#8C8C8C]" : "text-[#111111]"}>
+            {shippingCost === 0 ? "Free" : `₦${shippingCost.toLocaleString()}`}
+          </span>
         </div>
         <div className="divider" aria-hidden="true" />
         <div className="flex justify-between font-medium">
           <span className="font-serif">Total</span>
-          <span className="font-serif">₦{cart.total.toLocaleString()}</span>
+          <span className="font-serif">₦{orderTotal.toLocaleString()}</span>
         </div>
       </div>
 
@@ -237,7 +245,7 @@ export function PaymentMethodSelector({
         ) : (
           <span className="flex items-center justify-center gap-2">
             <LockIcon />
-            Pay ₦{cart.total.toLocaleString()} Securely
+            Pay ₦{orderTotal.toLocaleString()} Securely
           </span>
         )}
       </button>

@@ -100,6 +100,7 @@ export function CheckoutClient({
   const [step, setStep] = useState<Step>("shipping")
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress | null>(null)
   const [guestEmail, setGuestEmail] = useState(userEmail ?? "")
+  const [shippingCost, setShippingCost] = useState(0)
 
   // Empty cart guard
   if (cart.items.length === 0) {
@@ -116,9 +117,10 @@ export function CheckoutClient({
     )
   }
 
-  function handleShippingSubmit(address: ShippingAddress, email: string) {
+  function handleShippingSubmit(address: ShippingAddress, email: string, cost: number) {
     setShippingAddress(address)
     setGuestEmail(email)
+    setShippingCost(cost)
     setStep("payment")
   }
 
@@ -173,6 +175,7 @@ export function CheckoutClient({
                 shippingAddress={shippingAddress}
                 guestEmail={guestEmail}
                 isAuthenticated={isAuthenticated}
+                shippingCost={shippingCost}
                 onBack={handleBackToShipping}
               />
             )}
@@ -180,7 +183,7 @@ export function CheckoutClient({
 
           {/* Right — order summary */}
           <div className="order-1 lg:order-2 lg:sticky lg:top-24">
-            <CheckoutOrderSummary />
+            <CheckoutOrderSummary shippingCost={step === "payment" ? shippingCost : null} />
           </div>
         </div>
       </div>

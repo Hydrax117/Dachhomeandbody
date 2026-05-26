@@ -1,8 +1,9 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState, useEffect } from "react"
 import { addAddress, updateAddress, type AddressFormState } from "@/app/actions/profile"
 import { Input, Label, FieldError } from "@/app/components/ui/Input"
+import { nigerianStates, getCitiesForState } from "@/lib/nigeria-states"
 
 interface Address {
   id: string
@@ -35,6 +36,22 @@ export default function AddressForm({ address, onSuccess }: AddressFormProps) {
     },
     initialState
   )
+
+  // Controlled state/city for cascading dropdowns
+  const [selectedState, setSelectedState] = useState(address?.state ?? "")
+  const [selectedCity, setSelectedCity] = useState(address?.city ?? "")
+  const [cities, setCities] = useState<string[]>(() =>
+    address?.state ? getCitiesForState(address.state) : []
+  )
+
+  useEffect(() => {
+    setCities(selectedState ? getCitiesForState(selectedState) : [])
+  }, [selectedState])
+
+  function handleStateChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setSelectedState(e.target.value)
+    setSelectedCity("") // reset city when state changes
+  }
 
   return (
     <form action={formAction} className="space-y-4">
@@ -88,45 +105,65 @@ export default function AddressForm({ address, onSuccess }: AddressFormProps) {
         <FieldError id="addr-address-error" message={state.errors?.address?.[0]} />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* State dropdown */}
         <div className="space-y-1.5">
-          <Label htmlFor="addr-city">City</Label>
-          <Input
-            id="addr-city"
-            name="city"
-            type="text"
-            defaultValue={address?.city ?? ""}
-            autoComplete="address-level2"
-            error={!!state.errors?.city}
-            aria-describedby={state.errors?.city ? "addr-city-error" : undefined}
-          />
-          <FieldError id="addr-city-error" message={state.errors?.city?.[0]} />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="addr-state">State <span className="text-[#8C8C8C]">(optional)</span></Label>
-          <Input
+          <Label htmlFor="addr-state">State</Label>
+          <select
             id="addr-state"
             name="state"
-            type="text"
-            defaultValue={address?.state ?? ""}
-            autoComplete="address-level1"
-          />
+            value={selectedState}
+            onChange={handleStateChange}
+            className={`input${state.errors?.state ? " input--error" : ""}`}
+            aria-describedby={state.errors?.state ? "addr-state-error" : undefined}
+          >
+            <option value="">Select state…</option>
+            {nigerianStates.map((s) => (
+              <option key={s.code} value={s.name}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <FieldError id="addr-state-error" message={state.errors?.state?.[0]} />
         </div>
 
+        {/* City dropdown — cascades from state */}
         <div className="space-y-1.5">
-          <Label htmlFor="addr-postal">Postal Code</Label>
-          <Input
-            id="addr-postal"
-            name="postalCode"
-            type="text"
-            defaultValue={address?.postalCode ?? ""}
-            autoComplete="postal-code"
-            error={!!state.errors?.postalCode}
-            aria-describedby={state.errors?.postalCode ? "addr-postal-error" : undefined}
-          />
-          <FieldError id="addr-postal-error" message={state.errors?.postalCode?.[0]} />
+          <Label htmlFor="addr-city">City</Label>
+          <select
+            id="addr-city"
+            name="city"
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+            disabled={!selectedState}
+            className={`input${state.errors?.city ? " input--error" : ""}`}
+            aria-describedby={state.errors?.city ? "addr-city-error" : undefined}
+          >
+            <option value="">
+              {selectedState ? "Select city…" : "Select state first"}
+            </option>
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+          <FieldError id="addr-city-error" message={state.errors?.city?.[0]} />
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="addr-postal">Postal Code</Label>
+        <Input
+          id="addr-postal"
+          name="postalCode"
+          type="text"
+          defaultValue={address?.postalCode ?? ""}
+          autoComplete="postal-code"
+          error={!!state.errors?.postalCode}
+          aria-describedby={state.errors?.postalCode ? "addr-postal-error" : undefined}
+        />
+        <FieldError id="addr-postal-error" message={state.errors?.postalCode?.[0]} />
       </div>
 
       <div className="space-y-1.5">

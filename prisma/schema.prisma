@@ -390,6 +390,18 @@ enum GiftOrderStatus {
   CANCELLED
 }
 
+// ── Shipping Rates ─────────────────────────────────────────────────────────
+
+model ShippingRate {
+  id        String   @id @default(cuid())
+  state     String   @unique  // Nigerian state name, e.g. "Lagos"
+  fee       Float             // Shipping fee in Naira
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([state])
+}
+
 model GiftBox {
   id          String       @id @default(cuid())
   title       String

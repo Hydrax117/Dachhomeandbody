@@ -128,6 +128,17 @@ function StoreIcon() {
   )
 }
 
+function ShippingIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <rect x="1" y="3" width="15" height="13" />
+      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+      <circle cx="5.5" cy="18.5" r="2.5" />
+      <circle cx="18.5" cy="18.5" r="2.5" />
+    </svg>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Nav groups
 // ---------------------------------------------------------------------------
@@ -151,6 +162,7 @@ const navGroups = [
       { label: "Orders", href: "/admin/orders", icon: <OrdersIcon /> },
       { label: "Gift Boxes", href: "/admin/gift-boxes", icon: <GiftBoxIcon /> },
       { label: "Coupons", href: "/admin/coupons", icon: <CouponsIcon /> },
+      { label: "Shipping Rates", href: "/admin/shipping", icon: <ShippingIcon /> },
     ],
   },
   {
