@@ -7,94 +7,144 @@ import { Newsletter } from "@/app/components/Newsletter"
 import { AddToCartButton } from "@/app/components/ui/AddToCartButton"
 
 // ---------------------------------------------------------------------------
-// Hero — conversion-first, immediate selling
+// Hero — split layout: content left, product image right
 // ---------------------------------------------------------------------------
 function Hero() {
   return (
-    <section className="relative h-screen min-h-[600px] flex items-end overflow-hidden">
-      <div className="absolute inset-0">
-        <Image
-          src="/homepage-bg.png"
-          alt=""
-          fill
-          priority
-          className="object-cover object-right animate-slow-zoom"
+    <section className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden bg-[#0A0A0A]">
+
+      {/* ── LEFT — content panel ── */}
+      <div className="relative z-10 flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-24
+                      pt-28 pb-12 lg:pt-0 lg:pb-0
+                      w-full lg:w-[52%] xl:w-[48%]
+                      min-h-[55vh] lg:min-h-screen">
+
+        {/* Subtle gold radial behind text */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at 0% 60%, rgb(184 150 92 / 0.07) 0%, transparent 65%)" }}
           aria-hidden="true"
         />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/92 via-black/70 to-black/10" aria-hidden="true" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" aria-hidden="true" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" aria-hidden="true" />
-      <div
-        className="absolute bottom-0 left-0 w-[700px] h-[500px] pointer-events-none animate-pulse-glow"
-        style={{ background: "radial-gradient(ellipse at 20% 100%, rgb(184 150 92 / 0.10) 0%, transparent 65%)" }}
-        aria-hidden="true"
-      />
-      <div className="grain-overlay" aria-hidden="true" />
 
-      <div className="relative z-10 w-full pb-16 sm:pb-20 lg:pb-32 px-5 sm:px-8 lg:px-16 max-w-7xl mx-auto">
-        <div className="max-w-xl lg:max-w-2xl">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8 lg:mb-10">
-            <div className="w-6 sm:w-8 h-px bg-[#B8965C] shrink-0" aria-hidden="true" />
-            <p className="text-[#B8965C] text-[9px] sm:text-[10px] tracking-[0.3em] sm:tracking-[0.4em] uppercase font-medium">
-              Luxury Home Fragrance &amp; Natural Skincare
+        <div className="relative max-w-lg">
+          {/* Eyebrow */}
+          <div className="flex items-center gap-3 mb-7">
+            <div className="w-7 h-px bg-[#B8965C]" aria-hidden="true" />
+            <p className="text-[#B8965C] text-[10px] tracking-[0.38em] uppercase font-medium">
+              Abuja&apos;s Premium Home &amp; Body Brand
             </p>
           </div>
 
-          <h1
-            className="font-serif text-white font-light leading-[1.02] mb-5 sm:mb-6 lg:mb-8"
-            style={{ fontSize: "clamp(2.75rem, 9vw, 7.5rem)" }}
-          >
-            Premium scents.<br />
-            <em className="not-italic" style={{
-              background: "linear-gradient(90deg, #CBA96E 0%, #B8965C 45%, #8C6E3A 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>Delivered today</em>.
+          {/* Headline — controlled size, always fits in viewport */}
+          <h1 className="font-serif text-white font-light leading-[1.08] mb-6">
+            <span className="block" style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.25rem)" }}>
+              Luxury fragrance.
+            </span>
+            <span
+              className="block"
+              style={{
+                fontSize: "clamp(2.4rem, 5.5vw, 4.25rem)",
+                background: "linear-gradient(90deg, #CBA96E 0%, #B8965C 50%, #9A7A48 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Natural skincare.
+            </span>
+            <span className="block text-white/70" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)", marginTop: "0.35em" }}>
+              Crafted for your space.
+            </span>
           </h1>
 
-          <p className="text-white/60 text-sm lg:text-base max-w-md mb-4 leading-[1.9] font-light">
-            Luxury home fragrance, natural skincare, and curated gift boxes — 
+          {/* Subtext */}
+          <p className="text-white/45 text-sm lg:text-[0.9375rem] leading-[1.85] mb-8 max-w-sm font-light">
+            Home fragrance, natural skincare, and curated gift boxes —
             same-day delivery across Abuja.
           </p>
 
-          {/* Trust signals */}
-          <div className="flex flex-wrap items-center gap-4 mb-10 sm:mb-12 lg:mb-14">
-            <span className="flex items-center gap-1.5 text-white/50 text-[10px] tracking-wide">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="#B8965C" stroke="none" aria-hidden="true">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              5.0 · Loved by customers in Abuja
-            </span>
-            <span className="text-white/20 hidden sm:block">·</span>
-            <span className="text-white/50 text-[10px] tracking-wide">100% Natural Ingredients</span>
-            <span className="text-white/20 hidden sm:block">·</span>
-            <span className="text-white/50 text-[10px] tracking-wide">Same-Day Delivery, Abuja</span>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4">
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-10">
             <Link
               href="/shop?sort=bestsellers"
-              className="px-8 py-4 bg-[#B8965C] text-[#111111] text-[10px] tracking-[0.3em] uppercase font-semibold hover:bg-[#CBA96E] transition-colors duration-300 text-center min-h-[52px] flex items-center justify-center sm:min-w-[200px]"
+              className="inline-flex items-center justify-center px-8 py-[14px] bg-[#B8965C] text-[#0A0A0A] text-[10px] tracking-[0.28em] uppercase font-semibold hover:bg-[#CBA96E] transition-colors duration-300 min-h-[52px] min-w-[190px]"
             >
               Shop Best Sellers
             </Link>
             <Link
               href="/gift-box"
-              className="px-8 py-4 border border-white/25 text-white/80 text-[10px] tracking-[0.3em] uppercase font-medium hover:border-[#B8965C] hover:text-[#B8965C] transition-all duration-300 text-center min-h-[52px] flex items-center justify-center sm:min-w-[200px]"
+              className="inline-flex items-center justify-center px-8 py-[14px] border border-white/20 text-white/70 text-[10px] tracking-[0.28em] uppercase font-medium hover:border-[#B8965C] hover:text-[#B8965C] transition-all duration-300 min-h-[52px] min-w-[190px]"
             >
               Build a Gift Box
             </Link>
           </div>
+
+          {/* Trust pills */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2.5">
+            {[
+              { icon: "★", text: "5.0 · Loved in Abuja" },
+              { icon: "✦", text: "100% Natural" },
+              { icon: "◎", text: "Same-Day Delivery" },
+            ].map(({ icon, text }) => (
+              <span key={text} className="flex items-center gap-1.5 text-white/35 text-[10px] tracking-wide">
+                <span className="text-[#B8965C] text-[9px]" aria-hidden="true">{icon}</span>
+                {text}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Scroll indicator — bottom of left panel */}
+        <div className="absolute bottom-8 left-6 sm:left-10 lg:left-16 xl:left-24 flex items-center gap-3 hidden lg:flex">
+          <div className="w-7 h-px bg-white/15 relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-full w-1/2 bg-[#B8965C]/60 animate-scroll-dot" />
+          </div>
+          <span className="text-[9px] tracking-[0.35em] uppercase text-white/25">Scroll</span>
         </div>
       </div>
 
-      <div className="absolute bottom-6 left-5 sm:left-8 lg:left-16 flex items-center gap-4 z-10">
-        <div className="w-8 h-px bg-white/20 relative overflow-hidden">
-          <div className="absolute top-0 left-0 h-full w-1/2 bg-[#B8965C]/70 animate-scroll-dot" />
+      {/* ── RIGHT — product image panel ── */}
+      <div className="relative w-full lg:w-[48%] xl:w-[52%] min-h-[45vh] lg:min-h-screen overflow-hidden">
+        {/* Main image */}
+        <Image
+          src="/homepage-bg.png"
+          alt="DACH Home & Body — luxury fragrance and skincare"
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="(max-width: 1024px) 100vw, 52vw"
+        />
+
+        {/* Left-edge fade — blends into the dark left panel on desktop */}
+        <div
+          className="absolute inset-0 hidden lg:block"
+          style={{ background: "linear-gradient(to right, #0A0A0A 0%, transparent 30%)" }}
+          aria-hidden="true"
+        />
+        {/* Top fade — blends into navbar on mobile */}
+        <div
+          className="absolute inset-0 lg:hidden"
+          style={{ background: "linear-gradient(to bottom, #0A0A0A 0%, transparent 25%, transparent 75%, #0A0A0A 100%)" }}
+          aria-hidden="true"
+        />
+        {/* Subtle overall darkening so image doesn't overpower */}
+        <div className="absolute inset-0 bg-black/20" aria-hidden="true" />
+
+        {/* Floating product badge — bottom-left of image */}
+        <div className="absolute bottom-8 left-6 lg:bottom-12 lg:left-10 z-10 hidden sm:block">
+          <div className="bg-black/50 backdrop-blur-md border border-white/10 px-5 py-3.5">
+            <p className="text-[#B8965C] text-[9px] tracking-[0.3em] uppercase mb-1">Featured</p>
+            <p className="text-white font-serif text-base font-light">Oud Noir Collection</p>
+            <Link
+              href="/shop?category=home-fragrance"
+              className="text-white/40 text-[10px] tracking-[0.2em] uppercase hover:text-[#B8965C] transition-colors duration-300 mt-1 inline-block"
+            >
+              Explore →
+            </Link>
+          </div>
         </div>
-        <span className="text-[9px] tracking-[0.35em] uppercase text-white/35">Scroll</span>
+
+        <div className="grain-overlay" aria-hidden="true" />
       </div>
     </section>
   )
