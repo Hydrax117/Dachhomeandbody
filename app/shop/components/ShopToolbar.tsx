@@ -92,7 +92,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
       </div>
 
       {/* Right: search + sort */}
-      <div className="flex items-center gap-3 w-full sm:w-auto">
+      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
         {/* Search */}
         <form
           onSubmit={handleSearchSubmit}
@@ -119,8 +119,8 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
             type="search"
             value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Search products…"
-            className="input pl-9 pr-8 py-2.5 text-sm w-full"
+            placeholder="Search…"
+            className="input pl-9 pr-8 py-2.5 text-sm w-full min-h-[44px]"
             aria-label="Search products"
           />
           {searchValue && (
@@ -128,7 +128,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
               type="button"
               onClick={clearSearch}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#C4C4C4] hover:text-[#111111] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#C4C4C4] hover:text-[#111111] transition-colors w-6 h-6 flex items-center justify-center"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -145,7 +145,7 @@ export function ShopToolbar({ total, onFilterOpen }: ShopToolbarProps) {
             id="shop-sort"
             value={currentSort}
             onChange={(e) => updateParam("sort", e.target.value)}
-            className="input py-2.5 pr-8 text-sm appearance-none cursor-pointer w-full sm:min-w-[160px]"
+            className="input py-2.5 pr-8 text-sm appearance-none cursor-pointer min-h-[44px] w-full min-w-[120px] sm:min-w-[160px]"
             aria-label="Sort products"
           >
             {SORT_OPTIONS.map((opt) => (

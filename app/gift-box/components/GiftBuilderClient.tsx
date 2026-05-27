@@ -58,11 +58,11 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="text-center mb-12">
-        <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-4">
+      <div className="text-center mb-8 sm:mb-12">
+        <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-3 sm:mb-4">
           Step One
         </p>
-        <h2 className="font-serif text-3xl lg:text-5xl font-medium text-[#111111] mb-4">
+        <h2 className="font-serif font-medium text-[#111111] mb-3 sm:mb-4" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}>
           Choose Your Box
         </h2>
         <p className="text-[#8C8C8C] text-sm max-w-md mx-auto leading-relaxed">
@@ -71,7 +71,7 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {giftBoxes.map((box, i) => (
           <motion.div
             key={box.id}
@@ -112,11 +112,11 @@ function BuildStep({ products, categories }: { products: ProductData[]; categori
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="text-center mb-10">
-        <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-4">
+      <div className="text-center mb-8 sm:mb-10">
+        <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-3 sm:mb-4">
           Step Two
         </p>
-        <h2 className="font-serif text-3xl lg:text-5xl font-medium text-[#111111] mb-4">
+        <h2 className="font-serif font-medium text-[#111111] mb-3 sm:mb-4" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}>
           Curate Your Selection
         </h2>
         <p className="text-[#8C8C8C] text-sm max-w-md mx-auto leading-relaxed">
@@ -187,7 +187,7 @@ function BuildStep({ products, categories }: { products: ProductData[]; categori
       </div>
 
       {/* Mobile preview bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e5e5] px-4 py-3 z-40">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e5e5] px-4 py-3 z-40 fixed-bottom-bar">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <div>
             <p className="text-xs font-medium text-[#111111]">
@@ -206,7 +206,7 @@ function BuildStep({ products, categories }: { products: ProductData[]; categori
           <button
             onClick={() => setStep("customize")}
             disabled={itemCount === 0}
-            className="px-6 py-2.5 bg-[#111111] text-white text-[10px] tracking-[0.2em] uppercase font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#B8965C] hover:text-[#111111] transition-all duration-300"
+            className="px-6 py-3 bg-[#111111] text-white text-[10px] tracking-[0.2em] uppercase font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#B8965C] hover:text-[#111111] transition-all duration-300 min-h-[44px]"
           >
             Continue
           </button>
@@ -241,18 +241,27 @@ export default function GiftBuilderClient({
   return (
     <div className="min-h-screen bg-[#F8F5F2]">
       {/* Hero header */}
-      <div className="bg-[#111111] text-white py-16 lg:py-20 px-6 text-center">
+      <div className="bg-[#111111] text-white pt-20 pb-12 sm:py-16 lg:py-20 px-5 sm:px-6 text-center relative overflow-hidden">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at 50% 100%, rgb(184 150 92 / 0.06) 0%, transparent 60%)" }}
+          aria-hidden="true"
+        />
+        <div className="grain-overlay" aria-hidden="true" />
         <motion.div
+          className="relative z-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <p className="text-[#B8965C] text-[10px] tracking-[0.4em] uppercase mb-5">
+          <p className="text-[#B8965C] text-[10px] tracking-[0.4em] uppercase mb-4 sm:mb-5">
             Luxury Gift Atelier
           </p>
-          <h1 className="font-serif text-4xl lg:text-6xl font-light leading-[1.08] mb-5">
-            Build Your Own
-            <br />
+          <h1
+            className="font-serif font-light leading-[1.08] mb-4 sm:mb-5"
+            style={{ fontSize: "clamp(2rem, 7vw, 4.5rem)" }}
+          >
+            Build Your Own<br />
             <em className="not-italic text-[#B8965C]">Gift Box</em>
           </h1>
           <p className="text-white/50 text-sm max-w-sm mx-auto leading-relaxed">
@@ -262,12 +271,12 @@ export default function GiftBuilderClient({
       </div>
 
       {/* Progress */}
-      <div className="bg-white border-b border-[#e5e5e5] py-6 px-6">
+      <div className="bg-white border-b border-[#e5e5e5] py-4 sm:py-6 px-4 sm:px-6">
         <BuilderProgress />
       </div>
 
       {/* Step content */}
-      <div className="px-6 lg:px-12 max-w-7xl mx-auto py-12 lg:py-16 pb-24 lg:pb-16">
+      <div className="px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto py-8 sm:py-12 lg:py-16 pb-28 sm:pb-24 lg:pb-16">
         <AnimatePresence mode="wait">
           {state.step === "select-box" && (
             <motion.div

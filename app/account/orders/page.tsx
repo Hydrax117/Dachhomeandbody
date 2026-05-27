@@ -130,7 +130,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                   aria-label={`Order ${order.orderNumber}`}
                 >
                   {/* Order header row */}
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0ece4]">
+                  <div className="flex items-start sm:items-center justify-between px-4 sm:px-5 py-4 border-b border-[#f0ece4] gap-3">
                     <div className="flex items-center gap-4 min-w-0">
                       <div>
                         <p className="text-sm font-medium text-[#111111] group-hover:text-[#B8965C] transition-colors">
@@ -145,7 +145,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-4 shrink-0">
                       <StatusBadge status={order.status} />
                       <span className="text-sm font-medium text-[#111111]">
                         {formatCurrency(order.total)}
@@ -157,7 +157,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                         fill="none"
                         stroke="#8C8C8C"
                         strokeWidth="1.5"
-                        className="group-hover:stroke-[#B8965C] transition-colors"
+                        className="group-hover:stroke-[#B8965C] transition-colors hidden sm:block"
                         aria-hidden="true"
                       >
                         <polyline points="9 18 15 12 9 6" />
@@ -166,7 +166,7 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
                   </div>
 
                   {/* Order items preview */}
-                  <div className="px-5 py-3 flex items-center justify-between gap-4">
+                  <div className="px-4 sm:px-5 py-3 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2 min-w-0">
                       {/* Product image thumbnails (up to 3) */}
                       <div className="flex -space-x-2">

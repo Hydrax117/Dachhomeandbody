@@ -68,17 +68,47 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   ])
 
   return (
-    <main className="pt-24 lg:pt-28 pb-20">
-      <div className="container-luxury">
-        {/* Page header */}
-        <header className="mb-10 lg:mb-14">
-          <p className="text-eyebrow mb-3">Our Products</p>
-          <h1 className="font-serif text-3xl lg:text-5xl font-medium">
-            Shop All
-          </h1>
-        </header>
+    <main>
+      {/* Editorial shop header */}
+      <header className="relative overflow-hidden bg-[#111111] pt-28 pb-14 sm:pt-32 sm:pb-20 lg:pt-40 lg:pb-28">
+        <div
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] pointer-events-none"
+          style={{ background: "radial-gradient(ellipse, rgb(184 150 92 / 0.07) 0%, transparent 70%)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px"
+          style={{ background: "linear-gradient(90deg, transparent, rgb(184 150 92 / 0.2), transparent)" }}
+          aria-hidden="true"
+        />
+        <div className="grain-overlay" aria-hidden="true" />
 
-        {/* Shop layout: sidebar + grid */}
+        <div className="relative z-10 px-5 sm:px-8 lg:px-16 max-w-7xl mx-auto">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <div className="w-6 h-px bg-[#B8965C]/50" aria-hidden="true" />
+            <p className="text-[#B8965C] text-[10px] tracking-[0.4em] uppercase">Our Products</p>
+          </div>
+          <h1
+            className="font-serif text-white font-light leading-[1.05] mb-4 sm:mb-6"
+            style={{ fontSize: "clamp(2rem, 7vw, 5rem)" }}
+          >
+            Curated for<br />
+            <em className="not-italic" style={{
+              background: "linear-gradient(90deg, #CBA96E 0%, #B8965C 50%, #8C6E3A 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>intentional living</em>.
+          </h1>
+          <p className="text-white/35 text-sm lg:text-base leading-[1.9] max-w-lg font-light">
+            Luxury home fragrance, natural skincare, and curated gift services — 
+            each product chosen to transform your space and elevate your rituals.
+          </p>
+        </div>
+      </header>
+
+      {/* Shop content */}
+      <div className="container-luxury pt-8 sm:pt-12 pb-16 sm:pb-20">
         <ShopClient
           products={result.data}
           total={result.total}

@@ -276,12 +276,12 @@ export default async function OrderDetailPage({ params }: PageProps) {
               {order.items.map((item: OrderItem, index: number) => (
                 <li
                   key={item.id}
-                  className={`flex items-center gap-4 px-5 py-4 ${
+                  className={`flex items-start gap-3 sm:gap-4 px-4 sm:px-5 py-4 ${
                     index < order.items.length - 1 ? "border-b border-[#f0ece4]" : ""
                   }`}
                 >
                   {/* Product image */}
-                  <div className="w-14 h-16 shrink-0 bg-[#f5f0e8] rounded border border-[#e5e5e5] overflow-hidden">
+                  <div className="w-12 h-14 sm:w-14 sm:h-16 shrink-0 bg-[#f5f0e8] rounded border border-[#e5e5e5] overflow-hidden">
                     {item.product.images[0] ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -303,7 +303,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/shop/${item.product.slug}`}
-                      className="text-sm font-medium text-[#111111] hover:text-[#B8965C] transition-colors line-clamp-2"
+                      className="text-sm font-medium text-[#111111] hover:text-[#B8965C] transition-colors line-clamp-2 leading-snug"
                     >
                       {item.product.name}
                     </Link>
@@ -317,7 +317,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
                     </p>
                   </div>
 
-                  <p className="text-sm font-medium text-[#111111] shrink-0">
+                  <p className="text-sm font-medium text-[#111111] shrink-0 ml-1">
                     {formatCurrency(item.subtotal)}
                   </p>
                 </li>

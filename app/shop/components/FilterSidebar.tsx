@@ -47,7 +47,7 @@ function RadioOption({
   onChange: () => void
 }) {
   return (
-    <label className="flex items-center justify-between cursor-pointer group py-1.5">
+    <label className="flex items-center justify-between cursor-pointer group py-2 min-h-[44px]">
       <span className="flex items-center gap-3">
         <span
           className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${
@@ -75,7 +75,7 @@ function RadioOption({
         </span>
       </span>
       {count !== undefined && (
-        <span className="text-[11px] text-[#8C8C8C]">{count}</span>
+        <span className="text-[11px] text-[#8C8C8C] ml-2">{count}</span>
       )}
     </label>
   )

@@ -30,7 +30,7 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
       <button
         disabled
         aria-disabled="true"
-        className="btn-primary w-full opacity-40 cursor-not-allowed"
+        className="w-full py-4 bg-[#EBEBEB] text-[#8C8C8C] text-[10px] tracking-[0.3em] uppercase font-medium cursor-not-allowed"
       >
         Out of Stock
       </button>
@@ -45,14 +45,14 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
           onClick={decrement}
           aria-label="Decrease quantity"
           disabled={quantity <= 1}
-          className="w-10 h-10 flex items-center justify-center text-[#4A4A4A] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C]"
+          className="w-11 h-11 flex items-center justify-center text-[#4A4A4A] hover:bg-[#F2EDE8] transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C]"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
         <span
-          className="w-12 text-center text-sm font-medium"
+          className="w-12 text-center text-sm font-medium font-serif"
           aria-live="polite"
           aria-label={`Quantity: ${quantity}`}
         >
@@ -62,7 +62,7 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
           onClick={increment}
           aria-label="Increase quantity"
           disabled={quantity >= product.stock}
-          className="w-10 h-10 flex items-center justify-center text-[#4A4A4A] hover:bg-[#f0ece4] transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C]"
+          className="w-11 h-11 flex items-center justify-center text-[#4A4A4A] hover:bg-[#F2EDE8] transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8965C]"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -75,17 +75,19 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
       <button
         onClick={handleAdd}
         aria-label={added ? "Added to cart" : `Add ${quantity} to cart`}
-        className={`btn-primary w-full transition-all duration-300 ${
-          added ? "bg-[#B8965C] border-[#B8965C] text-[#111111]" : ""
+        className={`w-full py-4 text-[10px] tracking-[0.3em] uppercase font-medium transition-all duration-500 flex items-center justify-center gap-3 ${
+          added
+            ? "bg-[#B8965C] text-[#111111]"
+            : "bg-[#111111] text-white hover:bg-[#B8965C] hover:text-[#111111]"
         }`}
       >
         {added ? (
-          <span className="flex items-center gap-2 justify-center">
+          <>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <polyline points="20 6 9 17 4 12" />
             </svg>
             Added to Cart
-          </span>
+          </>
         ) : (
           "Add to Cart"
         )}
@@ -93,7 +95,8 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
 
       {/* Low stock warning */}
       {product.stock > 0 && product.stock <= 5 && (
-        <p className="text-[11px] text-[#B8965C] tracking-wide" role="status">
+        <p className="text-[11px] text-[#B8965C] tracking-wide flex items-center gap-2" role="status">
+          <span className="w-1 h-1 rounded-full bg-[#B8965C]" aria-hidden="true" />
           Only {product.stock} left in stock
         </p>
       )}

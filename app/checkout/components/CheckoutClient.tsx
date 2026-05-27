@@ -40,19 +40,18 @@ function StepIndicator({ current }: { current: Step }) {
   ]
 
   return (
-    <nav aria-label="Checkout steps" className="flex items-center gap-0 mb-10">
+    <nav aria-label="Checkout steps" className="flex items-center gap-0 mb-8 sm:mb-10">
       {steps.map((step, i) => {
         const isActive = step.key === current
-        const isDone =
-          (current === "payment" && step.key === "shipping")
+        const isDone = current === "payment" && step.key === "shipping"
 
         return (
           <div key={step.key} className="flex items-center">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2 sm:gap-2.5">
               <span
                 aria-current={isActive ? "step" : undefined}
                 className={[
-                  "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold tracking-wide transition-colors duration-300",
+                  "w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] font-semibold tracking-wide transition-colors duration-300 shrink-0",
                   isActive
                     ? "bg-[#111111] text-[#F8F5F2]"
                     : isDone
@@ -61,7 +60,7 @@ function StepIndicator({ current }: { current: Step }) {
                 ].join(" ")}
               >
                 {isDone ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 ) : (
@@ -70,7 +69,7 @@ function StepIndicator({ current }: { current: Step }) {
               </span>
               <span
                 className={[
-                  "text-[10px] tracking-[0.18em] uppercase font-medium transition-colors duration-300",
+                  "text-[10px] tracking-[0.15em] sm:tracking-[0.18em] uppercase font-medium transition-colors duration-300",
                   isActive ? "text-[#111111]" : isDone ? "text-[#B8965C]" : "text-[#C4C4C4]",
                 ].join(" ")}
               >
@@ -78,7 +77,7 @@ function StepIndicator({ current }: { current: Step }) {
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className="w-12 h-px bg-[#EBEBEB] mx-4" aria-hidden="true" />
+              <div className="w-8 sm:w-12 h-px bg-[#EBEBEB] mx-3 sm:mx-4" aria-hidden="true" />
             )}
           </div>
         )
@@ -129,27 +128,27 @@ export function CheckoutClient({
   }
 
   return (
-    <main className="min-h-screen bg-[#F8F5F2] pt-20 pb-16">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <main className="min-h-screen bg-[#F8F5F2] pt-16 sm:pt-20 pb-12 sm:pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
 
         {/* Header */}
-        <div className="py-8 border-b border-[#EBEBEB] mb-10">
+        <div className="py-6 sm:py-8 border-b border-[#EBEBEB] mb-8 sm:mb-10">
           <Link
             href="/"
-            className="font-serif text-base lg:text-lg tracking-[0.22em] uppercase text-[#111111]"
+            className="font-serif text-sm lg:text-base tracking-[0.22em] uppercase text-[#111111]"
             aria-label="Dachhomeandbody — Home"
           >
             Dachhomeandbody
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:gap-16 items-start">
+        {/* On mobile: summary first (collapsed), form below */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 sm:gap-12 lg:gap-16 items-start">
 
           {/* Left — form area */}
           <div className="order-2 lg:order-1">
             <StepIndicator current={step} />
 
-            {/* Payment failure banner (from redirect after failed payment) */}
             {paymentError && (
               <div
                 role="alert"

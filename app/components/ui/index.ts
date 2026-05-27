@@ -1,4 +1,5 @@
 export { Button } from "./Button"
+export { AddToCartButton } from "./AddToCartButton"
 export { Card, ProductCard, CollectionCard, ReviewCard } from "./Card"
 export { Input, Label, FieldError } from "./Input"
 export { Badge } from "./Badge"

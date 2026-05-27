@@ -84,7 +84,7 @@ export function CartDrawer() {
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 h-16 border-b border-[#EBEBEB] shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 h-16 border-b border-[#EBEBEB] shrink-0">
           <div className="flex items-center gap-3">
             <h2 className="font-serif text-base tracking-[0.08em]">Your Cart</h2>
             {itemCount > 0 && (
@@ -154,7 +154,7 @@ export function CartDrawer() {
         ) : (
           <>
             {/* Items list */}
-            <div className="flex-1 overflow-y-auto px-6 py-2">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-2">
               <ul aria-label="Cart items" className="divide-y divide-transparent">
                 {cart.items.map((item) => (
                   <CartItem key={item.productId} item={item} />
@@ -163,7 +163,7 @@ export function CartDrawer() {
             </div>
 
             {/* Summary footer */}
-            <div className="px-6 py-5 border-t border-[#EBEBEB] bg-[#F8F5F2] shrink-0">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-t border-[#EBEBEB] bg-[#F8F5F2] shrink-0">
               <CartSummary onCheckout={closeCart} />
             </div>
           </>

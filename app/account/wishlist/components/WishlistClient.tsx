@@ -94,7 +94,7 @@ function WishlistCard({
           }}
           disabled={isPending}
           aria-label={`Remove ${product.name} from wishlist`}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 border border-[#e5e5e5] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:border-red-200 disabled:opacity-50"
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 border border-[#e5e5e5] flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:border-red-200 disabled:opacity-50"
         >
           {isPending ? (
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2" className="animate-spin" aria-hidden="true">

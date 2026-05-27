@@ -572,8 +572,8 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             </li>
             )}
 
-            {/* Other links */}
-            {primaryLinks.slice(1).map((link) => (
+            {/* Other links — skip "Shop" since it has its own mega-menu trigger above */}
+            {primaryLinks.slice(1).filter((l) => l.label !== "Shop").map((link) => (
               <li key={link.label}>
                 <Link
                   href={link.href}

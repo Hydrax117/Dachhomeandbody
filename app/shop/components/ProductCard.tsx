@@ -50,64 +50,75 @@ export function ProductCard({
 }: ProductCardProps) {
   const isOutOfStock = stock === 0
   const hasDiscount = compareAtPrice && compareAtPrice > price
+  const discountPercent = hasDiscount
+    ? Math.round(((compareAtPrice! - price) / compareAtPrice!) * 100)
+    : 0
   const primaryImage = images[0]
 
   return (
-    <article className="group">
+    <article className="card-product-luxury group">
       <Link href={`/shop/${slug}`} className="block" aria-label={`View ${name}`}>
         {/* Image */}
-        <div className="card-product__image relative mb-5">
+        <div className="card-product-luxury__image">
           {primaryImage ? (
             <Image
               src={primaryImage}
               alt={name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              className="object-cover"
             />
           ) : (
-            <div className="absolute inset-0 bg-[#EBEBEB] flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F2EDE8] to-[#E8E0D8] flex items-center justify-center">
               <div className="w-16 h-24 rounded-full bg-[#B8965C]/15 border border-[#B8965C]/25" aria-hidden="true" />
             </div>
           )}
 
           {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/8 transition-colors duration-500" aria-hidden="true" />
+          <div className="card-product-luxury__overlay" aria-hidden="true" />
+
+          {/* Slide-up CTA */}
+          {!isOutOfStock && (
+            <div className="card-product-luxury__cta">View Product</div>
+          )}
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {isOutOfStock && (
               <span className="badge badge-dark text-[9px]">Out of Stock</span>
             )}
             {hasDiscount && !isOutOfStock && (
-              <span className="badge badge-gold text-[9px]">Sale</span>
+              <span className="badge badge-gold text-[9px]">−{discountPercent}%</span>
             )}
           </div>
 
-          {/* Quick add — slides up on hover */}
-          {!isOutOfStock && (
-            <div className="card-product__quick-add" aria-hidden="true">
-              Add to Cart
+          {/* Rating badge — top right */}
+          {averageRating && reviewCount > 0 && (
+            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-1.5 z-10">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="#B8965C" stroke="none" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              <span className="text-white text-[9px] tracking-wide">{averageRating.toFixed(1)}</span>
             </div>
           )}
         </div>
 
         {/* Info */}
-        <div className="px-0.5">
-          <p className="text-[10px] tracking-[0.2em] uppercase text-[#B8965C] mb-1">
+        <div className="pt-5 pb-2">
+          <p className="text-[#B8965C] text-[10px] tracking-[0.25em] uppercase mb-1.5">
             {category.name}
           </p>
-          <h3 className="font-serif text-base font-medium leading-snug mb-2 group-hover:text-[#B8965C] transition-colors duration-200">
+          <h3 className="font-serif text-[#111111] text-base font-normal leading-snug mb-2 group-hover:text-[#B8965C] transition-colors duration-300">
             {name}
           </h3>
 
           {averageRating && reviewCount > 0 ? (
-            <div className="mb-2">
+            <div className="mb-3">
               <StarRating rating={averageRating} count={reviewCount} />
             </div>
           ) : null}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-baseline gap-2.5">
             <span className={`font-serif text-base ${isOutOfStock ? "text-[#8C8C8C]" : "text-[#111111]"}`}>
               ₦{price.toLocaleString()}
             </span>
