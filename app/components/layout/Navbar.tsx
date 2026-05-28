@@ -387,18 +387,20 @@ function MobileMenu({
               </div>
             </li>
 
-            {/* Other primary links */}
-            {primaryLinks.slice(1).map((link) => (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  onClick={onClose}
-                  className="block py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#B8965C] transition-colors border-b border-[#EBEBEB]"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {/* About & Contact — Home and Shop are already rendered above */}
+            {primaryLinks
+              .filter((l) => l.label !== "Home" && l.label !== "Shop")
+              .map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    onClick={onClose}
+                    className="block py-3 text-xs tracking-[0.18em] uppercase font-medium hover:text-[#B8965C] transition-colors border-b border-[#EBEBEB]"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
           </ul>
 
           {/* Account section */}
@@ -543,46 +545,45 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
               </Link>
             </li>
 
-            {/* Shop — with mega menu (customers only) */}
+            {/* Shop — mega menu trigger (customers only) */}
             {!isAdmin && (
-            <li
-              onMouseEnter={openShopMenu}
-              onMouseLeave={closeShopMenu}
-            >
-              <button
-                aria-haspopup="true"
-                aria-expanded={shopHovered}
-                className="flex items-center gap-1 hover:text-[#B8965C] transition-colors duration-200"
-                style={{ color: textColor }}
-              >
-                Shop
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                  className={`transition-transform duration-200 ${shopHovered ? "rotate-180" : ""}`}
+              <li onMouseEnter={openShopMenu} onMouseLeave={closeShopMenu}>
+                <button
+                  aria-haspopup="true"
+                  aria-expanded={shopHovered}
+                  className="flex items-center gap-1 hover:text-[#B8965C] transition-colors duration-200"
+                  style={{ color: textColor }}
                 >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-            </li>
+                  Shop
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden="true"
+                    className={`transition-transform duration-200 ${shopHovered ? "rotate-180" : ""}`}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+              </li>
             )}
 
-            {/* Other links — skip "Shop" since it has its own mega-menu trigger above */}
-            {primaryLinks.slice(1).filter((l) => l.label !== "Shop").map((link) => (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  className="hover:text-[#B8965C] transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {/* About & Contact — skip Home and Shop which are handled above */}
+            {primaryLinks
+              .filter((l) => l.label !== "Home" && l.label !== "Shop")
+              .map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="hover:text-[#B8965C] transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
           </ul>
 
           {/* Right icons */}
