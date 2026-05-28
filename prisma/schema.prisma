@@ -181,6 +181,7 @@ model Product {
   cartItems       CartItem[]
   stockHistory    StockHistory[]
   giftOrderItems  GiftOrderItem[]
+  popupConfigs    PopupConfig[]
   
   deleted         Boolean         @default(false)
   
@@ -489,5 +490,32 @@ model GiftOrderItem {
   createdAt    DateTime  @default(now())
 
   @@index([giftOrderId])
+  @@index([productId])
+}
+
+// ── Promotional Popup ──────────────────────────────────────────────────────
+
+model PopupConfig {
+  id              String    @id @default(cuid())
+  enabled         Boolean   @default(false)
+  title           String    @default("")
+  description     String    @default("")
+  ctaLabel        String    @default("Shop Now")
+  ctaUrl          String    @default("/shop")
+  imageUrl        String?
+  productName     String?
+  originalPrice   Float?
+  discountPercent Float?
+  delaySeconds    Int       @default(4)
+  startDate       DateTime?
+  endDate         DateTime?
+
+  // Optional link to an existing product
+  productId       String?
+  product         Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
   @@index([productId])
 }

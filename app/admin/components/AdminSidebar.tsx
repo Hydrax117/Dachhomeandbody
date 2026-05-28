@@ -139,6 +139,16 @@ function ShippingIcon() {
   )
 }
 
+function PopupIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="1" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="9" y1="5" x2="9" y2="9" />
+    </svg>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Nav groups
 // ---------------------------------------------------------------------------
@@ -170,6 +180,12 @@ const navGroups = [
     items: [
       { label: "Customers", href: "/admin/customers", icon: <CustomersIcon /> },
       { label: "Reviews", href: "/admin/reviews", icon: <ReviewsIcon /> },
+    ],
+  },
+  {
+    label: "Marketing",
+    items: [
+      { label: "Popup", href: "/admin/popup", icon: <PopupIcon /> },
     ],
   },
 ]

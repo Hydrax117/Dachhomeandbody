@@ -8,6 +8,7 @@ import {
 import "./globals.css";
 import Providers from "@/app/components/layout/Providers";
 import ConditionalNavbar from "@/app/components/layout/ConditionalNavbar";
+import PromotionalPopupWrapper from "@/app/components/PromotionalPopupWrapper";
 
 // ── Serif: Playfair Display (variable) ──
 const playfair = Playfair_Display({
@@ -79,6 +80,7 @@ export default function RootLayout({
         <Providers>
           <ConditionalNavbar />
           {children}
+          <PromotionalPopupWrapper />
         </Providers>
       </body>
     </html>
