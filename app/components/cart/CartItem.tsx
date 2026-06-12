@@ -14,14 +14,14 @@ export function CartItem({ item }: CartItemProps) {
 
   const decrement = () => {
     if (quantity <= 1) {
-      removeItem(product.id)
+      removeItem(product.id, item.variantId)
     } else {
-      updateQuantity(product.id, quantity - 1)
+      updateQuantity(product.id, item.variantId, quantity - 1)
     }
   }
 
   const increment = () => {
-    updateQuantity(product.id, quantity + 1)
+    updateQuantity(product.id, item.variantId, quantity + 1)
   }
 
   const lineTotal = product.price * quantity
@@ -58,6 +58,9 @@ export function CartItem({ item }: CartItemProps) {
             >
               {product.name}
             </Link>
+            {product.variantName && (
+              <p className="text-[11px] text-[#B8965C] mt-0.5 tracking-wide">{product.variantName}</p>
+            )}
             <p className="text-[11px] text-[#8C8C8C] mt-0.5 tracking-wide">
               ₦{product.price.toLocaleString()} each
             </p>
@@ -65,8 +68,8 @@ export function CartItem({ item }: CartItemProps) {
 
           {/* Remove button */}
           <button
-            onClick={() => removeItem(product.id)}
-            aria-label={`Remove ${product.name} from cart`}
+            onClick={() => removeItem(product.id, item.variantId)}
+            aria-label={`Remove ${product.name}${product.variantName ? ` (${product.variantName})` : ""} from cart`}
             className="shrink-0 w-8 h-8 flex items-center justify-center text-[#C4C4C4] hover:text-[#c0392b] transition-colors duration-150 -mr-1"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">

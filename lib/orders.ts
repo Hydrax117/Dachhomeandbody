@@ -44,6 +44,8 @@ export interface AdminOrderRow {
     quantity: number
     price: number
     subtotal: number
+    variantId: string | null
+    variantName: string | null
     product: {
       id: string
       name: string
@@ -58,7 +60,7 @@ export interface OrderMetadata {
   userId?: string | null
   guestEmail?: string | null
   guestName?: string | null
-  items?: Array<{ productId: string; quantity: number; price: number }>
+  items?: Array<{ productId: string; variantId?: string | null; variantName?: string | null; quantity: number; price: number }>
   shippingAddress?: {
     name: string
     phone: string
@@ -124,6 +126,8 @@ export async function createOrderFromPayment({
   // Coerce item fields to numbers (Paystack metadata serialises everything as strings)
   const coercedItems = items.map((item) => ({
     productId: item.productId,
+    variantId: item.variantId ?? null,
+    variantName: item.variantName ?? null,
     quantity: Number(item.quantity),
     price: Number(item.price),
   }))
@@ -158,6 +162,8 @@ export async function createOrderFromPayment({
         items: {
           create: coercedItems.map((item) => ({
             productId: item.productId,
+            variantId: item.variantId,
+            variantName: item.variantName,
             quantity: item.quantity,
             price: item.price,
             subtotal: item.price * item.quantity,
@@ -166,13 +172,30 @@ export async function createOrderFromPayment({
       },
     })
 
-    // Decrement stock
+    // Decrement stock — prefer variant stock, fall back to product stock
     for (const item of coercedItems) {
-      if (!productMap.has(item.productId)) continue
-      await tx.product.update({
-        where: { id: item.productId },
-        data: { stock: { decrement: item.quantity } },
-      })
+      if (item.variantId) {
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data: { stock: { decrement: item.quantity } },
+        })
+        // Re-sync product base stock to sum of variants
+        const variants = await tx.productVariant.findMany({
+          where: { productId: item.productId },
+          select: { stock: true },
+        })
+        const totalStock = variants.reduce((s, v) => s + v.stock, 0)
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: totalStock },
+        })
+      } else {
+        if (!productMap.has(item.productId)) continue
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { decrement: item.quantity } },
+        })
+      }
     }
 
     // Coupon usage tracking
@@ -275,6 +298,8 @@ const orderDetailSelect = {
       quantity: true,
       price: true,
       subtotal: true,
+      variantId: true,
+      variantName: true,
       product: {
         select: {
           id: true,
@@ -457,7 +482,7 @@ export async function updateOrderStatus(
         where: { id },
         select: {
           status: true,
-          items: { select: { productId: true, quantity: true } },
+          items: { select: { productId: true, variantId: true, quantity: true } },
         },
       })
 
@@ -466,10 +491,27 @@ export async function updateOrderStatus(
       // Only restore stock if transitioning from a non-cancelled state
       if (current.status !== "CANCELLED" && current.status !== "REFUNDED") {
         for (const item of current.items) {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { increment: item.quantity } },
-          })
+          if (item.variantId) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            })
+            // Re-sync product base stock
+            const variants = await tx.productVariant.findMany({
+              where: { productId: item.productId },
+              select: { stock: true },
+            })
+            const totalStock = variants.reduce((s, v) => s + v.stock, 0)
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: totalStock },
+            })
+          } else {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: { increment: item.quantity } },
+            })
+          }
         }
       }
 
@@ -509,7 +551,7 @@ export async function processRefund(
       select: {
         status: true,
         orderNumber: true,
-        items: { select: { productId: true, quantity: true } },
+        items: { select: { productId: true, variantId: true, quantity: true } },
       },
     })
 
@@ -519,10 +561,26 @@ export async function processRefund(
     // Restore stock if order was not already cancelled
     if (order.status !== "CANCELLED") {
       for (const item of order.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { increment: item.quantity } },
-        })
+        if (item.variantId) {
+          await tx.productVariant.update({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.quantity } },
+          })
+          const variants = await tx.productVariant.findMany({
+            where: { productId: item.productId },
+            select: { stock: true },
+          })
+          const totalStock = variants.reduce((s, v) => s + v.stock, 0)
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: totalStock },
+          })
+        } else {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          })
+        }
       }
     }
 

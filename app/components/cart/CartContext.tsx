@@ -27,10 +27,13 @@ export interface CartProduct {
   price: number
   images: string[]
   stock: number
+  variantId?: string | null
+  variantName?: string | null
 }
 
 export interface CartItem {
   productId: string
+  variantId?: string | null
   product: CartProduct
   quantity: number
 }
@@ -49,8 +52,8 @@ export interface Cart {
 
 type CartAction =
   | { type: "ADD_ITEM"; product: CartProduct; quantity: number }
-  | { type: "UPDATE_QUANTITY"; productId: string; quantity: number }
-  | { type: "REMOVE_ITEM"; productId: string }
+  | { type: "UPDATE_QUANTITY"; productId: string; variantId?: string | null; quantity: number }
+  | { type: "REMOVE_ITEM"; productId: string; variantId?: string | null }
   | { type: "APPLY_COUPON"; code: string; discount: number }
   | { type: "COUPON_ERROR"; error: string }
   | { type: "REMOVE_COUPON" }
@@ -62,6 +65,11 @@ type CartAction =
 
 function calcSubtotal(items: CartItem[]): number {
   return items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+}
+
+/** Two cart items are the same if they share productId and variantId. */
+function isSameItem(a: CartItem, b: { productId: string; variantId?: string | null }): boolean {
+  return a.productId === b.productId && (a.variantId ?? null) === (b.variantId ?? null)
 }
 
 // ── Reducer ────────────────────────────────────────────────────────────────
@@ -79,7 +87,7 @@ function cartReducer(state: Cart, action: CartAction): Cart {
     }
 
     case "ADD_ITEM": {
-      const existing = state.items.find((i) => i.productId === action.product.id)
+      const existing = state.items.find((i) => isSameItem(i, { productId: action.product.id, variantId: action.product.variantId }))
       let items: CartItem[]
       let stockNotice: string | null = null
 
@@ -87,20 +95,27 @@ function cartReducer(state: Cart, action: CartAction): Cart {
         const requested = existing.quantity + action.quantity
         const newQty = Math.min(requested, action.product.stock)
         if (requested > action.product.stock) {
-          stockNotice = `Only ${action.product.stock} unit${action.product.stock !== 1 ? "s" : ""} available for "${action.product.name}".`
+          stockNotice = `Only ${action.product.stock} unit${action.product.stock !== 1 ? "s" : ""} available for "${action.product.name}${action.product.variantName ? ` (${action.product.variantName})` : ""}".`
         }
         items = state.items.map((i) =>
-          i.productId === action.product.id ? { ...i, quantity: newQty } : i
+          isSameItem(i, { productId: action.product.id, variantId: action.product.variantId })
+            ? { ...i, quantity: newQty }
+            : i
         )
       } else {
         const requested = action.quantity
         const qty = Math.min(requested, action.product.stock)
         if (requested > action.product.stock) {
-          stockNotice = `Only ${action.product.stock} unit${action.product.stock !== 1 ? "s" : ""} available for "${action.product.name}".`
+          stockNotice = `Only ${action.product.stock} unit${action.product.stock !== 1 ? "s" : ""} available for "${action.product.name}${action.product.variantName ? ` (${action.product.variantName})` : ""}".`
         }
         items = [
           ...state.items,
-          { productId: action.product.id, product: action.product, quantity: qty },
+          {
+            productId: action.product.id,
+            variantId: action.product.variantId ?? null,
+            product: action.product,
+            quantity: qty,
+          },
         ]
       }
 
@@ -118,12 +133,12 @@ function cartReducer(state: Cart, action: CartAction): Cart {
       let stockNotice: string | null = null
       const items =
         action.quantity <= 0
-          ? state.items.filter((i) => i.productId !== action.productId)
+          ? state.items.filter((i) => !isSameItem(i, { productId: action.productId, variantId: action.variantId }))
           : state.items.map((i) => {
-              if (i.productId !== action.productId) return i
+              if (!isSameItem(i, { productId: action.productId, variantId: action.variantId })) return i
               const qty = Math.min(action.quantity, i.product.stock)
               if (action.quantity > i.product.stock) {
-                stockNotice = `Only ${i.product.stock} unit${i.product.stock !== 1 ? "s" : ""} available for "${i.product.name}".`
+                stockNotice = `Only ${i.product.stock} unit${i.product.stock !== 1 ? "s" : ""} available for "${i.product.name}${i.product.variantName ? ` (${i.product.variantName})` : ""}".`
               }
               return { ...i, quantity: qty }
             })
@@ -139,7 +154,7 @@ function cartReducer(state: Cart, action: CartAction): Cart {
     }
 
     case "REMOVE_ITEM": {
-      const items = state.items.filter((i) => i.productId !== action.productId)
+      const items = state.items.filter((i) => !isSameItem(i, { productId: action.productId, variantId: action.variantId }))
       const subtotal = calcSubtotal(items)
       return {
         ...state,
@@ -205,8 +220,8 @@ interface CartContextValue {
   openCart: () => void
   closeCart: () => void
   addItem: (product: CartProduct, quantity?: number) => void
-  updateQuantity: (productId: string, quantity: number) => void
-  removeItem: (productId: string) => void
+  updateQuantity: (productId: string, variantId: string | null | undefined, quantity: number) => void
+  removeItem: (productId: string, variantId?: string | null) => void
   applyCoupon: (code: string) => Promise<void>
   removeCoupon: () => void
   clearCart: () => void
@@ -239,6 +254,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // User just logged in — capture current guest cart before merging
         const guestItems = cart.items.map((i) => ({
           productId: i.productId,
+          variantId: i.variantId ?? null,
           quantity: i.quantity,
         }))
         guestItemsRef.current = cart.items
@@ -248,6 +264,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           mergeGuestCart(guestItems).then((merged) => {
             const cartItems: CartItem[] = merged.map((item) => ({
               productId: item.productId,
+              variantId: item.variantId,
               quantity: item.quantity,
               product: item.product,
             }))
@@ -258,6 +275,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           loadCart().then((items) => {
             const cartItems: CartItem[] = items.map((item) => ({
               productId: item.productId,
+              variantId: item.variantId,
               quantity: item.quantity,
               product: item.product,
             }))
@@ -283,27 +301,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (session?.user?.id) {
         // Compute new quantity after add (mirrors reducer logic)
-        const existing = cart.items.find((i) => i.productId === product.id)
+        const existing = cart.items.find((i) => isSameItem(i, { productId: product.id, variantId: product.variantId }))
         const newQty = existing
           ? Math.min(existing.quantity + quantity, product.stock)
           : Math.min(quantity, product.stock)
-        saveCartItem(product.id, newQty)
+        saveCartItem(product.id, product.variantId ?? null, newQty)
       }
     },
     [cart.items, session?.user?.id]
   )
 
   const updateQuantity = useCallback(
-    (productId: string, quantity: number) => {
-      dispatch({ type: "UPDATE_QUANTITY", productId, quantity })
+    (productId: string, variantId: string | null | undefined, quantity: number) => {
+      dispatch({ type: "UPDATE_QUANTITY", productId, variantId, quantity })
 
       if (session?.user?.id) {
         if (quantity <= 0) {
-          removeCartItem(productId)
+          removeCartItem(productId, variantId ?? null)
         } else {
-          const item = cart.items.find((i) => i.productId === productId)
+          const item = cart.items.find((i) => isSameItem(i, { productId, variantId }))
           const capped = item ? Math.min(quantity, item.product.stock) : quantity
-          saveCartItem(productId, capped)
+          saveCartItem(productId, variantId ?? null, capped)
         }
       }
     },
@@ -311,11 +329,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   )
 
   const removeItem = useCallback(
-    (productId: string) => {
-      dispatch({ type: "REMOVE_ITEM", productId })
+    (productId: string, variantId?: string | null) => {
+      dispatch({ type: "REMOVE_ITEM", productId, variantId })
 
       if (session?.user?.id) {
-        removeCartItem(productId)
+        removeCartItem(productId, variantId ?? null)
       }
     },
     [session?.user?.id]

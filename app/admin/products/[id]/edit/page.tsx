@@ -3,9 +3,17 @@ import { getStockHistory } from "@/lib/products"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { updateProductAction, updateStockAction } from "../../actions"
+import {
+  updateProductAction,
+  updateStockAction,
+  createVariantAction,
+  updateVariantAction,
+  deleteVariantAction,
+  updateVariantStockAction,
+} from "../../actions"
 import ProductForm from "../../components/ProductForm"
 import StockManager from "../../components/StockManager"
+import VariantManager from "../../components/VariantManager"
 import type { ProductInitialData } from "../../components/ProductForm"
 
 export const metadata = {
@@ -54,6 +62,12 @@ export default async function EditProductPage({
   // Bind the product id into the actions
   const boundUpdateAction = updateProductAction.bind(null, id)
   const boundStockAction = updateStockAction.bind(null, id)
+  const boundCreateVariant = createVariantAction.bind(null, id)
+  const boundUpdateVariant = updateVariantAction.bind(null, id)
+  const boundDeleteVariant = deleteVariantAction.bind(null, id)
+  const boundUpdateVariantStock = updateVariantStockAction.bind(null, id)
+
+  const hasVariants = product.variants && product.variants.length > 0
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -85,18 +99,41 @@ export default async function EditProductPage({
         mode="edit"
       />
 
-      {/* Stock Management Section */}
+      {/* Variants Section */}
       <div>
-        <h2 className="font-serif text-xl font-medium text-[#111111] mb-4">
-          Stock Management
+        <h2 className="font-serif text-xl font-medium text-[#111111] mb-1">
+          Variants
         </h2>
-        <StockManager
+        <p className="text-sm text-[#8C8C8C] mb-4">
+          Add size or option variants — each can have its own price and stock.
+        </p>
+        <VariantManager
           productId={id}
-          currentStock={product.stock}
-          stockHistory={stockHistory}
-          updateAction={boundStockAction}
+          variants={product.variants ?? []}
+          createAction={boundCreateVariant}
+          updateAction={boundUpdateVariant}
+          deleteAction={boundDeleteVariant}
+          updateStockAction={boundUpdateVariantStock}
         />
       </div>
+
+      {/* Stock Management — only shown for products without variants */}
+      {!hasVariants && (
+        <div>
+          <h2 className="font-serif text-xl font-medium text-[#111111] mb-1">
+            Stock Management
+          </h2>
+          <p className="text-sm text-[#8C8C8C] mb-4">
+            Manage base product stock. Add variants above to manage stock per size/option instead.
+          </p>
+          <StockManager
+            productId={id}
+            currentStock={product.stock}
+            stockHistory={stockHistory}
+            updateAction={boundStockAction}
+          />
+        </div>
+      )}
     </div>
   )
 }

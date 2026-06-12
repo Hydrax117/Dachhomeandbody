@@ -12,7 +12,10 @@
 .kiro
 # testing
 /coverage
-
+# Excel / data files
+*.xlsx
+*.xls
+*.csv
 # next.js
 /.next/
 /out/

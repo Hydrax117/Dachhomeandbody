@@ -1,7 +1,7 @@
 /**
  * Product data access functions.
  * Covers customer-facing queries (listing, filtering, sorting, pagination)
- * and admin CRUD operations.
+ * and admin CRUD operations including variant management.
  */
 
 import { z } from "zod"
@@ -40,6 +40,16 @@ export interface ProductFilters {
   featured?: boolean
 }
 
+export interface ProductVariantData {
+  id: string
+  name: string
+  sku: string
+  price: number
+  compareAtPrice: number | null
+  stock: number
+  sortOrder: number
+}
+
 // Prisma select shape used for customer-facing product lists
 const productListSelect = {
   id: true,
@@ -66,6 +76,18 @@ const productListSelect = {
   updatedAt: true,
   category: {
     select: { id: true, name: true, slug: true },
+  },
+  variants: {
+    orderBy: { sortOrder: "asc" as const },
+    select: {
+      id: true,
+      name: true,
+      sku: true,
+      price: true,
+      compareAtPrice: true,
+      stock: true,
+      sortOrder: true,
+    },
   },
 } satisfies Prisma.ProductSelect
 
@@ -437,6 +459,8 @@ export async function getStockHistory(productId: string, limit = 20) {
     take: limit,
     select: {
       id: true,
+      variantId: true,
+      variant: { select: { name: true } },
       previousStock: true,
       newStock: true,
       change: true,
@@ -445,5 +469,181 @@ export async function getStockHistory(productId: string, limit = 20) {
       createdAt: true,
       user: { select: { id: true, name: true, email: true } },
     },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Variant management
+// ---------------------------------------------------------------------------
+
+export const variantCreateSchema = z.object({
+  name: z.string().min(1).max(100),
+  sku: z.string().min(1).max(100),
+  price: z.number().positive(),
+  compareAtPrice: z.number().positive().optional(),
+  stock: z.number().int().nonnegative(),
+  sortOrder: z.number().int().nonnegative().default(0),
+})
+
+export const variantUpdateSchema = variantCreateSchema.partial()
+
+export type VariantCreateInput = z.infer<typeof variantCreateSchema>
+export type VariantUpdateInput = z.infer<typeof variantUpdateSchema>
+
+/**
+ * Create a variant for a product.
+ * Also syncs the product's base price/stock to reflect the lowest-price variant.
+ */
+export async function createVariant(productId: string, input: VariantCreateInput) {
+  const data = variantCreateSchema.parse(input)
+
+  return prisma.$transaction(async (tx) => {
+    const variant = await tx.productVariant.create({
+      data: { ...data, productId },
+    })
+
+    // Sync base product price = lowest variant price, stock = sum of variant stocks
+    await syncProductPriceAndStock(tx, productId)
+
+    return variant
+  })
+}
+
+/**
+ * Update a variant.
+ * Syncs the product's base price/stock afterward.
+ */
+export async function updateVariant(variantId: string, input: VariantUpdateInput) {
+  const data = variantUpdateSchema.parse(input)
+
+  // Get productId first
+  const existing = await prisma.productVariant.findUnique({
+    where: { id: variantId },
+    select: { productId: true },
+  })
+  if (!existing) throw new Error("Variant not found")
+
+  return prisma.$transaction(async (tx) => {
+    const variant = await tx.productVariant.update({
+      where: { id: variantId },
+      data,
+    })
+
+    await syncProductPriceAndStock(tx, existing.productId)
+
+    return variant
+  })
+}
+
+/**
+ * Delete a variant.
+ * Syncs the product's base price/stock afterward.
+ */
+export async function deleteVariant(variantId: string) {
+  const existing = await prisma.productVariant.findUnique({
+    where: { id: variantId },
+    select: { productId: true },
+  })
+  if (!existing) throw new Error("Variant not found")
+
+  return prisma.$transaction(async (tx) => {
+    await tx.productVariant.delete({ where: { id: variantId } })
+    await syncProductPriceAndStock(tx, existing.productId)
+  })
+}
+
+/**
+ * Update stock for a specific variant, recording in StockHistory.
+ */
+export async function updateVariantStock(
+  variantId: string,
+  input: StockAdjustmentInput,
+  adminUserId?: string
+) {
+  const { newStock, notes } = stockAdjustmentSchema.parse(input)
+
+  const variant = await prisma.productVariant.findUnique({
+    where: { id: variantId },
+    select: { id: true, stock: true, productId: true },
+  })
+  if (!variant) throw new Error("Variant not found")
+
+  return prisma.$transaction(async (tx) => {
+    const change = newStock - variant.stock
+
+    const updated = await tx.productVariant.update({
+      where: { id: variantId },
+      data: { stock: newStock },
+    })
+
+    await tx.stockHistory.create({
+      data: {
+        productId: variant.productId,
+        variantId,
+        userId: adminUserId ?? null,
+        previousStock: variant.stock,
+        newStock,
+        change,
+        reason: "Manual adjustment",
+        notes: notes ?? null,
+      },
+    })
+
+    // Keep product base stock in sync
+    await syncProductPriceAndStock(tx, variant.productId)
+
+    return updated
+  })
+}
+
+/**
+ * Get stock history for a specific variant.
+ */
+export async function getVariantStockHistory(variantId: string, limit = 20) {
+  return prisma.stockHistory.findMany({
+    where: { variantId },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      previousStock: true,
+      newStock: true,
+      change: true,
+      reason: true,
+      notes: true,
+      createdAt: true,
+      user: { select: { id: true, name: true, email: true } },
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+type TxClient = Omit<
+  typeof prisma,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>
+
+/**
+ * After any variant change, sync product.price (lowest variant price)
+ * and product.stock (sum of all variant stocks) so filtering and display
+ * stay consistent for products with variants.
+ */
+async function syncProductPriceAndStock(tx: TxClient, productId: string) {
+  const variants = await tx.productVariant.findMany({
+    where: { productId },
+    select: { price: true, stock: true },
+  })
+
+  if (variants.length === 0) return // no variants — product manages its own price/stock
+
+  const lowestPrice = Math.min(...variants.map((v) => v.price))
+  const totalStock = variants.reduce((sum, v) => sum + v.stock, 0)
+
+  await tx.product.update({
+    where: { id: productId },
+    data: { price: lowestPrice, stock: totalStock },
   })
 }

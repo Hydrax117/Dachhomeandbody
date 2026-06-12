@@ -7,6 +7,7 @@ import { ProductGallery } from "./components/ProductGallery"
 import { FragranceProfile } from "./components/FragranceProfile"
 import { ReviewsList } from "./components/ReviewsList"
 import { AddToCartButton } from "./components/AddToCartButton"
+import { VariantSelector } from "./components/VariantSelector"
 import { ProductCard } from "@/app/shop/components/ProductCard"
 
 // ---------------------------------------------------------------------------
@@ -229,58 +230,76 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
               )}
 
-              {/* Price */}
-              <div className="flex items-baseline gap-3 mb-3">
-                <span
-                  className={`font-serif text-2xl lg:text-3xl font-light ${isOutOfStock ? "text-[#8C8C8C]" : "text-[#111111]"}`}
-                  aria-label={`Price: ₦${product.price.toLocaleString()}`}
-                >
-                  ₦{product.price.toLocaleString()}
-                </span>
-                {hasDiscount && (
-                  <>
-                    <span className="text-sm text-[#C4C4C4] line-through">
-                      ₦{product.compareAtPrice!.toLocaleString()}
+              {/* Price / Variant Selector / Add to cart */}
+              {product.variants && product.variants.length > 0 ? (
+                <VariantSelector
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    images: product.images,
+                    basePrice: product.price,
+                    baseCompareAtPrice: product.compareAtPrice ?? null,
+                    baseStock: product.stock,
+                  }}
+                  variants={product.variants}
+                />
+              ) : (
+                <>
+                  {/* Price */}
+                  <div className="flex items-baseline gap-3 mb-3">
+                    <span
+                      className={`font-serif text-2xl lg:text-3xl font-light ${isOutOfStock ? "text-[#8C8C8C]" : "text-[#111111]"}`}
+                      aria-label={`Price: ₦${product.price.toLocaleString()}`}
+                    >
+                      ₦{product.price.toLocaleString()}
                     </span>
-                    <span className="badge badge-gold text-[9px]">−{discountPercent}%</span>
-                  </>
-                )}
-              </div>
+                    {hasDiscount && (
+                      <>
+                        <span className="text-sm text-[#C4C4C4] line-through">
+                          ₦{product.compareAtPrice!.toLocaleString()}
+                        </span>
+                        <span className="badge badge-gold text-[9px]">−{discountPercent}%</span>
+                      </>
+                    )}
+                  </div>
 
-              {/* Stock status */}
-              <div className="mb-8">
-                {isOutOfStock ? (
-                  <p className="text-sm text-[#8C8C8C] flex items-center gap-2" role="status">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#8C8C8C] inline-block" aria-hidden="true" />
-                    Out of Stock
-                  </p>
-                ) : product.stock <= 5 ? (
-                  <p className="text-sm text-[#B8965C] flex items-center gap-2" role="status">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#B8965C] inline-block" aria-hidden="true" />
-                    Only {product.stock} left
-                  </p>
-                ) : (
-                  <p className="text-sm text-[#4A4A4A] flex items-center gap-2" role="status">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#27ae60] inline-block" aria-hidden="true" />
-                    In Stock
-                  </p>
-                )}
-              </div>
+                  {/* Stock status */}
+                  <div className="mb-8">
+                    {isOutOfStock ? (
+                      <p className="text-sm text-[#8C8C8C] flex items-center gap-2" role="status">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#8C8C8C] inline-block" aria-hidden="true" />
+                        Out of Stock
+                      </p>
+                    ) : product.stock <= 5 ? (
+                      <p className="text-sm text-[#B8965C] flex items-center gap-2" role="status">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B8965C] inline-block" aria-hidden="true" />
+                        Only {product.stock} left
+                      </p>
+                    ) : (
+                      <p className="text-sm text-[#4A4A4A] flex items-center gap-2" role="status">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#27ae60] inline-block" aria-hidden="true" />
+                        In Stock
+                      </p>
+                    )}
+                  </div>
 
-              {/* Divider */}
-              <div className="w-full h-px bg-[#EBEBEB] mb-8" aria-hidden="true" />
+                  {/* Divider */}
+                  <div className="w-full h-px bg-[#EBEBEB] mb-8" aria-hidden="true" />
 
-              {/* Add to cart */}
-              <AddToCartButton
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  price: product.price,
-                  images: product.images,
-                  stock: product.stock,
-                }}
-              />
+                  {/* Add to cart */}
+                  <AddToCartButton
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      slug: product.slug,
+                      price: product.price,
+                      images: product.images,
+                      stock: product.stock,
+                    }}
+                  />
+                </>
+              )}
 
               {/* Best enjoyed during */}
               {bestEnjoyedDuring.length > 0 && (

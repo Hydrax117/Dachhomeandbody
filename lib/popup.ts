@@ -43,19 +43,24 @@ export async function getPopupConfig() {
 
 /**
  * Get popup config for public display — only returns if enabled and within date range.
+ * Returns null gracefully if the database is unreachable (e.g. during build).
  */
 export async function getActivePopupConfig() {
-  const config = await prisma.popupConfig.findFirst({
-    orderBy: { createdAt: "asc" },
-  })
+  try {
+    const config = await prisma.popupConfig.findFirst({
+      orderBy: { createdAt: "asc" },
+    })
 
-  if (!config || !config.enabled) return null
+    if (!config || !config.enabled) return null
 
-  const now = new Date()
-  if (config.startDate && config.startDate > now) return null
-  if (config.endDate && config.endDate < now) return null
+    const now = new Date()
+    if (config.startDate && config.startDate > now) return null
+    if (config.endDate && config.endDate < now) return null
 
-  return config
+    return config
+  } catch {
+    return null
+  }
 }
 
 // ---------------------------------------------------------------------------

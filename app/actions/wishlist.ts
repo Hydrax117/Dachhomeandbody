@@ -120,11 +120,15 @@ export async function addToWishlist(
   if (!product) return { error: "Product not found" }
 
   // Upsert — silently succeed if already in wishlist
-  await prisma.wishlistItem.upsert({
-    where: { userId_productId: { userId: session.user.id, productId } },
-    create: { userId: session.user.id, productId },
-    update: {},
+  const existingItem = await prisma.wishlistItem.findFirst({
+    where: { userId: session.user.id, productId, variantId: null },
+    select: { id: true },
   })
+  if (!existingItem) {
+    await prisma.wishlistItem.create({
+      data: { userId: session.user.id, productId },
+    })
+  }
 
   revalidatePath("/account/wishlist")
   return {}
@@ -159,8 +163,8 @@ export async function toggleWishlist(
   const session = await auth()
   if (!session?.user?.id) return { inWishlist: false, error: "You must be logged in" }
 
-  const existing = await prisma.wishlistItem.findUnique({
-    where: { userId_productId: { userId: session.user.id, productId } },
+  const existing = await prisma.wishlistItem.findFirst({
+    where: { userId: session.user.id, productId, variantId: null },
     select: { id: true },
   })
 

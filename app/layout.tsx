@@ -10,6 +10,9 @@ import Providers from "@/app/components/layout/Providers";
 import ConditionalNavbar from "@/app/components/layout/ConditionalNavbar";
 import PromotionalPopupWrapper from "@/app/components/PromotionalPopupWrapper";
 
+// Opt out of static prerendering — all pages are dynamic (require DB/auth at request time)
+export const dynamic = "force-dynamic"
+
 // ── Serif: Playfair Display (variable) ──
 const playfair = Playfair_Display({
   variable: "--font-playfair",

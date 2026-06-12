@@ -1,4 +1,4 @@
-import { PrismaClient, FragranceType, Longevity, Strength, Gender } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -6,7 +6,8 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding database...')
 
-  // Create admin user
+  // ── Admin user ─────────────────────────────────────────────────────────
+
   const hashedPassword = await bcrypt.hash('admin123', 10)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@dachhomeandbody.com' },
@@ -19,143 +20,69 @@ async function main() {
       emailVerified: new Date(),
     },
   })
-  console.log('✅ Created admin user:', admin.email)
+  console.log('✅ Admin user:', admin.email)
 
-  // Create test customer
-  const customerPassword = await bcrypt.hash('customer123', 10)
-  const customer = await prisma.user.upsert({
-    where: { email: 'customer@example.com' },
-    update: {},
-    create: {
-      email: 'customer@example.com',
-      name: 'Test Customer',
-      password: customerPassword,
-      role: 'CUSTOMER',
-      emailVerified: new Date(),
-    },
-  })
-  console.log('✅ Created test customer:', customer.email)
+  // ── Categories ─────────────────────────────────────────────────────────
 
-  // Create categories
   const categories = [
     {
-      name: 'Perfumes',
-      slug: 'perfumes',
-      description: 'Luxury perfumes and eau de parfums',
+      name: 'Home Fragrance',
+      slug: 'home-fragrance',
+      description: 'Scented candles, reed diffusers, room sprays, fragrance oils and home scenting accessories',
     },
     {
-      name: 'Body Care',
-      slug: 'body-care',
-      description: 'Premium body lotions, oils, and care products',
+      name: 'Body Oil',
+      slug: 'body-oil',
+      description: 'Nourishing and moisturising body oils for all skin types',
     },
     {
-      name: 'Colognes',
-      slug: 'colognes',
-      description: 'Fresh and sophisticated colognes',
+      name: 'Body Wash',
+      slug: 'body-wash',
+      description: 'Luxury body washes and liquid soaps including aromatherapy and black soap formulas',
+    },
+    {
+      name: 'Massage Oil',
+      slug: 'massage-oil',
+      description: 'Therapeutic massage oils for relaxation and revitalization',
+    },
+    {
+      name: 'Hand Wash & Lotion',
+      slug: 'hand-wash-lotion',
+      description: 'Gentle hand washes and moisturising hand lotions',
+    },
+    {
+      name: 'Body Butter',
+      slug: 'body-butter',
+      description: 'Rich, deeply moisturising body butters in a variety of scents',
+    },
+    {
+      name: 'Body Scrub',
+      slug: 'body-scrub',
+      description: 'Exfoliating sugar scrubs and skin treatments including Dead Sea mud mask',
     },
     {
       name: 'Gift Sets',
       slug: 'gift-sets',
-      description: 'Curated fragrance gift collections',
+      description: 'Curated gift boxes and sets — perfect for every occasion',
+    },
+    {
+      name: 'Accessories',
+      slug: 'accessories',
+      description: 'Bathrobes, beard oils and other lifestyle accessories',
     },
   ]
 
-  for (const category of categories) {
+  for (const cat of categories) {
     await prisma.category.upsert({
-      where: { slug: category.slug },
-      update: {},
-      create: category,
+      where: { slug: cat.slug },
+      update: { name: cat.name, description: cat.description },
+      create: cat,
     })
   }
-  console.log('✅ Created categories')
+  console.log('✅ Created 9 categories')
 
-  // Create sample products
-  const perfumeCategory = await prisma.category.findUnique({
-    where: { slug: 'perfumes' },
-  })
+  // ── Welcome coupon ─────────────────────────────────────────────────────
 
-  if (perfumeCategory) {
-    const products = [
-      {
-        name: 'Midnight Oud',
-        slug: 'midnight-oud',
-        description:
-          'A sophisticated blend of oud wood, amber, and vanilla. Deep, mysterious, and unforgettable.',
-        price: 45000,
-        compareAtPrice: 55000,
-        images: [
-          'https://images.unsplash.com/photo-1541643600914-78b084683601?w=800',
-        ],
-        categoryId: perfumeCategory.id,
-        stock: 50,
-        sku: 'PERF-MO-001',
-        featured: true,
-        fragranceType: FragranceType.EAU_DE_PARFUM,
-        topNotes: ['Bergamot', 'Saffron', 'Pink Pepper'],
-        heartNotes: ['Oud Wood', 'Rose', 'Jasmine'],
-        baseNotes: ['Amber', 'Vanilla', 'Musk'],
-        longevity: Longevity.VERY_LONG,
-        strength: Strength.STRONG,
-        moodTags: ['Mysterious', 'Sophisticated', 'Evening'],
-        gender: Gender.UNISEX,
-      },
-      {
-        name: 'Citrus Dawn',
-        slug: 'citrus-dawn',
-        description:
-          'A fresh and invigorating blend of citrus notes. Perfect for daytime wear.',
-        price: 35000,
-        images: [
-          'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800',
-        ],
-        categoryId: perfumeCategory.id,
-        stock: 75,
-        sku: 'PERF-CD-002',
-        featured: true,
-        fragranceType: FragranceType.EAU_DE_TOILETTE,
-        topNotes: ['Lemon', 'Orange', 'Grapefruit'],
-        heartNotes: ['Neroli', 'Lavender', 'Green Tea'],
-        baseNotes: ['Cedarwood', 'White Musk'],
-        longevity: Longevity.MODERATE,
-        strength: Strength.LIGHT,
-        moodTags: ['Fresh', 'Energizing', 'Daytime'],
-        gender: Gender.UNISEX,
-      },
-      {
-        name: 'Velvet Rose',
-        slug: 'velvet-rose',
-        description:
-          'An elegant rose fragrance with powdery undertones. Timeless and romantic.',
-        price: 42000,
-        images: [
-          'https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=800',
-        ],
-        categoryId: perfumeCategory.id,
-        stock: 60,
-        sku: 'PERF-VR-003',
-        featured: false,
-        fragranceType: FragranceType.EAU_DE_PARFUM,
-        topNotes: ['Peony', 'Blackcurrant'],
-        heartNotes: ['Rose', 'Violet', 'Iris'],
-        baseNotes: ['Sandalwood', 'Vanilla', 'Musk'],
-        longevity: Longevity.LONG,
-        strength: Strength.MODERATE,
-        moodTags: ['Romantic', 'Elegant', 'Feminine'],
-        gender: Gender.FEMALE,
-      },
-    ]
-
-    for (const product of products) {
-      await prisma.product.upsert({
-        where: { slug: product.slug },
-        update: {},
-        create: product,
-      })
-    }
-    console.log('✅ Created sample products')
-  }
-
-  // Create a sample coupon
   await prisma.coupon.upsert({
     where: { code: 'WELCOME10' },
     update: {},
@@ -166,13 +93,13 @@ async function main() {
       minOrderValue: 20000,
       maxUsageCount: 100,
       usageCount: 0,
-      expiresAt: new Date('2026-12-31'),
+      expiresAt: new Date('2027-12-31'),
       active: true,
     },
   })
-  console.log('✅ Created sample coupon: WELCOME10')
+  console.log('✅ Created coupon: WELCOME10 (10% off orders over ₦20,000)')
 
-  console.log('🎉 Seeding completed!')
+  console.log('🎉 Seeding complete!')
 }
 
 main()

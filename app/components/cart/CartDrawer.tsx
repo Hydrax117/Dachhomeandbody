@@ -157,7 +157,7 @@ export function CartDrawer() {
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-2">
               <ul aria-label="Cart items" className="divide-y divide-transparent">
                 {cart.items.map((item) => (
-                  <CartItem key={item.productId} item={item} />
+                  <CartItem key={`${item.productId}-${item.variantId ?? "base"}`} item={item} />
                 ))}
               </ul>
             </div>

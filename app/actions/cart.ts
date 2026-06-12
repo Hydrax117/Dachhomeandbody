@@ -8,6 +8,7 @@ import type { CartItem } from "@/app/components/cart/CartContext"
 
 export interface PersistedCartItem {
   productId: string
+  variantId: string | null
   quantity: number
   product: {
     id: string
@@ -16,6 +17,8 @@ export interface PersistedCartItem {
     price: number
     images: string[]
     stock: number
+    variantId: string | null
+    variantName: string | null
   }
 }
 
@@ -39,66 +42,83 @@ export async function loadCart(): Promise<PersistedCartItem[]> {
           deleted: true,
         },
       },
+      variant: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          stock: true,
+        },
+      },
     },
   })
 
-  // Filter out deleted products
-  return (items as Array<{
-    productId: string
-    quantity: number
-    product: {
-      id: string
-      name: string
-      slug: string
-      price: number
-      images: string[]
-      stock: number
-      deleted: boolean
-    }
-  }>)
+  return items
     .filter((item) => !item.product.deleted)
-    .map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      product: {
-        id: item.product.id,
-        name: item.product.name,
-        slug: item.product.slug,
-        price: item.product.price,
-        images: item.product.images,
-        stock: item.product.stock,
-      },
-    }))
+    .map((item) => {
+      // If variant exists, use variant price and stock
+      const effectivePrice = item.variant ? item.variant.price : item.product.price
+      const effectiveStock = item.variant ? item.variant.stock : item.product.stock
+
+      return {
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        product: {
+          id: item.product.id,
+          name: item.product.name,
+          slug: item.product.slug,
+          price: effectivePrice,
+          images: item.product.images,
+          stock: effectiveStock,
+          variantId: item.variantId,
+          variantName: item.variant?.name ?? null,
+        },
+      }
+    })
 }
 
 // ── Save a single cart item (upsert) ──────────────────────────────────────
 
-export async function saveCartItem(productId: string, quantity: number): Promise<void> {
+export async function saveCartItem(
+  productId: string,
+  variantId: string | null,
+  quantity: number
+): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) return
 
   if (quantity <= 0) {
     await prisma.cartItem.deleteMany({
-      where: { userId: session.user.id, productId },
+      where: { userId: session.user.id, productId, variantId },
     })
     return
   }
 
   await prisma.cartItem.upsert({
-    where: { userId_productId: { userId: session.user.id, productId } },
-    create: { userId: session.user.id, productId, quantity },
+    where: {
+      userId_productId_variantId: {
+        userId: session.user.id,
+        productId,
+        variantId: variantId as string,
+      },
+    },
+    create: { userId: session.user.id, productId, variantId, quantity },
     update: { quantity },
   })
 }
 
 // ── Remove a single cart item ──────────────────────────────────────────────
 
-export async function removeCartItem(productId: string): Promise<void> {
+export async function removeCartItem(
+  productId: string,
+  variantId: string | null
+): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) return
 
   await prisma.cartItem.deleteMany({
-    where: { userId: session.user.id, productId },
+    where: { userId: session.user.id, productId, variantId },
   })
 }
 
@@ -114,44 +134,58 @@ export async function clearPersistedCart(): Promise<void> {
 }
 
 // ── Merge guest cart into user cart on login ───────────────────────────────
-// Takes guest items and merges them with the user's existing DB cart.
-// Guest quantities are added to existing quantities, capped at stock.
 
-export async function mergeGuestCart(guestItems: { productId: string; quantity: number }[]): Promise<PersistedCartItem[]> {
+export async function mergeGuestCart(
+  guestItems: { productId: string; variantId?: string | null; quantity: number }[]
+): Promise<PersistedCartItem[]> {
   const session = await auth()
   if (!session?.user?.id || guestItems.length === 0) return loadCart()
 
   const userId = session.user.id
 
-  // Fetch current DB cart and product stock in parallel
-  const [dbItems, products] = await Promise.all([
+  const [dbItems, products, variants] = await Promise.all([
     prisma.cartItem.findMany({ where: { userId } }),
     prisma.product.findMany({
-      where: {
-        id: { in: guestItems.map((i) => i.productId) },
-        deleted: false,
-      },
+      where: { id: { in: guestItems.map((i) => i.productId) }, deleted: false },
       select: { id: true, stock: true },
     }),
+    guestItems.some((i) => i.variantId)
+      ? prisma.productVariant.findMany({
+          where: { id: { in: guestItems.map((i) => i.variantId).filter(Boolean) as string[] } },
+          select: { id: true, stock: true },
+        })
+      : Promise.resolve([]),
   ])
 
-  const stockMap = new Map((products as Array<{ id: string; stock: number }>).map((p) => [p.id, p.stock]))
-  const dbMap = new Map((dbItems as Array<{ productId: string; quantity: number }>).map((i) => [i.productId, i.quantity]))
+  const productStockMap = new Map(products.map((p) => [p.id, p.stock]))
+  const variantStockMap = new Map((variants as Array<{ id: string; stock: number }>).map((v) => [v.id, v.stock]))
+  const dbMap = new Map(
+    (dbItems as Array<{ productId: string; variantId: string | null; quantity: number }>).map(
+      (i) => [`${i.productId}:${i.variantId ?? ""}`, i.quantity]
+    )
+  )
 
-  // Upsert each guest item, merging quantities
   await Promise.all(
     guestItems.map(async (guestItem) => {
-      const stock = stockMap.get(guestItem.productId)
-      if (stock === undefined) return // product not found or deleted
+      const stock = guestItem.variantId
+        ? variantStockMap.get(guestItem.variantId)
+        : productStockMap.get(guestItem.productId)
+      if (stock === undefined) return
 
-      const existing = dbMap.get(guestItem.productId) ?? 0
+      const key = `${guestItem.productId}:${guestItem.variantId ?? ""}`
+      const existing = dbMap.get(key) ?? 0
       const merged = Math.min(existing + guestItem.quantity, stock)
-
       if (merged <= 0) return
 
       await prisma.cartItem.upsert({
-        where: { userId_productId: { userId, productId: guestItem.productId } },
-        create: { userId, productId: guestItem.productId, quantity: merged },
+        where: {
+          userId_productId_variantId: {
+            userId,
+            productId: guestItem.productId,
+            variantId: (guestItem.variantId ?? null) as string,
+          },
+        },
+        create: { userId, productId: guestItem.productId, variantId: guestItem.variantId ?? null, quantity: merged },
         update: { quantity: merged },
       })
     })
