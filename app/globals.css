@@ -838,9 +838,11 @@ img, video {
 }
 
 /* ── Grain overlay — cinematic film texture ── */
+/* inset: -5% absorbs the max 4% translate in the grain keyframes,
+   preventing edge tears on all sides regardless of viewport size. */
 .grain-overlay {
   position: absolute;
-  inset: 0;
+  inset: -5%;
   pointer-events: none;
   z-index: 1;
   opacity: 0.035;
