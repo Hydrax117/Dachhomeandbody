@@ -29,8 +29,11 @@ export async function createPaymentRequestAction(
 ): Promise<CreatePaymentRequestState> {
   const session = await auth()
 
+  // For authenticated users, always use the session email as the canonical requester email
+  const requesterEmail = session?.user?.email ?? input.requesterEmail
+
   // Basic validation
-  if (!input.requesterEmail) {
+  if (!requesterEmail) {
     return { errors: { _form: ["Email is required to create a payment request."] } }
   }
   if (!input.items?.length) {
@@ -46,6 +49,7 @@ export async function createPaymentRequestAction(
   try {
     const record = await createPaymentRequest({
       ...input,
+      requesterEmail,   // use validated email
       userId: session?.user?.id ?? null,
     })
 
@@ -53,7 +57,7 @@ export async function createPaymentRequestAction(
 
     // Send link email (non-blocking)
     sendPaymentRequestLinkEmail(
-      input.requesterEmail,
+      requesterEmail,
       record.token,
       input.total,
       input.items.length,

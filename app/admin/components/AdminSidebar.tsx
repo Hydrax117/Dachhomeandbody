@@ -177,6 +177,14 @@ function ShippingIcon() {
   )
 }
 
+function ChatIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  )
+}
+
 function PopupIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -225,6 +233,7 @@ const navGroups = [
     label: "Marketing",
     items: [
       { label: "Popup", href: "/admin/popup", icon: <PopupIcon /> },
+      { label: "Chat", href: "/admin/chat", icon: <ChatIcon /> },
     ],
   },
 ]

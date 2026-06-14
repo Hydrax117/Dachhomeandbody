@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server"
 import { GoogleGenAI } from "@google/genai"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+import { createHash } from "crypto"
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -12,12 +14,63 @@ interface ChatMessage {
 interface RequestBody {
   message: string
   history: ChatMessage[]
+  sessionId?: string
+}
+
+// ── Rate limiter (in-memory, per IP) ──────────────────────────────────────
+// 20 requests per 60 seconds per IP
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT = 20
+const RATE_WINDOW_MS = 60_000
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
+    return true // allowed
+  }
+
+  if (entry.count >= RATE_LIMIT) return false // blocked
+
+  entry.count++
+  return true // allowed
+}
+
+// Clean up old entries every 5 minutes to prevent memory leak
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, val] of rateLimitMap.entries()) {
+    if (now > val.resetAt) rateLimitMap.delete(key)
+  }
+}, 5 * 60_000)
+
+// ── IP extraction ──────────────────────────────────────────────────────────
+
+function getIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown"
+  )
+}
+
+function hashIp(ip: string): string {
+  return createHash("sha256").update(ip + "dach_salt").digest("hex").slice(0, 16)
 }
 
 // ── Product context fetcher ────────────────────────────────────────────────
 
-async function getProductContext(query: string): Promise<string> {
-  // Fetch products matching the query, plus a general sample
+type ProductWithVariants = Awaited<ReturnType<typeof prisma.product.findMany<{
+  include: { category: { select: { name: true } }; variants: true }
+}>>>[number]
+
+async function getProductContext(query: string): Promise<{
+  text: string
+  cards: ProductWithVariants[]
+}> {
   const [matchedProducts, featuredProducts] = await Promise.all([
     prisma.product.findMany({
       where: {
@@ -56,17 +109,15 @@ async function getProductContext(query: string): Promise<string> {
     }),
   ])
 
-  // Merge and deduplicate
   const seen = new Set<string>()
-  const products = [...matchedProducts, ...featuredProducts].filter((p) => {
+  let products = [...matchedProducts, ...featuredProducts].filter((p) => {
     if (seen.has(p.id)) return false
     seen.add(p.id)
     return true
   })
 
   if (products.length === 0) {
-    // Fall back to a general sample if nothing found
-    const sample = await prisma.product.findMany({
+    products = await prisma.product.findMany({
       where: { deleted: false, stock: { gt: 0 } },
       include: {
         category: { select: { name: true } },
@@ -79,17 +130,12 @@ async function getProductContext(query: string): Promise<string> {
       take: 10,
       orderBy: { createdAt: "desc" },
     })
-    return formatProducts(sample)
   }
 
-  return formatProducts(products)
+  return { text: formatProducts(products), cards: products }
 }
 
-function formatProducts(
-  products: Awaited<ReturnType<typeof prisma.product.findMany<{
-    include: { category: { select: { name: true } }; variants: true }
-  }>>>
-): string {
+function formatProducts(products: ProductWithVariants[]): string {
   if (products.length === 0) return "No products currently available."
 
   return products
@@ -108,7 +154,9 @@ function formatProducts(
         p.moodTags.length ? `Mood: ${p.moodTags.join(", ")}` : null,
         p.gender ? `Gender: ${p.gender}` : null,
         p.longevity ? `Longevity: ${p.longevity.replace("_", " ")}` : null,
-        p.averageRating ? `Rating: ${p.averageRating.toFixed(1)}/5 (${p.reviewCount} reviews)` : null,
+        p.averageRating
+          ? `Rating: ${p.averageRating.toFixed(1)}/5 (${p.reviewCount} reviews)`
+          : null,
       ]
         .filter(Boolean)
         .join(" | ")
@@ -126,9 +174,33 @@ function formatProducts(
     .join("\n\n---\n\n")
 }
 
+// ── Order lookup for authenticated users ───────────────────────────────────
+
+async function getOrderContext(userId: string): Promise<string> {
+  const orders = await prisma.order.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    include: {
+      items: {
+        include: { product: { select: { name: true } } },
+      },
+    },
+  })
+
+  if (orders.length === 0) return ""
+
+  const lines = orders.map((o) => {
+    const items = o.items.map((i) => `${i.product.name} x${i.quantity}`).join(", ")
+    return `Order #${o.orderNumber} — Status: ${o.status} | Payment: ${o.paymentStatus} | Total: ₦${o.total.toLocaleString("en-NG")} | Items: ${items} | Date: ${o.createdAt.toLocaleDateString("en-NG")}`
+  })
+
+  return `\n\nThis customer's recent orders:\n${lines.join("\n")}`
+}
+
 // ── System prompt ──────────────────────────────────────────────────────────
 
-function buildSystemPrompt(productContext: string): string {
+function buildSystemPrompt(productContext: string, orderContext: string): string {
   return `You are Dach, the personal shopping assistant for DACH Home & Body — a luxury home fragrance, natural skincare, and gift services brand based in Abuja, Nigeria.
 
 Your personality: warm, knowledgeable, elegant, and personal — like a trusted friend who knows every product intimately. You speak with confidence and grace, matching the brand's minimalist luxury aesthetic. Keep responses concise and helpful, typically 2–4 sentences unless more detail is genuinely needed.
@@ -148,22 +220,33 @@ What you can help with:
 - Sharing pricing and availability
 - Directing customers to the right pages (/shop, /gift-box, /account, etc.)
 - Answering FAQs about delivery, returns, and payments
+${orderContext ? "- Answering order status questions using the customer's order history below" : ""}
 
 Current product catalogue (use this to give accurate, real recommendations):
 ${productContext}
+${orderContext}
 
 Important rules:
 - Only recommend products that exist in the catalogue above
 - Always quote prices in ₦ (Naira)
 - If a customer asks about something not in the catalogue, say so honestly and suggest alternatives
 - Never make up products, prices, or policies you don't know
-- For order-specific questions (tracking, etc.), direct them to /account/orders or to contact 07064313141
+- For order tracking links, direct them to /account/orders
 - Keep the tone warm and personal — never robotic or salesy`
 }
 
 // ── Route handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // ── Rate limiting ────────────────────────────────────────────────────────
+  const ip = getIp(req)
+  if (!checkRateLimit(ip)) {
+    return Response.json(
+      { error: "Too many messages. Please wait a moment before trying again." },
+      { status: 429 }
+    )
+  }
+
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     return Response.json(
@@ -179,7 +262,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid request body" }, { status: 400 })
   }
 
-  const { message, history = [] } = body
+  const { message, history = [], sessionId } = body
 
   if (!message || typeof message !== "string" || message.trim().length === 0) {
     return Response.json({ error: "Message is required" }, { status: 400 })
@@ -190,13 +273,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Fetch relevant product context based on the user's message
-    const productContext = await getProductContext(message.trim())
+    // ── Auth check for order lookup ────────────────────────────────────────
+    const session = await auth()
+    const userId = session?.user?.id as string | undefined
+
+    // ── Fetch product context + order context in parallel ──────────────────
+    const [{ text: productContextText, cards: productCards }, orderContext] = await Promise.all([
+      getProductContext(message.trim()),
+      userId ? getOrderContext(userId) : Promise.resolve(""),
+    ])
 
     const ai = new GoogleGenAI({ apiKey })
 
-    // Gemini requires history to start with a 'user' turn.
-    // Drop any leading 'model' turns (e.g. the bot greeting) before passing history.
     const trimmedHistory = history.slice(-10)
     const firstUserIdx = trimmedHistory.findIndex((t) => t.role === "user")
     const safeHistory = firstUserIdx === -1 ? [] : trimmedHistory.slice(firstUserIdx)
@@ -204,7 +292,7 @@ export async function POST(req: NextRequest) {
     const chat = ai.chats.create({
       model: "gemini-2.5-flash",
       config: {
-        systemInstruction: buildSystemPrompt(productContext),
+        systemInstruction: buildSystemPrompt(productContextText, orderContext),
         maxOutputTokens: 512,
         temperature: 0.7,
       },
@@ -214,9 +302,39 @@ export async function POST(req: NextRequest) {
     const response = await chat.sendMessage({
       message: [{ text: message.trim() }],
     })
-    const text = response.text
+    const reply = response.text ?? ""
 
-    return Response.json({ reply: text })
+    // ── Determine which product cards to return ────────────────────────────
+    // Return cards only for the products mentioned/recommended in the reply
+    const mentionedCards = productCards
+      .filter((p) =>
+        reply.toLowerCase().includes(p.name.toLowerCase()) ||
+        reply.includes(`/shop/${p.slug}`)
+      )
+      .slice(0, 4)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.variants.length > 0 ? p.variants[0].price : p.price,
+        image: p.images[0] ?? "",
+        category: p.category.name,
+      }))
+
+    // ── Log to DB (non-blocking — don't await) ─────────────────────────────
+    prisma.chatLog
+      .create({
+        data: {
+          sessionId: sessionId ?? "unknown",
+          userId: userId ?? null,
+          userMessage: message.trim(),
+          botReply: reply,
+          ipHash: hashIp(ip),
+        },
+      })
+      .catch((err) => console.error("[Chat] Failed to log conversation:", err))
+
+    return Response.json({ reply, products: mentionedCards })
   } catch (error) {
     console.error("[Chat API] Error:", error)
     return Response.json(

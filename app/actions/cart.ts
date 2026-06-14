@@ -87,25 +87,33 @@ export async function saveCartItem(
 ): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) return
+  const userId = session.user.id
 
   if (quantity <= 0) {
     await prisma.cartItem.deleteMany({
-      where: { userId: session.user.id, productId, variantId },
+      where: { userId, productId, variantId },
     })
     return
   }
 
-  await prisma.cartItem.upsert({
-    where: {
-      userId_productId_variantId: {
-        userId: session.user.id,
-        productId,
-        variantId: variantId as string,
-      },
-    },
-    create: { userId: session.user.id, productId, variantId, quantity },
-    update: { quantity },
-  })
+  // Prisma's compound unique key does not accept null in the `where` clause.
+  // When variantId is null we must use findFirst + update/create manually.
+  if (variantId) {
+    await prisma.cartItem.upsert({
+      where: { userId_productId_variantId: { userId, productId, variantId } },
+      create: { userId, productId, variantId, quantity },
+      update: { quantity },
+    })
+  } else {
+    const existing = await prisma.cartItem.findFirst({
+      where: { userId, productId, variantId: null },
+    })
+    if (existing) {
+      await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity } })
+    } else {
+      await prisma.cartItem.create({ data: { userId, productId, variantId: null, quantity } })
+    }
+  }
 }
 
 // ── Remove a single cart item ──────────────────────────────────────────────
@@ -177,17 +185,24 @@ export async function mergeGuestCart(
       const merged = Math.min(existing + guestItem.quantity, stock)
       if (merged <= 0) return
 
-      await prisma.cartItem.upsert({
-        where: {
-          userId_productId_variantId: {
-            userId,
-            productId: guestItem.productId,
-            variantId: (guestItem.variantId ?? null) as string,
-          },
-        },
-        create: { userId, productId: guestItem.productId, variantId: guestItem.variantId ?? null, quantity: merged },
-        update: { quantity: merged },
-      })
+      const vid = guestItem.variantId ?? null
+
+      if (vid) {
+        await prisma.cartItem.upsert({
+          where: { userId_productId_variantId: { userId, productId: guestItem.productId, variantId: vid } },
+          create: { userId, productId: guestItem.productId, variantId: vid, quantity: merged },
+          update: { quantity: merged },
+        })
+      } else {
+        const existingRow = await prisma.cartItem.findFirst({
+          where: { userId, productId: guestItem.productId, variantId: null },
+        })
+        if (existingRow) {
+          await prisma.cartItem.update({ where: { id: existingRow.id }, data: { quantity: merged } })
+        } else {
+          await prisma.cartItem.create({ data: { userId, productId: guestItem.productId, variantId: null, quantity: merged } })
+        }
+      }
     })
   )
 

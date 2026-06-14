@@ -590,6 +590,22 @@ model PaymentRequest {
   @@index([createdAt])
 }
 
+// ── Chat Analytics ────────────────────────────────────────────────────────
+
+model ChatLog {
+  id          String   @id @default(cuid())
+  sessionId   String   // anonymous session identifier (from localStorage)
+  userId      String?  // set if the user is authenticated
+  userMessage String   @db.Text
+  botReply    String   @db.Text
+  ipHash      String?  // hashed IP for rate-limit auditing (never plain IP)
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
 // ── Promotional Popup ──────────────────────────────────────────────────────
 
 model PopupConfig {

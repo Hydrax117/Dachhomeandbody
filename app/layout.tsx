@@ -10,6 +10,7 @@ import Providers from "@/app/components/layout/Providers";
 import ConditionalNavbar from "@/app/components/layout/ConditionalNavbar";
 import PromotionalPopupWrapper from "@/app/components/PromotionalPopupWrapper";
 import ChatWidget from "@/app/components/chat/ChatWidget";
+import { ChatProvider } from "@/app/components/chat/ChatContext";
 
 // Opt out of static prerendering — all pages are dynamic (require DB/auth at request time)
 export const dynamic = "force-dynamic"
@@ -82,10 +83,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#F8F5F2] text-[#111111]">
         <Providers>
-          <ConditionalNavbar />
-          {children}
-          <PromotionalPopupWrapper />
-          <ChatWidget />
+          <ChatProvider>
+            <ConditionalNavbar />
+            {children}
+            <PromotionalPopupWrapper />
+            <ChatWidget />
+          </ChatProvider>
         </Providers>
       </body>
     </html>

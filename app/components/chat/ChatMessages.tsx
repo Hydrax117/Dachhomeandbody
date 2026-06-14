@@ -1,24 +1,29 @@
 "use client"
 
+import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
-import type { Message } from "./ChatWidget"
+import type { ChatMessage, ProductCard } from "./ChatContext"
 
 interface Props {
-  messages: Message[]
+  messages: ChatMessage[]
   isLoading: boolean
 }
 
-// Very simple markdown-like renderer: bolds **text** and turns /links into anchors
+// ── Inline text renderer ───────────────────────────────────────────────────
+// Handles **bold**, /path links
+
 function renderText(text: string) {
-  const lines = text.split("\n")
-  return lines.map((line, i) => {
-    // Replace **bold** with <strong>
+  return text.split("\n").map((line, i, arr) => {
     const parts = line.split(/(\*\*[^*]+\*\*)/)
     const rendered = parts.map((part, j) => {
       if (part.startsWith("**") && part.endsWith("**")) {
-        return <strong key={j} className="font-semibold text-[#111111]">{part.slice(2, -2)}</strong>
+        return (
+          <strong key={j} className="font-semibold text-[#111111]">
+            {part.slice(2, -2)}
+          </strong>
+        )
       }
-      // Turn /shop/... links into anchor tags
       return (
         <span key={j}>
           {part.split(/(\/[a-z][a-z0-9/-]+)/).map((chunk, k) => {
@@ -38,17 +43,78 @@ function renderText(text: string) {
         </span>
       )
     })
-
     return (
       <span key={i}>
         {rendered}
-        {i < lines.length - 1 && <br />}
+        {i < arr.length - 1 && <br />}
       </span>
     )
   })
 }
 
-function UserBubble({ message }: { message: Message }) {
+// ── Product card ───────────────────────────────────────────────────────────
+
+function ChatProductCard({ product }: { product: ProductCard }) {
+  const formatted = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+  }).format(product.price)
+
+  return (
+    <Link
+      href={`/shop/${product.slug}`}
+      className="flex items-center gap-3 p-2.5 bg-[#F8F5F2] border border-[#EBEBEB] hover:border-[#B8965C]/50 hover:bg-[#B8965C]/5 transition-all duration-200 group"
+    >
+      {/* Image */}
+      <div className="w-14 h-14 bg-[#EBEBEB] shrink-0 overflow-hidden relative">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="56px"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-[#C4C4C4] text-lg font-serif">D</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-medium text-[#111111] truncate leading-snug">
+          {product.name}
+        </p>
+        <p className="text-[10px] text-[#8C8C8C] tracking-wider uppercase mt-0.5">
+          {product.category}
+        </p>
+        <p className="text-[12px] text-[#B8965C] font-medium mt-1">{formatted}</p>
+      </div>
+
+      {/* Arrow */}
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#B8965C"
+        strokeWidth="2"
+        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-hidden="true"
+      >
+        <line x1="5" y1="12" x2="19" y2="12" />
+        <polyline points="12 5 19 12 12 19" />
+      </svg>
+    </Link>
+  )
+}
+
+// ── Bubbles ────────────────────────────────────────────────────────────────
+
+function UserBubble({ message }: { message: ChatMessage }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 8 }}
@@ -63,7 +129,7 @@ function UserBubble({ message }: { message: Message }) {
   )
 }
 
-function AssistantBubble({ message }: { message: Message }) {
+function AssistantBubble({ message }: { message: ChatMessage }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -8 }}
@@ -75,8 +141,21 @@ function AssistantBubble({ message }: { message: Message }) {
       <div className="w-6 h-6 rounded-full bg-[#B8965C]/20 border border-[#B8965C]/40 flex items-center justify-center shrink-0 mt-0.5">
         <span className="text-[#B8965C] text-[9px] font-serif">D</span>
       </div>
-      <div className="max-w-[82%] px-4 py-2.5 bg-white border border-[#EBEBEB] text-[#111111] text-[13px] leading-relaxed font-sans shadow-[0_1px_4px_0_rgb(17_17_17/0.06)]">
-        {renderText(message.text)}
+
+      <div className="max-w-[82%] flex flex-col gap-2">
+        {/* Text bubble */}
+        <div className="px-4 py-2.5 bg-white border border-[#EBEBEB] text-[#111111] text-[13px] leading-relaxed font-sans shadow-[0_1px_4px_0_rgb(17_17_17/0.06)]">
+          {renderText(message.text)}
+        </div>
+
+        {/* Product cards */}
+        {message.products && message.products.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            {message.products.map((product) => (
+              <ChatProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
     </motion.div>
   )
@@ -114,6 +193,8 @@ function TypingIndicator() {
     </motion.div>
   )
 }
+
+// ── Main export ────────────────────────────────────────────────────────────
 
 export default function ChatMessages({ messages, isLoading }: Props) {
   if (messages.length === 0 && !isLoading) return null
