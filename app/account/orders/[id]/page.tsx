@@ -307,6 +307,11 @@ export default async function OrderDetailPage({ params }: PageProps) {
                     >
                       {item.product.name}
                     </Link>
+                    {item.variantName && (
+                      <p className="text-[11px] text-[#8C8C8C] mt-0.5">
+                        {item.variantName}
+                      </p>
+                    )}
                     {item.product.sku && (
                       <p className="text-[11px] text-[#C4C4C4] mt-0.5">
                         SKU: {item.product.sku}
