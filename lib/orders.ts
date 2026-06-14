@@ -204,11 +204,19 @@ export async function createOrderFromPayment({
     variantId: item.variantId && validVariantIdSet.has(item.variantId) ? item.variantId : null,
   }))
 
+  // Safely resolve userId — validate it exists in User table
+  const rawUserId = (rawMeta?.userId as string | null) && (rawMeta?.userId as string) !== "null"
+    ? (rawMeta?.userId as string)
+    : null
+  const userId = rawUserId
+    ? (await prisma.user.findUnique({ where: { id: rawUserId }, select: { id: true } }))?.id ?? null
+    : null
+
   // Safely resolve couponId — only use it if it's a non-empty string and
   // actually exists in the database (prevents FK constraint failures from
   // Paystack stringifying null values or stale IDs)
   const rawCouponId = (rawMeta?.couponId as string | null) || null
-  const couponId = rawCouponId
+  const couponId = rawCouponId && rawCouponId !== "null"
     ? (await prisma.coupon.findUnique({ where: { id: rawCouponId }, select: { id: true } }))?.id ?? null
     : null
   const couponCode = (rawMeta?.couponCode as string | null) || null
@@ -226,7 +234,7 @@ export async function createOrderFromPayment({
     const newOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
-        userId: (rawMeta?.userId as string | null) ?? null,
+        userId: userId,
         guestEmail: (rawMeta?.guestEmail as string | null) || customerEmail,
         guestName: (rawMeta?.guestName as string | null) ?? null,
         subtotal,
@@ -294,8 +302,8 @@ export async function createOrderFromPayment({
       }
     }
     // Clear persisted cart for authenticated users
-    if (rawMeta?.userId) {
-      await tx.cartItem.deleteMany({ where: { userId: rawMeta.userId as string } })
+    if (userId) {
+      await tx.cartItem.deleteMany({ where: { userId } })
     }
 
     return newOrder
@@ -308,7 +316,6 @@ export async function createOrderFromPayment({
       include: { items: { include: { product: { select: { name: true } } } } },
     })
 
-    const userId = rawMeta?.userId as string | null | undefined
     const userRecord = userId
       ? await prisma.user.findUnique({
           where: { id: userId },
