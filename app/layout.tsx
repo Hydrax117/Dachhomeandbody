@@ -9,6 +9,7 @@ import "./globals.css";
 import Providers from "@/app/components/layout/Providers";
 import ConditionalNavbar from "@/app/components/layout/ConditionalNavbar";
 import PromotionalPopupWrapper from "@/app/components/PromotionalPopupWrapper";
+import ChatWidget from "@/app/components/chat/ChatWidget";
 
 // Opt out of static prerendering — all pages are dynamic (require DB/auth at request time)
 export const dynamic = "force-dynamic"
@@ -84,6 +85,7 @@ export default function RootLayout({
           <ConditionalNavbar />
           {children}
           <PromotionalPopupWrapper />
+          <ChatWidget />
         </Providers>
       </body>
     </html>
