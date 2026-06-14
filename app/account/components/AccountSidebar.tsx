@@ -60,6 +60,15 @@ function GiftBoxIcon() {
   )
 }
 
+function PayRequestIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  )
+}
+
 function StoreIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -97,6 +106,7 @@ const navItems = [
   { label: "Overview", href: "/account", icon: <OverviewIcon />, exact: true },
   { label: "Orders", href: "/account/orders", icon: <OrdersIcon />, exact: false },
   { label: "Gift Orders", href: "/account/gift-orders", icon: <GiftBoxIcon />, exact: false },
+  { label: "Payment Requests", href: "/account/payment-requests", icon: <PayRequestIcon />, exact: false },
   { label: "Wishlist", href: "/account/wishlist", icon: <WishlistIcon />, exact: false },
   { label: "Profile", href: "/account/profile", icon: <ProfileIcon />, exact: false },
 ]

@@ -8,6 +8,10 @@
  * This webhook acts as a reliable fallback (e.g. if the user closes the
  * browser before the verify page loads).
  *
+ * Both normal checkout and "Pay For Me" payments flow through the same
+ * createOrderFromPayment function — it detects paymentRequestToken in
+ * metadata and fulfils the payment request automatically.
+ *
  * Requirements: 4.4, 4.5
  */
 
@@ -60,7 +64,8 @@ async function handleChargeSuccess(event: PaystackWebhookEvent) {
   const verified = await verifyPayment(reference)
   if (verified.status !== "success") return
 
-  // Delegate to shared order creation (idempotent — skips if already created by verify page)
+  // createOrderFromPayment detects Pay-For-Me via reference prefix (PAY-...)
+  // and fulfils the PaymentRequest automatically — no metadata dependency
   await createOrderFromPayment({
     reference,
     amountKobo: amount,

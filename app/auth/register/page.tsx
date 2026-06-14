@@ -7,6 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { register } from "@/app/actions/auth"
 import type { RegisterFormState } from "@/app/actions/auth"
+import { useToast } from "@/app/components/ui/Toast"
 
 function EyeOpenIcon() {
   return (
@@ -40,16 +41,25 @@ function SubmitButton() {
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const initialState: RegisterFormState = {}
   const [state, formAction] = useActionState(register, initialState)
   const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (state.success) {
-      router.push("/")
+      toast("Account created! Welcome to Dachhomeandbody.", "success")
+      router.push("/account")
       router.refresh()
     }
-  }, [state.success, router])
+  }, [state.success, router, toast])
+
+  // Show error toast when form-level error appears
+  useEffect(() => {
+    if (state.errors?._form?.[0]) {
+      toast(state.errors._form[0], "error")
+    }
+  }, [state.errors?._form, toast])
 
   return (
     <div className="min-h-screen flex font-[family-name:var(--font-manrope)]">

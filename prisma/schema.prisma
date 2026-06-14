@@ -84,15 +84,16 @@ model User {
   resetToken    String?   @unique
   resetTokenExpiry DateTime?
   
-  orders        Order[]
-  reviews       Review[]
-  wishlist      WishlistItem[]
-  addresses     Address[]
-  cart          CartItem[]
-  accounts      Account[]
-  sessions      Session[]
-  stockHistory  StockHistory[]
-  giftOrders    GiftOrder[]
+  orders           Order[]
+  reviews          Review[]
+  wishlist         WishlistItem[]
+  addresses        Address[]
+  cart             CartItem[]
+  accounts         Account[]
+  sessions         Session[]
+  stockHistory     StockHistory[]
+  giftOrders       GiftOrder[]
+  paymentRequests  PaymentRequest[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -537,6 +538,56 @@ model GiftOrderItem {
   @@index([giftOrderId])
   @@index([productId])
   @@index([variantId])
+}
+
+// ── Pay-For-Me / Payment Request ──────────────────────────────────────────
+
+enum PaymentRequestStatus {
+  PENDING   // link is active, waiting for payment
+  PAID      // payer completed payment, order created
+  EXPIRED   // link passed its expiry time
+  CANCELLED // requester cancelled the link
+}
+
+model PaymentRequest {
+  id              String               @id @default(cuid())
+  /// 32-byte cryptographically random hex token used in the shareable URL
+  token           String               @unique
+
+  /// Who created the request (authenticated users)
+  userId          String?
+  user            User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  /// Contact info for the requester (always captured, even for auth'd users)
+  requesterEmail  String
+  requesterName   String?
+
+  /// Snapshot of the order at request-creation time
+  items           Json                 // Array<{ productId, variantId, variantName, quantity, price, name, image }>
+  shippingAddress Json                 // { name, phone, address, city, state, postalCode, country }
+  subtotal        Float
+  discount        Float                @default(0)
+  shippingCost    Float                @default(0)
+  total           Float
+  couponCode      String?
+  couponId        String?
+
+  status          PaymentRequestStatus @default(PENDING)
+  expiresAt       DateTime
+
+  /// Filled in after the payer completes payment
+  paymentReference String?
+  payerEmail      String?
+  orderId         String?              // the Order record created on payment
+
+  paidAt          DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@index([token])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // ── Promotional Popup ──────────────────────────────────────────────────────

@@ -9,6 +9,7 @@ import Link from "next/link"
 import { Suspense } from "react"
 import DateRangeFilter, { type DateRangePreset } from "./components/DateRangeFilter"
 import RevenueChartWrapper from "./components/RevenueChartWrapper"
+import NeedsAttention from "./components/NeedsAttention"
 
 export const metadata = {
   title: "Dashboard",
@@ -116,12 +117,18 @@ function StatusBadge({ status }: { status: string }) {
 // Data fetching
 // ---------------------------------------------------------------------------
 async function getAlertStats() {
-  const [pendingOrders, pendingReviews, lowStockProducts] = await Promise.all([
-    prisma.order.count({ where: { status: "PENDING" } }),
+  const [pendingOrders, pendingReviews, lowStockProducts, newPayRequests] = await Promise.all([
+    prisma.order.count({ where: { status: "PENDING", paymentStatus: "PAID" } }),
     prisma.review.count({ where: { status: "PENDING" } }),
     prisma.product.count({ where: { stock: { lte: 5 }, deleted: false } }),
+    prisma.paymentRequest.count({
+      where: {
+        status: "PAID",
+        paidAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+      },
+    }),
   ])
-  return { pendingOrders, pendingReviews, lowStockProducts }
+  return { pendingOrders, pendingReviews, lowStockProducts, newPayRequests }
 }
 
 async function getRecentOrders() {
@@ -356,29 +363,15 @@ export default async function AdminDashboardPage({
         </div>
       </div>
 
-      {/* Attention items */}
-      {(alertStats.pendingOrders > 0 || alertStats.pendingReviews > 0 || alertStats.lowStockProducts > 0) && (
-        <div className="bg-[#fffbf0] border border-[#B8965C]/30 rounded p-4">
-          <p className="text-xs tracking-[0.18em] uppercase text-[#8C8C8C] mb-3">Needs Attention</p>
-          <div className="flex flex-wrap gap-4">
-            {alertStats.pendingOrders > 0 && (
-              <Link href="/admin/orders?status=PENDING" className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors">
-                <span className="font-medium">{alertStats.pendingOrders}</span> pending order{alertStats.pendingOrders !== 1 ? "s" : ""}
-              </Link>
-            )}
-            {alertStats.pendingReviews > 0 && (
-              <Link href="/admin/reviews" className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors">
-                <span className="font-medium">{alertStats.pendingReviews}</span> review{alertStats.pendingReviews !== 1 ? "s" : ""} to moderate
-              </Link>
-            )}
-            {alertStats.lowStockProducts > 0 && (
-              <Link href="/admin/products?stock=low" className="text-sm text-[#111111] hover:text-[#B8965C] transition-colors">
-                <span className="font-medium">{alertStats.lowStockProducts}</span> low-stock product{alertStats.lowStockProducts !== 1 ? "s" : ""}
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Needs Attention — live, auto-refreshing every 30 s */}
+      <NeedsAttention
+        initial={{
+          pendingOrders: alertStats.pendingOrders,
+          newPayRequests: alertStats.newPayRequests,
+          pendingReviews: alertStats.pendingReviews,
+          lowStock: alertStats.lowStockProducts,
+        }}
+      />
 
       {/* Recent orders */}
       <div>

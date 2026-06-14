@@ -12,16 +12,23 @@ import { NextResponse } from "next/server"
 
 const { auth } = NextAuth(authConfig)
 
-// Routes that require authentication (customer)
-const protectedRoutes = ["/account", "/checkout"]
+// Routes that require authentication (customer account area)
+const protectedPrefixes = ["/account"]
+
+// /checkout itself requires login, but /checkout/verify must stay PUBLIC —
+// unauthenticated payers (Pay-For-Me) land here after Paystack redirects them back
+const protectedCheckoutPrefixes = ["/checkout"]
+
+// Checkout sub-paths that must remain public even though /checkout is protected
+const publicCheckoutPaths = ["/checkout/verify", "/checkout/confirmation"]
 
 // Routes that require admin role
 const adminRoutes = ["/admin"]
 
-// Routes that are for customers only (admins should not access)
-const customerOnlyRoutes = ["/shop", "/account", "/checkout", "/cart", "/collections"]
+// Routes only customers should access (not admins)
+const customerOnlyRoutes = ["/shop", "/account", "/cart", "/collections"]
 
-// Auth routes (redirect to home if already logged in)
+// Auth pages — redirect logged-in users away
 const authRoutes = ["/auth/login", "/auth/register"]
 
 export default auth((req) => {
@@ -31,13 +38,19 @@ export default auth((req) => {
   const isLoggedIn = !!session?.user
   const isAdmin = session?.user?.role === "ADMIN"
 
-  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route))
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
-  const isCustomerOnlyRoute = customerOnlyRoutes.some((route) => pathname.startsWith(route))
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
+  // ── Always-public paths — never intercept ─────────────────────────────
+  // /pay/  — Pay-For-Me public pages (payer has no account)
+  // /checkout/verify — Paystack callback (payer is unauthenticated)
+  // /checkout/confirmation — confirmation page after order
+  if (
+    pathname.startsWith("/pay/") ||
+    publicCheckoutPaths.some((p) => pathname.startsWith(p))
+  ) {
+    return NextResponse.next()
+  }
 
-  // Admin routes: require ADMIN role
-  if (isAdminRoute) {
+  // ── Admin routes ───────────────────────────────────────────────────────
+  if (adminRoutes.some((r) => pathname.startsWith(r))) {
     if (!isLoggedIn) {
       const loginUrl = new URL("/auth/login", nextUrl)
       loginUrl.searchParams.set("callbackUrl", pathname)
@@ -46,23 +59,36 @@ export default auth((req) => {
     if (!isAdmin) {
       return NextResponse.redirect(new URL("/", nextUrl))
     }
+    return NextResponse.next()
   }
 
-  // Customer-only routes: admins are redirected to their dashboard
-  if (isCustomerOnlyRoute && isLoggedIn && isAdmin) {
+  // ── Customer-only routes — redirect admins to their dashboard ──────────
+  if (customerOnlyRoutes.some((r) => pathname.startsWith(r)) && isLoggedIn && isAdmin) {
     return NextResponse.redirect(new URL("/admin", nextUrl))
   }
 
-  // Protected customer routes: require authentication
-  if (isProtectedRoute && !isLoggedIn) {
+  // ── Protected checkout (requires login) ───────────────────────────────
+  if (protectedCheckoutPrefixes.some((r) => pathname.startsWith(r)) && !isLoggedIn) {
     const loginUrl = new URL("/auth/login", nextUrl)
     loginUrl.searchParams.set("callbackUrl", pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  // Auth routes: redirect logged-in users away from login/register
-  if (isAuthRoute && isLoggedIn) {
-    const destination = isAdmin ? "/admin" : "/"
+  // ── Protected account area ─────────────────────────────────────────────
+  if (protectedPrefixes.some((r) => pathname.startsWith(r)) && !isLoggedIn) {
+    const loginUrl = new URL("/auth/login", nextUrl)
+    loginUrl.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // ── Auth pages — redirect logged-in users to their destination ─────────
+  if (authRoutes.some((r) => pathname.startsWith(r)) && isLoggedIn) {
+    const callbackUrl = nextUrl.searchParams.get("callbackUrl")
+    const destination = isAdmin
+      ? "/admin"
+      : callbackUrl && callbackUrl.startsWith("/")
+      ? callbackUrl
+      : "/account"
     return NextResponse.redirect(new URL(destination, nextUrl))
   }
 

@@ -4,6 +4,34 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { logout } from "@/app/actions/auth"
 import { useFormStatus } from "react-dom"
+import { useEffect, useState, useCallback } from "react"
+
+// ---------------------------------------------------------------------------
+// Live counts type
+// ---------------------------------------------------------------------------
+interface AdminCounts {
+  pendingOrders: number
+  newPayRequests: number
+  pendingReviews: number
+  lowStock: number
+}
+
+// ---------------------------------------------------------------------------
+// Badge component
+// ---------------------------------------------------------------------------
+function Badge({ count, pulse = false }: { count: number; pulse?: boolean }) {
+  if (count === 0) return null
+  return (
+    <span className="relative ml-auto shrink-0 flex items-center">
+      {pulse && (
+        <span className="absolute inline-flex h-full w-full rounded-full bg-[#B8965C] opacity-75 animate-ping" />
+      )}
+      <span className="relative min-w-[18px] h-[18px] px-1 rounded-full bg-[#B8965C] text-[#111111] text-[9px] font-bold flex items-center justify-center leading-none">
+        {count > 99 ? "99+" : count}
+      </span>
+    </span>
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Nav item definition
@@ -12,6 +40,7 @@ interface NavItem {
   label: string
   href: string
   icon: React.ReactNode
+  badgeKey?: keyof AdminCounts
 }
 
 function LogoutButton() {
@@ -98,6 +127,15 @@ function GiftBoxIcon() {
   )
 }
 
+function PayRequestIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  )
+}
+
 function ReviewsIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -169,8 +207,9 @@ const navGroups = [
   {
     label: "Sales",
     items: [
-      { label: "Orders", href: "/admin/orders", icon: <OrdersIcon /> },
+      { label: "Orders", href: "/admin/orders", icon: <OrdersIcon />, badgeKey: "pendingOrders" as const },
       { label: "Gift Boxes", href: "/admin/gift-boxes", icon: <GiftBoxIcon /> },
+      { label: "Pay Requests", href: "/admin/payment-requests", icon: <PayRequestIcon />, badgeKey: "newPayRequests" as const },
       { label: "Coupons", href: "/admin/coupons", icon: <CouponsIcon /> },
       { label: "Shipping Rates", href: "/admin/shipping", icon: <ShippingIcon /> },
     ],
@@ -179,7 +218,7 @@ const navGroups = [
     label: "Community",
     items: [
       { label: "Customers", href: "/admin/customers", icon: <CustomersIcon /> },
-      { label: "Reviews", href: "/admin/reviews", icon: <ReviewsIcon /> },
+      { label: "Reviews", href: "/admin/reviews", icon: <ReviewsIcon />, badgeKey: "pendingReviews" as const },
     ],
   },
   {
@@ -193,13 +232,16 @@ const navGroups = [
 // ---------------------------------------------------------------------------
 // Sidebar nav item
 // ---------------------------------------------------------------------------
-function NavItem({ item }: { item: NavItem }) {
+function NavItem({ item, counts }: { item: NavItem; counts: AdminCounts | null }) {
   const pathname = usePathname()
-  // Exact match for dashboard, prefix match for others
   const isActive =
     item.href === "/admin"
       ? pathname === "/admin"
       : pathname.startsWith(item.href)
+
+  const badgeCount = item.badgeKey && counts ? counts[item.badgeKey] : 0
+  // Pulse animation only when not on that page (new arrivals)
+  const shouldPulse = badgeCount > 0 && !isActive
 
   return (
     <li>
@@ -213,7 +255,8 @@ function NavItem({ item }: { item: NavItem }) {
         }`}
       >
         {item.icon}
-        {item.label}
+        <span className="flex-1">{item.label}</span>
+        {badgeCount > 0 && <Badge count={badgeCount} pulse={shouldPulse} />}
       </Link>
     </li>
   )
@@ -223,6 +266,28 @@ function NavItem({ item }: { item: NavItem }) {
 // Sidebar
 // ---------------------------------------------------------------------------
 export default function AdminSidebar() {
+  const [counts, setCounts] = useState<AdminCounts | null>(null)
+
+  const fetchCounts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/counts", { cache: "no-store" })
+      if (res.ok) {
+        const data = await res.json() as AdminCounts
+        setCounts(data)
+      }
+    } catch {
+      // Silently ignore network errors — badges just won't show
+    }
+  }, [])
+
+  useEffect(() => {
+    // Fetch immediately on mount
+    fetchCounts()
+    // Then refresh every 30 seconds
+    const interval = setInterval(fetchCounts, 30_000)
+    return () => clearInterval(interval)
+  }, [fetchCounts])
+
   return (
     <aside
       className="w-60 shrink-0 bg-[#F8F5F2] border-r border-[#e5e5e5] flex flex-col h-full"
@@ -239,6 +304,12 @@ export default function AdminSidebar() {
         <span className="ml-2 text-[9px] tracking-[0.15em] uppercase text-[#B8965C] bg-[#B8965C]/10 px-1.5 py-0.5 rounded">
           Admin
         </span>
+        {/* Total unprocessed badge on brand — visible from anywhere */}
+        {counts && (counts.pendingOrders + counts.newPayRequests) > 0 && (
+          <span className="ml-auto">
+            <Badge count={counts.pendingOrders + counts.newPayRequests} pulse />
+          </span>
+        )}
       </div>
 
       {/* Nav */}
@@ -250,7 +321,7 @@ export default function AdminSidebar() {
             </p>
             <ul className="space-y-0.5">
               {group.items.map((item) => (
-                <NavItem key={item.href} item={item} />
+                <NavItem key={item.href} item={item} counts={counts} />
               ))}
             </ul>
           </div>

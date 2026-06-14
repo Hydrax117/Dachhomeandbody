@@ -14,6 +14,7 @@ import {
   paginate,
   type PaginationParams,
 } from "@/lib/db"
+import { revalidatePath } from "next/cache"
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -87,6 +88,20 @@ export function generateOrderNumber(): string {
 // ── Create order from verified payment ────────────────────────────────────
 
 /**
+ * Safely parse a value that Paystack may have JSON-stringified in transit.
+ * Paystack serialises nested objects/arrays as strings in metadata.
+ */
+function safeParseJson<T>(value: unknown, fallback: T): T {
+  if (value === null || value === undefined) return fallback
+  if (typeof value !== "string") return value as T
+  try {
+    return JSON.parse(value) as T
+  } catch {
+    return fallback
+  }
+}
+
+/**
  * Creates an order from a verified Paystack payment.
  * Idempotent — safe to call multiple times for the same reference.
  * Returns the order (existing or newly created).
@@ -105,35 +120,101 @@ export async function createOrderFromPayment({
   // Idempotency check — return existing order if already created
   const existing = await prisma.order.findFirst({
     where: { paymentReference: reference },
-    select: { orderNumber: true },
+    select: { orderNumber: true, id: true },
   })
+
+  // Paystack can stringify nested objects/arrays in metadata — deserialise defensively
+  const rawMeta = metadata as Record<string, unknown> | null
+
+  // ── Pay-For-Me reference detection ───────────────────────────────────────
+  // If the reference starts with PAY-, extract the token from it and look up
+  // the PaymentRequest directly from DB. This avoids any Paystack metadata
+  // round-trip unreliability.
+  // Reference format: PAY-[first 24 chars of token]-[4 char random]
+  let payRequestToken: string | null = null
+  if (reference.startsWith("PAY-")) {
+    const parts = reference.split("-")
+    // parts[0]="PAY", parts[1]=token-prefix, rest=random
+    const tokenPrefix = parts[1] ?? ""
+    if (tokenPrefix.length >= 16) {
+      // Find the PaymentRequest whose token starts with this prefix
+      const matchingRequest = await prisma.paymentRequest.findFirst({
+        where: { token: { startsWith: tokenPrefix } },
+        select: { token: true },
+      })
+      if (matchingRequest) {
+        payRequestToken = matchingRequest.token
+      }
+    }
+  }
+
   if (existing) {
+    // Even on duplicate calls, fulfil the PaymentRequest if not yet done
+    await fulfilPaymentRequestIfPresent(
+      rawMeta, existing.id, existing.orderNumber,
+      reference, amountKobo, customerEmail, payRequestToken
+    )
+    try {
+      revalidatePath("/admin/orders")
+      revalidatePath("/admin")
+      revalidatePath("/account/orders")
+      revalidatePath("/account/payment-requests")
+    } catch { /* no-op outside Next.js context */ }
     return { orderNumber: existing.orderNumber, isNew: false }
   }
 
-  const items = metadata?.items
-  const shippingAddress = metadata?.shippingAddress
+  const items = safeParseJson<OrderMetadata["items"]>(rawMeta?.items, undefined)
+  const shippingAddress = safeParseJson<OrderMetadata["shippingAddress"]>(
+    rawMeta?.shippingAddress,
+    undefined
+  )
 
   if (!items?.length || !shippingAddress) {
     throw new Error(`Missing order metadata for reference ${reference}`)
   }
 
   const totalNaira = fromKobo(amountKobo)
-  const discount = Number(metadata?.discount ?? 0)
-  const shippingCost = Number(metadata?.shippingCost ?? 0)
+  const discount = Number(rawMeta?.discount ?? 0)
+  const shippingCost = Number(rawMeta?.shippingCost ?? 0)
   const subtotal = totalNaira - shippingCost + discount
 
   // Coerce item fields to numbers (Paystack metadata serialises everything as strings)
+  // Also normalise variantId/variantName — Paystack stringifies JS null as "null"
   const coercedItems = items.map((item) => ({
     productId: item.productId,
-    variantId: item.variantId ?? null,
-    variantName: item.variantName ?? null,
+    variantId: item.variantId && item.variantId !== "null" && item.variantId !== "" ? item.variantId : null,
+    variantName: item.variantName && item.variantName !== "null" && item.variantName !== "" ? item.variantName : null,
     quantity: Number(item.quantity),
     price: Number(item.price),
   }))
 
+  // Validate that all variantIds exist in the DB — FK constraint will fail otherwise
+  const variantIdsToCheck = coercedItems.map((i) => i.variantId).filter(Boolean) as string[]
+  const validVariants = variantIdsToCheck.length > 0
+    ? await prisma.productVariant.findMany({
+        where: { id: { in: variantIdsToCheck } },
+        select: { id: true },
+      })
+    : []
+  const validVariantIdSet = new Set(validVariants.map((v) => v.id))
+
+  // Null out any variantId that doesn't exist in DB
+  const safeItems = coercedItems.map((item) => ({
+    ...item,
+    variantId: item.variantId && validVariantIdSet.has(item.variantId) ? item.variantId : null,
+  }))
+
+  // Safely resolve couponId — only use it if it's a non-empty string and
+  // actually exists in the database (prevents FK constraint failures from
+  // Paystack stringifying null values or stale IDs)
+  const rawCouponId = (rawMeta?.couponId as string | null) || null
+  const couponId = rawCouponId
+    ? (await prisma.coupon.findUnique({ where: { id: rawCouponId }, select: { id: true } }))?.id ?? null
+    : null
+  const couponCode = (rawMeta?.couponCode as string | null) || null
+
   // Fetch products for stock decrement
-  const productIds = items.map((i) => i.productId)
+  const productIds = safeItems.map((i) => i.productId)
   const products = await prisma.product.findMany({
     where: { id: { in: productIds }, deleted: false },
     select: { id: true, stock: true },
@@ -145,9 +226,9 @@ export async function createOrderFromPayment({
     const newOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
-        userId: metadata?.userId ?? null,
-        guestEmail: metadata?.guestEmail || customerEmail,
-        guestName: metadata?.guestName ?? null,
+        userId: (rawMeta?.userId as string | null) ?? null,
+        guestEmail: (rawMeta?.guestEmail as string | null) || customerEmail,
+        guestName: (rawMeta?.guestName as string | null) ?? null,
         subtotal,
         discount,
         shippingCost,
@@ -157,10 +238,10 @@ export async function createOrderFromPayment({
         paymentMethod: "paystack",
         paymentReference: reference,
         shippingAddress: shippingAddress as object,
-        couponCode: metadata?.couponCode || null,
-        couponId: metadata?.couponId ?? null,
+        couponCode: couponCode,
+        couponId: couponId,
         items: {
-          create: coercedItems.map((item) => ({
+          create: safeItems.map((item) => ({
             productId: item.productId,
             variantId: item.variantId,
             variantName: item.variantName,
@@ -173,7 +254,7 @@ export async function createOrderFromPayment({
     })
 
     // Decrement stock — prefer variant stock, fall back to product stock
-    for (const item of coercedItems) {
+    for (const item of safeItems) {
       if (item.variantId) {
         await tx.productVariant.update({
           where: { id: item.variantId },
@@ -198,28 +279,23 @@ export async function createOrderFromPayment({
       }
     }
 
-    // Coupon usage tracking
-    if (metadata?.couponId) {
+    // Coupon usage tracking — use the DB-validated couponId (never trust rawMeta directly)
+    if (couponId) {
       await tx.coupon.update({
-        where: { id: metadata.couponId },
+        where: { id: couponId },
         data: { usageCount: { increment: 1 } },
       })
-
-      const coupon = await tx.coupon.findUnique({
-        where: { id: metadata.couponId },
+      const couponRecord = await tx.coupon.findUnique({
+        where: { id: couponId },
         select: { usageCount: true, maxUsageCount: true },
       })
-      if (coupon?.maxUsageCount != null && coupon.usageCount >= coupon.maxUsageCount) {
-        await tx.coupon.update({
-          where: { id: metadata.couponId },
-          data: { active: false },
-        })
+      if (couponRecord?.maxUsageCount != null && couponRecord.usageCount >= couponRecord.maxUsageCount) {
+        await tx.coupon.update({ where: { id: couponId }, data: { active: false } })
       }
     }
-
     // Clear persisted cart for authenticated users
-    if (metadata?.userId) {
-      await tx.cartItem.deleteMany({ where: { userId: metadata.userId } })
+    if (rawMeta?.userId) {
+      await tx.cartItem.deleteMany({ where: { userId: rawMeta.userId as string } })
     }
 
     return newOrder
@@ -232,15 +308,19 @@ export async function createOrderFromPayment({
       include: { items: { include: { product: { select: { name: true } } } } },
     })
 
-    const userRecord = metadata?.userId
+    const userId = rawMeta?.userId as string | null | undefined
+    const userRecord = userId
       ? await prisma.user.findUnique({
-          where: { id: metadata.userId },
+          where: { id: userId },
           select: { email: true, name: true },
         })
       : null
 
-    const recipientEmail = userRecord?.email ?? metadata?.guestEmail ?? customerEmail
-    const recipientName = userRecord?.name ?? metadata?.guestName ?? null
+    const guestEmail = rawMeta?.guestEmail as string | null | undefined
+    const guestName = rawMeta?.guestName as string | null | undefined
+
+    const recipientEmail = userRecord?.email ?? guestEmail ?? customerEmail
+    const recipientName = userRecord?.name ?? guestName ?? null
 
     const orderDetails: OrderEmailDetails = {
       items: (orderWithItems?.items ?? []).map((item) => ({
@@ -260,7 +340,113 @@ export async function createOrderFromPayment({
     console.error("Failed to send order confirmation email:", emailError)
   }
 
+  // If this payment came from a "Pay For Me" link, fulfil the request and notify everyone.
+  await fulfilPaymentRequestIfPresent(
+    rawMeta, order.id, order.orderNumber,
+    reference, amountKobo, customerEmail, payRequestToken
+  )
+
+  // Revalidate admin and user dashboards so the new order shows immediately
+  try {
+    revalidatePath("/admin/orders")
+    revalidatePath("/admin")
+    revalidatePath("/account/orders")
+    revalidatePath("/account/payment-requests")
+  } catch {
+    // revalidatePath is a no-op outside of Next.js request context (e.g. webhook)
+  }
+
   return { orderNumber: order.orderNumber, isNew: true }
+}
+
+// ── Post-order payment request fulfilment ─────────────────────────────────
+
+/**
+ * If metadata contains a paymentRequestToken, mark the PaymentRequest as PAID
+ * and send all three notification emails (requester, payer, admin).
+ *
+ * Uses the Paystack-verified customerEmail as the authoritative payer email
+ * (payerEmail in metadata may have been dropped/stringified by Paystack).
+ */
+async function fulfilPaymentRequestIfPresent(
+  rawMeta: Record<string, unknown> | null,
+  orderId: string,
+  orderNumber: string,
+  paymentReference: string,
+  amountKobo: number,
+  customerEmail: string,
+  /** Token extracted from the reference string — more reliable than metadata */
+  referenceToken: string | null = null
+) {
+  // Prefer token extracted from reference (100% reliable), fall back to metadata
+  const rawToken = referenceToken ?? rawMeta?.paymentRequestToken
+  const token = typeof rawToken === "string" && rawToken.length > 0 ? rawToken : null
+  if (!token) return   // Not a Pay-For-Me payment
+
+  // customerEmail is the Paystack-verified payer email
+  const payerEmail = customerEmail
+
+  try {
+    const { fulfillPaymentRequest } = await import("@/lib/payment-requests")
+
+    // fulfillPaymentRequest is idempotent — safe to call multiple times
+    const request = await fulfillPaymentRequest(token, paymentReference, payerEmail, orderId)
+    if (!request) return
+
+    // Revalidate the requester's payment requests page so status shows as PAID immediately
+    try {
+      revalidatePath("/account/payment-requests")
+      revalidatePath("/admin/payment-requests")
+    } catch { /* no-op outside Next.js context */ }
+
+    const {
+      sendPaymentRequestFulfilledEmail,
+      sendPayerConfirmationEmail,
+      sendAdminPaymentRequestNotification,
+    } = await import("@/lib/email")
+
+    const { fromKobo: fk } = await import("@/lib/paystack")
+    const total = fk(amountKobo)
+
+    const items = request.items as Array<{ name: string; quantity: number; price: number }>
+    const shippingAddress = request.shippingAddress as {
+      name: string; address: string; city: string; state?: string | null
+      postalCode: string; country: string; phone: string
+    }
+
+    const emailDetails = {
+      items,
+      subtotal: request.subtotal,
+      discount: request.discount,
+      shippingCost: request.shippingCost,
+      total,
+      shippingAddress,
+      paymentRequestToken: token,
+    }
+
+    await Promise.allSettled([
+      sendPaymentRequestFulfilledEmail(
+        request.requesterEmail,
+        orderNumber,
+        payerEmail,
+        emailDetails,
+        request.requesterName
+      ),
+      sendPayerConfirmationEmail(payerEmail, orderNumber, request.requesterName, emailDetails),
+      ...(process.env.ADMIN_EMAIL
+        ? [sendAdminPaymentRequestNotification(
+            process.env.ADMIN_EMAIL,
+            orderNumber,
+            request.requesterEmail,
+            payerEmail,
+            total
+          )]
+        : []),
+    ])
+  } catch (err) {
+    // Log but don't crash — the order is already created successfully
+    console.error("fulfilPaymentRequestIfPresent error:", err)
+  }
 }
 
 // ── Shared select shapes ───────────────────────────────────────────────────

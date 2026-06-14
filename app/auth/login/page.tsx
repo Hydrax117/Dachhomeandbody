@@ -8,6 +8,7 @@ import Image from "next/image"
 import { Suspense, useEffect } from "react"
 import { login } from "@/app/actions/auth"
 import type { LoginFormState } from "@/app/actions/auth"
+import { useToast } from "@/app/components/ui/Toast"
 
 function EyeOpenIcon() {
   return (
@@ -46,19 +47,29 @@ function SubmitButton() {
 function LoginForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const callbackUrl = searchParams.get("callbackUrl") || "/"
+  const { toast } = useToast()
+  // Default to /account instead of / so logged-in users land on their dashboard
+  const callbackUrl = searchParams.get("callbackUrl") || "/account"
   const initialState: LoginFormState = {}
   const [state, formAction] = useActionState(login, initialState)
   const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (state.success) {
+      toast("Welcome back! You're now signed in.", "success")
       // Admins always go to their dashboard; customers go to callbackUrl
       const destination = state.isAdmin ? "/admin" : callbackUrl
       router.push(destination)
       router.refresh()
     }
-  }, [state.success, state.isAdmin, callbackUrl, router])
+  }, [state.success, state.isAdmin, callbackUrl, router, toast])
+
+  // Show error toast when form-level error appears
+  useEffect(() => {
+    if (state.errors?._form?.[0]) {
+      toast(state.errors._form[0], "error")
+    }
+  }, [state.errors?._form, toast])
 
   return (
     <div className="min-h-screen flex font-[family-name:var(--font-manrope)]">

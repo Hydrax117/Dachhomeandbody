@@ -373,3 +373,264 @@ export async function sendNewsletterWelcomeEmail(email: string) {
     return { success: false, error: "Failed to send email" }
   }
 }
+
+// ─── Pay-For-Me: Requester Notification ──────────────────────────────────────
+
+export interface PaymentRequestEmailDetails {
+  items: Array<{ name: string; quantity: number; price: number }>
+  subtotal: number
+  discount?: number
+  shippingCost?: number
+  total: number
+  shippingAddress: {
+    name: string
+    address: string
+    city: string
+    state?: string | null
+    postalCode: string
+    country: string
+    phone: string
+  }
+  paymentRequestToken: string
+}
+
+/**
+ * Sent to the requester when someone else just paid for their items.
+ */
+export async function sendPaymentRequestFulfilledEmail(
+  email: string,
+  orderNumber: string,
+  payerEmail: string,
+  details: PaymentRequestEmailDetails,
+  userName?: string | null
+) {
+  const { items, subtotal, discount = 0, shippingCost = 0, total, shippingAddress } = details
+  const orderUrl = `${SITE_URL}/account/orders`
+
+  const addressLines = [
+    shippingAddress.name,
+    shippingAddress.address,
+    [shippingAddress.city, shippingAddress.state].filter(Boolean).join(", "),
+    shippingAddress.postalCode,
+    shippingAddress.country,
+  ]
+    .filter(Boolean)
+    .join("<br>")
+
+  const content = `
+    ${userName ? `<p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#1a1a1a;">Hello ${userName},</p>` : ""}
+    <p style="margin:0 0 8px;font-size:16px;line-height:1.6;color:#1a1a1a;">
+      Great news — your payment request has been fulfilled.
+    </p>
+    <p style="margin:0 0 24px;font-size:14px;color:#666666;">
+      <strong style="color:#1a1a1a;">${payerEmail}</strong> has paid for your order. We're now processing it.
+    </p>
+    <p style="margin:0 0 6px;font-size:14px;color:#666666;">
+      Order number: <strong style="color:#1a1a1a;">${orderNumber}</strong>
+    </p>
+
+    ${orderItemsTable(items)}
+
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:8px;">
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#666666;">Subtotal</td>
+        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">${formatCurrency(subtotal)}</td>
+      </tr>
+      ${discount > 0 ? `<tr><td style="padding:6px 0;font-size:14px;color:#666666;">Discount</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">−${formatCurrency(discount)}</td></tr>` : ""}
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#666666;">Shipping</td>
+        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">${shippingCost === 0 ? "Free" : formatCurrency(shippingCost)}</td>
+      </tr>
+      <tr>
+        <td style="padding:12px 0 0;font-size:16px;font-weight:600;color:#1a1a1a;border-top:2px solid #e5e5e5;">Total</td>
+        <td style="padding:12px 0 0;font-size:16px;font-weight:600;color:#1a1a1a;text-align:right;border-top:2px solid #e5e5e5;">${formatCurrency(total)}</td>
+      </tr>
+    </table>
+
+    <div style="margin-top:30px;padding:20px;background-color:#f9f9f9;border-radius:2px;">
+      <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#999999;">Delivering to</p>
+      <p style="margin:0;font-size:14px;line-height:1.8;color:#1a1a1a;">${addressLines}</p>
+    </div>
+
+    ${ctaButton(orderUrl, "View Order")}
+
+    <p style="margin:0;font-size:13px;line-height:1.6;color:#999999;">
+      We'll send you a shipping notification once your order is on its way.
+    </p>`
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: `Your payment request was fulfilled — ${orderNumber}`,
+      html: emailWrapper(content),
+    })
+    if (error) {
+      console.error("Resend error (payment request fulfilled):", error)
+      return { success: false, error: error.message }
+    }
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to send payment request fulfilled email:", error)
+    return { success: false, error: "Failed to send email" }
+  }
+}
+
+/**
+ * Sent to the payer after they complete payment for someone else's request.
+ */
+export async function sendPayerConfirmationEmail(
+  payerEmail: string,
+  orderNumber: string,
+  requesterName: string | null,
+  details: PaymentRequestEmailDetails
+) {
+  const { items, subtotal, discount = 0, shippingCost = 0, total } = details
+
+  const content = `
+    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#1a1a1a;">
+      Thank you for your payment.
+    </p>
+    <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#666666;">
+      You've successfully paid for ${requesterName ? `<strong style="color:#1a1a1a;">${requesterName}</strong>'s` : "someone's"} order. They'll be notified and we'll begin processing immediately.
+    </p>
+    <p style="margin:0 0 6px;font-size:14px;color:#666666;">
+      Order number: <strong style="color:#1a1a1a;">${orderNumber}</strong>
+    </p>
+
+    ${orderItemsTable(items)}
+
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:8px;">
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#666666;">Subtotal</td>
+        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">${formatCurrency(subtotal)}</td>
+      </tr>
+      ${discount > 0 ? `<tr><td style="padding:6px 0;font-size:14px;color:#666666;">Discount</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">−${formatCurrency(discount)}</td></tr>` : ""}
+      <tr>
+        <td style="padding:6px 0;font-size:14px;color:#666666;">Shipping</td>
+        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">${shippingCost === 0 ? "Free" : formatCurrency(shippingCost)}</td>
+      </tr>
+      <tr>
+        <td style="padding:12px 0 0;font-size:16px;font-weight:600;color:#1a1a1a;border-top:2px solid #e5e5e5;">Total paid</td>
+        <td style="padding:12px 0 0;font-size:16px;font-weight:600;color:#1a1a1a;text-align:right;border-top:2px solid #e5e5e5;">${formatCurrency(total)}</td>
+      </tr>
+    </table>
+
+    <p style="margin:30px 0 0;font-size:13px;line-height:1.6;color:#999999;">
+      This is a payment confirmation only. The order will be delivered to the requester's address. Thank you for your generosity!
+    </p>`
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: payerEmail,
+      subject: `Payment confirmed — ${orderNumber}`,
+      html: emailWrapper(content),
+    })
+    if (error) {
+      console.error("Resend error (payer confirmation):", error)
+      return { success: false, error: error.message }
+    }
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to send payer confirmation email:", error)
+    return { success: false, error: "Failed to send email" }
+  }
+}
+
+/**
+ * Sent to admin when a payment request is fulfilled.
+ */
+export async function sendAdminPaymentRequestNotification(
+  adminEmail: string,
+  orderNumber: string,
+  requesterEmail: string,
+  payerEmail: string,
+  total: number
+) {
+  const adminOrderUrl = `${SITE_URL}/admin/orders`
+
+  const content = `
+    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#1a1a1a;">
+      A "Pay For Me" request has been fulfilled.
+    </p>
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:20px 0;background-color:#f9f9f9;border-radius:2px;padding:20px;">
+      <tr><td style="padding:6px 0;font-size:14px;color:#666666;">Order Number</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;font-weight:600;">${orderNumber}</td></tr>
+      <tr><td style="padding:6px 0;font-size:14px;color:#666666;">Requester</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">${requesterEmail}</td></tr>
+      <tr><td style="padding:6px 0;font-size:14px;color:#666666;">Paid by</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;text-align:right;">${payerEmail}</td></tr>
+      <tr>
+        <td style="padding:12px 0 0;font-size:16px;font-weight:600;color:#1a1a1a;border-top:2px solid #e5e5e5;">Total</td>
+        <td style="padding:12px 0 0;font-size:16px;font-weight:600;color:#1a1a1a;text-align:right;border-top:2px solid #e5e5e5;">${formatCurrency(total)}</td>
+      </tr>
+    </table>
+    ${ctaButton(adminOrderUrl, "View in Admin")}
+  `
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: adminEmail,
+      subject: `[Admin] Pay-For-Me order fulfilled — ${orderNumber}`,
+      html: emailWrapper(content),
+    })
+    if (error) {
+      console.error("Resend error (admin payment request):", error)
+      return { success: false, error: error.message }
+    }
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to send admin payment request notification:", error)
+    return { success: false, error: "Failed to send email" }
+  }
+}
+
+/**
+ * Sent to the requester with their shareable payment link.
+ */
+export async function sendPaymentRequestLinkEmail(
+  email: string,
+  token: string,
+  total: number,
+  itemCount: number,
+  userName?: string | null
+) {
+  const payUrl = `${SITE_URL}/pay/${token}`
+
+  const content = `
+    ${userName ? `<p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#1a1a1a;">Hello ${userName},</p>` : ""}
+    <p style="margin:0 0 8px;font-size:16px;line-height:1.6;color:#1a1a1a;">
+      Your payment request has been created.
+    </p>
+    <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#666666;">
+      Share the link below with the person you'd like to pay for your ${itemCount} item${itemCount !== 1 ? "s" : ""} totalling <strong style="color:#1a1a1a;">${formatCurrency(total)}</strong>. The link is valid for 48 hours.
+    </p>
+
+    ${ctaButton(payUrl, "Share Payment Link")}
+
+    <p style="margin:20px 0 8px;font-size:13px;line-height:1.6;color:#666666;">Or copy this link:</p>
+    <p style="margin:0 0 24px;font-size:13px;line-height:1.6;color:#666666;word-break:break-all;">
+      <a href="${payUrl}" style="color:#1a1a1a;">${payUrl}</a>
+    </p>
+
+    <p style="margin:0;font-size:13px;line-height:1.6;color:#999999;padding-top:20px;border-top:1px solid #e5e5e5;">
+      This link can only be used once. Once paid, it will be deactivated automatically.
+      You can cancel it from your account if needed.
+    </p>`
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: `Your payment request link — ${formatCurrency(total)}`,
+      html: emailWrapper(content),
+    })
+    if (error) {
+      console.error("Resend error (payment request link):", error)
+      return { success: false, error: error.message }
+    }
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to send payment request link email:", error)
+    return { success: false, error: "Failed to send email" }
+  }
+}
