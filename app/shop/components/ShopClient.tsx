@@ -56,7 +56,7 @@ export function ShopClient({ products, total, page, totalPages, categories }: Sh
         ) : (
           <>
             <div
-              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10"
+              className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10 items-stretch"
               aria-label="Product grid"
             >
               {products.map((product) => (

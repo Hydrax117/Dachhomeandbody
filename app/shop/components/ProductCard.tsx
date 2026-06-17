@@ -57,7 +57,7 @@ export function ProductCard({
 
   return (
     <article className="card-product-luxury group">
-      <Link href={`/shop/${slug}`} className="block" aria-label={`View ${name}`}>
+      <Link href={`/shop/${slug}`} className="flex flex-col flex-1" aria-label={`View ${name}`}>
         {/* Image */}
         <div className="card-product-luxury__image">
           {primaryImage ? (
@@ -104,7 +104,7 @@ export function ProductCard({
         </div>
 
         {/* Info */}
-        <div className="pt-5 pb-2">
+        <div className="pt-5 pb-2 flex flex-col flex-1">
           <p className="text-[#B8965C] text-[10px] tracking-[0.25em] uppercase mb-1.5">
             {category.name}
           </p>
@@ -118,7 +118,7 @@ export function ProductCard({
             </div>
           ) : null}
 
-          <div className="flex items-baseline gap-2.5">
+          <div className="mt-auto flex items-baseline gap-2.5">
             <span className={`font-serif text-base ${isOutOfStock ? "text-[#8C8C8C]" : "text-[#111111]"}`}>
               ₦{price.toLocaleString()}
             </span>
