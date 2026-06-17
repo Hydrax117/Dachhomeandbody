@@ -11,17 +11,34 @@ interface Props {
 }
 
 // ── Inline text renderer ───────────────────────────────────────────────────
-// Handles **bold**, /path links
+// Handles **bold**, [label](url) markdown links, and bare /path links
 
 function renderText(text: string) {
   return text.split("\n").map((line, i, arr) => {
-    const parts = line.split(/(\*\*[^*]+\*\*)/)
+    // Split on **bold** and [label](url) markdown links
+    const parts = line.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/)
     const rendered = parts.map((part, j) => {
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
           <strong key={j} className="font-semibold text-[#111111]">
             {part.slice(2, -2)}
           </strong>
+        )
+      }
+      // Markdown link: [label](url)
+      const mdLink = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+      if (mdLink) {
+        const [, label, href] = mdLink
+        const isInternal = href.startsWith("/")
+        return (
+          <a
+            key={j}
+            href={href}
+            {...(!isInternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="text-[#B8965C] underline underline-offset-2 hover:text-[#8C6E3A] transition-colors"
+          >
+            {label}
+          </a>
         )
       }
       return (

@@ -17,6 +17,17 @@ interface RequestBody {
   sessionId?: string
 }
 
+// ── Singleton AI client ────────────────────────────────────────────────────
+// Constructed once per process, not on every request
+
+let _ai: GoogleGenAI | null = null
+function getAI(): GoogleGenAI {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error("GEMINI_API_KEY not set")
+  if (!_ai) _ai = new GoogleGenAI({ apiKey })
+  return _ai
+}
+
 // ── Rate limiter (in-memory, per IP) ──────────────────────────────────────
 // 20 requests per 60 seconds per IP
 
@@ -30,13 +41,13 @@ function checkRateLimit(ip: string): boolean {
 
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
-    return true // allowed
+    return true
   }
 
-  if (entry.count >= RATE_LIMIT) return false // blocked
+  if (entry.count >= RATE_LIMIT) return false
 
   entry.count++
-  return true // allowed
+  return true
 }
 
 // Clean up old entries every 5 minutes to prevent memory leak
@@ -61,78 +72,50 @@ function hashIp(ip: string): string {
   return createHash("sha256").update(ip + "dach_salt").digest("hex").slice(0, 16)
 }
 
-// ── Product context fetcher ────────────────────────────────────────────────
+// ── Product catalogue cache ────────────────────────────────────────────────
+// Products change infrequently — cache the full catalogue for 5 minutes so we
+// don't hit the DB on every chat message.
 
 type ProductWithVariants = Awaited<ReturnType<typeof prisma.product.findMany<{
   include: { category: { select: { name: true } }; variants: true }
 }>>>[number]
 
-async function getProductContext(query: string): Promise<{
+interface CatalogueCache {
+  products: ProductWithVariants[]
   text: string
-  cards: ProductWithVariants[]
-}> {
-  const [matchedProducts, featuredProducts] = await Promise.all([
-    prisma.product.findMany({
-      where: {
-        deleted: false,
-        stock: { gt: 0 },
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { description: { contains: query, mode: "insensitive" } },
-          { moodTags: { hasSome: [query] } },
-          { category: { name: { contains: query, mode: "insensitive" } } },
-        ],
-      },
-      include: {
-        category: { select: { name: true } },
-        variants: {
-          where: { stock: { gt: 0 } },
-          orderBy: { sortOrder: "asc" },
-          take: 5,
-        },
-      },
-      take: 8,
-      orderBy: { averageRating: { sort: "desc", nulls: "last" } },
-    }),
-    prisma.product.findMany({
-      where: { deleted: false, featured: true, stock: { gt: 0 } },
-      include: {
-        category: { select: { name: true } },
-        variants: {
-          where: { stock: { gt: 0 } },
-          orderBy: { sortOrder: "asc" },
-          take: 3,
-        },
-      },
-      take: 6,
-      orderBy: { createdAt: "desc" },
-    }),
-  ])
+  expiresAt: number
+}
 
-  const seen = new Set<string>()
-  let products = [...matchedProducts, ...featuredProducts].filter((p) => {
-    if (seen.has(p.id)) return false
-    seen.add(p.id)
-    return true
-  })
+let _catalogueCache: CatalogueCache | null = null
+const CATALOGUE_TTL_MS = 5 * 60_000 // 5 minutes
 
-  if (products.length === 0) {
-    products = await prisma.product.findMany({
-      where: { deleted: false, stock: { gt: 0 } },
-      include: {
-        category: { select: { name: true } },
-        variants: {
-          where: { stock: { gt: 0 } },
-          orderBy: { sortOrder: "asc" },
-          take: 3,
-        },
-      },
-      take: 10,
-      orderBy: { createdAt: "desc" },
-    })
+async function getCatalogue(): Promise<{ products: ProductWithVariants[]; text: string }> {
+  const now = Date.now()
+  if (_catalogueCache && now < _catalogueCache.expiresAt) {
+    return { products: _catalogueCache.products, text: _catalogueCache.text }
   }
 
-  return { text: formatProducts(products), cards: products }
+  const products = await prisma.product.findMany({
+    where: { deleted: false, stock: { gt: 0 } },
+    include: {
+      category: { select: { name: true } },
+      variants: {
+        where: { stock: { gt: 0 } },
+        orderBy: { sortOrder: "asc" },
+        take: 5,
+      },
+    },
+    orderBy: [{ featured: "desc" }, { averageRating: { sort: "desc", nulls: "last" } }],
+  })
+
+  const text = formatProducts(products)
+  _catalogueCache = { products, text, expiresAt: now + CATALOGUE_TTL_MS }
+  return { products, text }
+}
+
+/** Call this whenever a product is created/updated/deleted to bust the cache immediately. */
+export function invalidateCatalogueCache() {
+  _catalogueCache = null
 }
 
 function formatProducts(products: ProductWithVariants[]): string {
@@ -200,7 +183,7 @@ async function getOrderContext(userId: string): Promise<string> {
 
 // ── System prompt ──────────────────────────────────────────────────────────
 
-function buildSystemPrompt(productContext: string, orderContext: string): string {
+function buildSystemPrompt(productContext: string, orderContext: string, totalProductCount: number): string {
   return `You are Dach, the personal shopping assistant for DACH Home & Body — a luxury home fragrance, natural skincare, and gift services brand based in Abuja, Nigeria.
 
 Your personality: warm, knowledgeable, elegant, and personal — like a trusted friend who knows every product intimately. You speak with confidence and grace, matching the brand's minimalist luxury aesthetic. Keep responses concise and helpful, typically 2–4 sentences unless more detail is genuinely needed.
@@ -212,6 +195,7 @@ About the brand:
 - Delivery: Abuja — same day (except custom orders); Nationwide — 3–5 business days
 - Payments: Paystack and Flutterwave (cards, bank transfer, USSD)
 - Currency: Nigerian Naira (₦)
+- Total products in stock: ${totalProductCount}
 
 What you can help with:
 - Recommending products based on mood, occasion, budget, or scent preferences
@@ -232,6 +216,7 @@ Important rules:
 - If a customer asks about something not in the catalogue, say so honestly and suggest alternatives
 - Never make up products, prices, or policies you don't know
 - For order tracking links, direct them to /account/orders
+- When sharing links, write them as plain paths like /shop or /account/orders — do not use markdown link syntax like [text](url)
 - Keep the tone warm and personal — never robotic or salesy`
 }
 
@@ -247,8 +232,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) {
+  if (!process.env.GEMINI_API_KEY) {
     return Response.json(
       { error: "Chatbot is not configured. Please add GEMINI_API_KEY." },
       { status: 503 }
@@ -273,26 +257,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // ── Auth check for order lookup ────────────────────────────────────────
+    // ── Fetch catalogue (cached) + auth + order context in parallel ─────────
     const session = await auth()
     const userId = session?.user?.id as string | undefined
 
-    // ── Fetch product context + order context in parallel ──────────────────
-    const [{ text: productContextText, cards: productCards }, orderContext] = await Promise.all([
-      getProductContext(message.trim()),
+    const [{ products: allProducts, text: productContextText }, orderContext] = await Promise.all([
+      getCatalogue(),
       userId ? getOrderContext(userId) : Promise.resolve(""),
     ])
-
-    const ai = new GoogleGenAI({ apiKey })
 
     const trimmedHistory = history.slice(-10)
     const firstUserIdx = trimmedHistory.findIndex((t) => t.role === "user")
     const safeHistory = firstUserIdx === -1 ? [] : trimmedHistory.slice(firstUserIdx)
 
-    const chat = ai.chats.create({
-      model: "gemini-2.5-flash",
+    const chat = getAI().chats.create({
+      model: "gemini-3.1-flash-lite",
       config: {
-        systemInstruction: buildSystemPrompt(productContextText, orderContext),
+        systemInstruction: buildSystemPrompt(productContextText, orderContext, allProducts.length),
         maxOutputTokens: 512,
         temperature: 0.7,
       },
@@ -305,13 +286,14 @@ export async function POST(req: NextRequest) {
     const reply = response.text ?? ""
 
     // ── Determine which product cards to return ────────────────────────────
-    // Return cards only for the products mentioned/recommended in the reply
-    const mentionedCards = productCards
+    // Scan the full catalogue for any product the AI mentioned by name or slug
+    const replyLower = reply.toLowerCase()
+    const mentionedCards = allProducts
       .filter((p) =>
-        reply.toLowerCase().includes(p.name.toLowerCase()) ||
+        replyLower.includes(p.name.toLowerCase()) ||
         reply.includes(`/shop/${p.slug}`)
       )
-      .slice(0, 4)
+      .slice(0, 6)
       .map((p) => ({
         id: p.id,
         name: p.name,
@@ -321,7 +303,7 @@ export async function POST(req: NextRequest) {
         category: p.category.name,
       }))
 
-    // ── Log to DB (non-blocking — don't await) ─────────────────────────────
+    // ── Log to DB (non-blocking) ───────────────────────────────────────────
     prisma.chatLog
       .create({
         data: {
