@@ -240,7 +240,7 @@ function ProductCard({ product, badge }: { product: Product; badge?: string }) {
     : null
 
   return (
-    <div className="group flex flex-col">
+    <div className="group flex flex-col h-full">
       {/* Image */}
       <Link href={`/shop/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] bg-[#F2EDE8]">
         {product.images[0] ? (
@@ -295,25 +295,27 @@ function ProductCard({ product, badge }: { product: Product; badge?: string }) {
           </h3>
         </Link>
         {notes && (
-          <p className="text-[#8C8C8C] text-[11px] tracking-wide mb-2 leading-relaxed">{notes}</p>
+          <p className="text-[#8C8C8C] text-[11px] tracking-wide mb-2 leading-relaxed line-clamp-2">{notes}</p>
         )}
-        <div className="flex items-center gap-2 mb-3">
-          <p className="font-serif text-[#111111] text-base">₦{product.price.toLocaleString()}</p>
-          {product.compareAtPrice && product.compareAtPrice > product.price && (
-            <p className="text-[#8C8C8C] text-sm line-through">₦{product.compareAtPrice.toLocaleString()}</p>
-          )}
+        <div className="mt-auto pt-3 flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <p className="font-serif text-[#111111] text-base">₦{product.price.toLocaleString()}</p>
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <p className="text-[#8C8C8C] text-sm line-through">₦{product.compareAtPrice.toLocaleString()}</p>
+            )}
+          </div>
+          {/* Always-visible Add to Cart */}
+          <AddToCartButton
+            product={{
+              id: product.id,
+              name: product.name,
+              slug: product.slug,
+              price: product.price,
+              images: product.images,
+              stock: product.stock,
+            }}
+          />
         </div>
-        {/* Always-visible Add to Cart */}
-        <AddToCartButton
-          product={{
-            id: product.id,
-            name: product.name,
-            slug: product.slug,
-            price: product.price,
-            images: product.images,
-            stock: product.stock,
-          }}
-        />
       </div>
     </div>
   )
@@ -349,7 +351,7 @@ function BestSellers({ products }: { products: Product[] }) {
         </div>
 
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 items-stretch">
             {products.map((p, i) => (
               <ProductCard key={p.id} product={p} badge={i < 2 ? "Best Seller" : undefined} />
             ))}
@@ -574,7 +576,7 @@ function NewArrivals({ products }: { products: Product[] }) {
             </svg>
           </Link>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 items-stretch">
           {products.slice(0, 4).map((p) => (
             <ProductCard key={p.id} product={p} badge="New" />
           ))}
