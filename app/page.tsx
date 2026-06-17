@@ -874,12 +874,12 @@ export default async function HomePage() {
         <BrandMarquee />
         {/* 4. Best Sellers — highest conversion products first */}
         <BestSellers products={bestSellers} />
-        {/* 5. Gift Box — primary revenue driver */}
-        <GiftBoxSection />
-        {/* 6. Collections — buyable category grid */}
-        <CollectionsGrid categories={categories} />
-        {/* 7. New Arrivals */}
+        {/* 5. New Arrivals */}
         <NewArrivals products={newArrivals} />
+        {/* 6. Gift Box — primary revenue driver */}
+        <GiftBoxSection />
+        {/* 7. Collections — buyable category grid */}
+        <CollectionsGrid categories={categories} />
         {/* 8. Social Proof — reviews + CTA */}
         <SocialProof />
         {/* 9. Brand Trust — condensed story + stats */}
