@@ -1,7 +1,10 @@
 import { Resend } from "resend"
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazily initialize Resend so it's not instantiated at module load time
+// (build-time env vars are not available in all Next.js build steps)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 // Email configuration
 // Use RESEND_FROM_EMAIL env var if set (verified domain), otherwise fall back
@@ -150,7 +153,7 @@ export async function sendPasswordResetEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Reset your ${SITE_NAME} password`,
@@ -229,7 +232,7 @@ export async function sendOrderConfirmationEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Order confirmed — ${orderNumber}`,
@@ -279,7 +282,7 @@ export async function sendShippingNotificationEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Your order ${orderNumber} has shipped`,
@@ -322,7 +325,7 @@ export async function sendDeliveryConfirmationEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Your order ${orderNumber} has been delivered`,
@@ -357,7 +360,7 @@ export async function sendNewsletterWelcomeEmail(email: string) {
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Welcome to ${SITE_NAME}`,
@@ -459,7 +462,7 @@ export async function sendPaymentRequestFulfilledEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Your payment request was fulfilled — ${orderNumber}`,
@@ -521,7 +524,7 @@ export async function sendPayerConfirmationEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: payerEmail,
       subject: `Payment confirmed — ${orderNumber}`,
@@ -567,7 +570,7 @@ export async function sendAdminPaymentRequestNotification(
   `
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: adminEmail,
       subject: `[Admin] Pay-For-Me order fulfilled — ${orderNumber}`,
@@ -618,7 +621,7 @@ export async function sendPaymentRequestLinkEmail(
     </p>`
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `Your payment request link — ${formatCurrency(total)}`,
