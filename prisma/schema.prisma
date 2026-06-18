@@ -16,11 +16,14 @@ enum UserRole {
 }
 
 enum FragranceType {
-  PERFUME
-  EAU_DE_PARFUM
-  EAU_DE_TOILETTE
-  COLOGNE
-  BODY_MIST
+  FLORAL      // rose, jasmine, lavender
+  WOODY       // sandalwood, cedarwood, oud
+  CITRUS      // lemon, bergamot, orange
+  ORIENTAL    // amber, musk, vanilla, spice
+  FRESH       // clean, aquatic, airy
+  FRUITY      // tropical, berry, apple
+  EARTHY      // patchouli, eucalyptus, herbal
+  GOURMAND    // chocolate, caramel, coffee
 }
 
 enum Longevity {

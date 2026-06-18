@@ -42,11 +42,14 @@ export async function generateMetadata({
 // ---------------------------------------------------------------------------
 
 const fragranceTypeLabel: Record<string, string> = {
-  PERFUME: "Perfume",
-  EAU_DE_PARFUM: "Eau de Parfum",
-  EAU_DE_TOILETTE: "Eau de Toilette",
-  COLOGNE: "Cologne",
-  BODY_MIST: "Body Mist",
+  FLORAL: "Floral",
+  WOODY: "Woody",
+  CITRUS: "Citrus",
+  ORIENTAL: "Oriental",
+  FRESH: "Fresh",
+  FRUITY: "Fruity",
+  EARTHY: "Earthy",
+  GOURMAND: "Gourmand",
 }
 
 const genderLabel: Record<string, string> = {
@@ -77,8 +80,11 @@ function getBestEnjoyedDuring(moodTags: string[], fragranceType?: string | null)
   if (tags.some((t) => t.includes("work") || t.includes("focus") || t.includes("study"))) {
     moments.push("Focused work sessions")
   }
-  if (fragranceType === "BODY_MIST") {
+  if (fragranceType === "FRESH") {
     moments.push("After a shower", "Layering with other scents")
+  }
+  if (fragranceType === "FLORAL" || fragranceType === "ORIENTAL") {
+    moments.push("Intimate occasions", "Date nights")
   }
 
   // Defaults if nothing matched

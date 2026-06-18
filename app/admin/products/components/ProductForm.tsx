@@ -281,11 +281,14 @@ function ProductDetailsStep({
           <div className="relative">
             <select id="fragranceType" name="fragranceType" defaultValue={initialData?.fragranceType ?? ""} className={selectCls()}>
               <option value="">Select type…</option>
-              <option value="PERFUME">Perfume</option>
-              <option value="EAU_DE_PARFUM">Eau de Parfum</option>
-              <option value="EAU_DE_TOILETTE">Eau de Toilette</option>
-              <option value="COLOGNE">Cologne</option>
-              <option value="BODY_MIST">Body Mist</option>
+              <option value="FLORAL">Floral</option>
+              <option value="WOODY">Woody</option>
+              <option value="CITRUS">Citrus</option>
+              <option value="ORIENTAL">Oriental</option>
+              <option value="FRESH">Fresh</option>
+              <option value="FRUITY">Fruity</option>
+              <option value="EARTHY">Earthy</option>
+              <option value="GOURMAND">Gourmand</option>
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
