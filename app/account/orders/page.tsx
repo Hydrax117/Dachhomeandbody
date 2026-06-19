@@ -10,6 +10,7 @@ import { redirect } from "next/navigation"
 import { getUserOrders, getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
+import Pagination from "@/app/components/ui/Pagination"
 
 // Derive the order shape from the existing data access function
 type OrderListItem = NonNullable<Awaited<ReturnType<typeof getOrder>>>
@@ -229,32 +230,14 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <nav
-              className="flex items-center justify-center gap-2 pt-2"
-              aria-label="Order history pagination"
-            >
-              {page > 1 && (
-                <Link
-                  href={`/account/orders?page=${page - 1}`}
-                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
-                >
-                  ← Previous
-                </Link>
-              )}
-              <span className="text-xs text-[#8C8C8C]">
-                Page {page} of {totalPages}
-              </span>
-              {page < totalPages && (
-                <Link
-                  href={`/account/orders?page=${page + 1}`}
-                  className="px-3 py-1.5 text-xs border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
-                >
-                  Next →
-                </Link>
-              )}
-            </nav>
-          )}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            itemLabel="orders"
+            buildUrl={(p) => `/account/orders?page=${p}`}
+            centered
+          />
         </>
       )}
     </div>

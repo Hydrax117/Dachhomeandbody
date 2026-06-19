@@ -4,6 +4,7 @@ import Link from "next/link"
 import { deleteProductAction } from "./actions"
 import ProductsToolbar from "./components/ProductsToolbar"
 import DeleteProductButton from "./components/DeleteProductButton"
+import Pagination from "@/app/components/ui/Pagination"
 
 export const metadata = {
   title: "Products",
@@ -235,31 +236,13 @@ export default async function AdminProductsPage({
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="border-t border-[#e5e5e5] px-4 py-3 flex items-center justify-between bg-[#F8F5F2]">
-              <p className="text-xs text-[#8C8C8C]">
-                Page {page} of {totalPages} — {total} products
-              </p>
-              <div className="flex items-center gap-2">
-                {page > 1 && (
-                  <Link
-                    href={buildPageUrl(params, page - 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
-                  >
-                    ← Prev
-                  </Link>
-                )}
-                {page < totalPages && (
-                  <Link
-                    href={buildPageUrl(params, page + 1)}
-                    className="text-xs px-3 py-1.5 border border-[#e5e5e5] rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
-                  >
-                    Next →
-                  </Link>
-                )}
-              </div>
-            </div>
-          )}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            itemLabel="products"
+            buildUrl={(p) => buildPageUrl(params, p)}
+          />
         </div>
       )}
     </div>
