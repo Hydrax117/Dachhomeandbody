@@ -16,7 +16,7 @@ function AboutHero() {
   return (
     <section className="relative min-h-[60vh] flex items-end overflow-hidden bg-[#0A0A0A]">
       <Image
-        src="/story-image.png"
+        src="/homepage-image.jpeg"
         alt="DACH Home & Body — crafted with intention"
         fill
         priority
@@ -273,7 +273,7 @@ function SustainabilitySection() {
           {/* Visual placeholder */}
           <div className="relative min-h-[340px] sm:min-h-[440px] overflow-hidden order-last lg:order-first">
             <Image
-              src="/homepage-bg.png"
+              src="/homepage-image.jpeg"
               alt="DACH Home & Body — sustainability and community"
               fill
               className="object-cover object-center"

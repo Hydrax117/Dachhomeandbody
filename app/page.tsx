@@ -691,7 +691,7 @@ function BrandTrust() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="relative min-h-[300px] sm:min-h-[400px] overflow-hidden">
             <Image
-              src="/story-image.png"
+              src="/homepage-image.jpeg"
               alt="DACH Home & Body — crafted with intention"
               fill
               className="object-cover"
