@@ -111,15 +111,24 @@ function selectCls(error?: string) {
   ].join(" ")
 }
 
-function SubmitButton({ mode }: { mode: "create" | "edit" }) {
+function SubmitButton({ mode, isUploading }: { mode: "create" | "edit"; isUploading: boolean }) {
   const { pending } = useFormStatus()
+  const disabled = pending || isUploading
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={disabled}
+      title={isUploading ? "Please wait for images to finish uploading" : undefined}
       className="inline-flex items-center gap-2 bg-[#111111] text-white text-xs tracking-[0.12em] uppercase px-6 py-3 rounded hover:bg-[#1a1a1a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {pending
+      {isUploading
+        ? <>
+            <svg className="animate-spin w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+            </svg>
+            Uploading images…
+          </>
+        : pending
         ? mode === "edit" ? "Saving…" : "Creating…"
         : mode === "edit" ? "Save Changes" : "Create Product"}
     </button>
@@ -444,25 +453,35 @@ function ProductDetailsStep({
 function ImagesAndStockStep({
   errors,
   initialData,
+  onUploadingChange,
 }: {
   errors: CreateProductState["errors"]
   initialData?: ProductInitialData
+  onUploadingChange: (uploading: boolean) => void
 }) {
   const [images, setImages] = useState<string[]>(initialData?.images ?? [])
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0) // 0-100
   const [uploadError, setUploadError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [, startTransition] = useTransition()
   const dragIndex = useRef<number | null>(null)
 
+  function setUploadingState(val: boolean) {
+    setUploading(val)
+    onUploadingChange(val)
+  }
+
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     if (!files.length) return
     setUploadError("")
-    setUploading(true)
+    setUploadingState(true)
+    setUploadProgress(0)
 
     const uploaded: string[] = []
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
       const fd = new FormData()
       fd.append("file", file)
       try {
@@ -473,12 +492,14 @@ function ImagesAndStockStep({
       } catch (err) {
         setUploadError(err instanceof Error ? err.message : "Upload failed")
       }
+      setUploadProgress(Math.round(((i + 1) / files.length) * 100))
     }
 
     startTransition(() => {
       setImages((prev) => [...prev, ...uploaded])
     })
-    setUploading(false)
+    setUploadingState(false)
+    setUploadProgress(0)
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
@@ -516,12 +537,18 @@ function ImagesAndStockStep({
       <div>
         <Label htmlFor="imageUpload">Product Images</Label>
         <div
-          className="border-2 border-dashed border-[#e5e5e5] rounded-lg p-6 text-center hover:border-[#B8965C] transition-colors cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-          onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+          className={[
+            "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
+            uploading
+              ? "border-[#B8965C] cursor-not-allowed"
+              : "border-[#e5e5e5] hover:border-[#B8965C] cursor-pointer",
+          ].join(" ")}
+          onClick={() => !uploading && fileInputRef.current?.click()}
+          onKeyDown={(e) => !uploading && e.key === "Enter" && fileInputRef.current?.click()}
           role="button"
           tabIndex={0}
           aria-label="Upload product images"
+          aria-busy={uploading}
         >
           <input
             ref={fileInputRef}
@@ -531,9 +558,34 @@ function ImagesAndStockStep({
             multiple
             className="sr-only"
             onChange={handleFileChange}
+            disabled={uploading}
           />
           {uploading ? (
-            <p className="text-sm text-[#8C8C8C]">Uploading…</p>
+            <div className="space-y-3">
+              <svg className="mx-auto animate-spin text-[#B8965C]" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              <p className="text-sm text-[#111111] font-medium">Uploading images…</p>
+              {/* Progress bar */}
+              <div className="w-full max-w-xs mx-auto">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] text-[#8C8C8C] tracking-wide">Progress</span>
+                  <span className="text-[10px] text-[#B8965C] font-medium">{uploadProgress}%</span>
+                </div>
+                <div className="w-full h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#B8965C] rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${uploadProgress}%` }}
+                    role="progressbar"
+                    aria-valuenow={uploadProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Upload progress"
+                  />
+                </div>
+              </div>
+              <p className="text-[11px] text-[#aaa]">Please wait — do not submit yet</p>
+            </div>
           ) : (
             <>
               <svg className="mx-auto mb-2 text-[#B8965C]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -647,6 +699,7 @@ function ImagesAndStockStep({
 export default function ProductForm({ categories, action, initialData, mode = "create" }: ProductFormProps) {
   const [step, setStep] = useState<Step>(0)
   const [state, formAction] = useActionState(action, {})
+  const [isUploading, setIsUploading] = useState(false)
 
   // Detect product line from selected category to show relevant Step 2 fields
   const initialCategory = categories.find((c) => c.id === initialData?.categoryId)
@@ -741,7 +794,7 @@ export default function ProductForm({ categories, action, initialData, mode = "c
           />
         </div>
         <div className={step === 2 ? undefined : "hidden"} aria-hidden={step !== 2}>
-          <ImagesAndStockStep errors={state.errors} initialData={initialData} />
+          <ImagesAndStockStep errors={state.errors} initialData={initialData} onUploadingChange={setIsUploading} />
         </div>
       </div>
 
@@ -766,7 +819,7 @@ export default function ProductForm({ categories, action, initialData, mode = "c
               Next →
             </button>
           ) : (
-            <SubmitButton mode={mode} />
+            <SubmitButton mode={mode} isUploading={isUploading} />
           )}
         </div>
       </div>
