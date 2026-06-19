@@ -67,18 +67,30 @@ function MissionStatement() {
             <div className="w-8 h-px bg-[#B8965C]" aria-hidden="true" />
           </div>
           <p
-            className="font-serif text-[#111111] font-light leading-[1.5] text-center"
+            className="font-serif text-[#111111] font-light leading-[1.5] text-center mb-6"
             style={{ fontSize: "clamp(1.35rem, 3vw, 2rem)" }}
           >
-            Transforming everyday spaces into calming, luxurious experiences through
-            home fragrance and aromatherapy-based skincare.
+            Dach Home &amp; Body is a proudly Nigerian brand transforming everyday spaces
+            into calming, luxurious experiences.
           </p>
-          <p className="text-[#4A4A4A] leading-[1.95] mt-6 text-sm sm:text-base max-w-2xl mx-auto">
-            Dach Home &amp; Body is a proudly Nigerian brand with roots in Abuja, FCT. Our
-            handcrafted candles, reed diffusers, fragrance oils, body oils, and soaps are
-            inspired by nature — designed to enhance wellness and elevate the rituals of
-            daily living.
-          </p>
+          <div className="space-y-4 text-[#4A4A4A] leading-[1.95] text-sm sm:text-base text-left max-w-2xl mx-auto">
+            <p>
+              Our handcrafted candles, reed diffusers, fragrance oils, body oils, and soaps
+              are inspired by nature — designed to enhance wellness and elevate daily living
+              through home fragrance and aromatherapy-based skincare.
+            </p>
+            <p>
+              Committed to sustainability, we use responsibly sourced ingredients and
+              eco-friendly minimal wastage. By partnering with local suppliers and creating
+              opportunities for women and youth, we promote inclusive economic growth.
+            </p>
+            <p>
+              We also offer curated gifting services for individuals, businesses, and special
+              events, delivering memorable, personalised experiences. Through digital sales,
+              gift sets, and wholesale partnerships, we combine purpose, beauty, and growth
+              in every product.
+            </p>
+          </div>
         </div>
       </div>
     </section>

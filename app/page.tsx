@@ -107,7 +107,7 @@ function Hero() {
       <div className="relative w-full lg:w-[48%] xl:w-[52%] min-h-[45vh] lg:min-h-screen overflow-hidden">
         {/* Main image */}
         <Image
-          src="/homepage-bg.png"
+          src="/homepage-image.jpeg"
           alt="DACH Home & Body — luxury fragrance and skincare"
           fill
           priority
