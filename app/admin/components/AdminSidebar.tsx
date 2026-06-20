@@ -291,7 +291,7 @@ function NavItem({ item, counts }: { item: NavItemDef; counts: AdminCounts | nul
   const isActive =
     item.href === "/admin"
       ? pathname === "/admin"
-      : pathname.startsWith(item.href)
+      : pathname === item.href || pathname.startsWith(item.href + "/")
 
   const badgeCount = item.badgeKey && counts ? counts[item.badgeKey] : 0
   // Pulse animation only when not on that page (new arrivals)

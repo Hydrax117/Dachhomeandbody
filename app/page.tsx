@@ -2,7 +2,6 @@ import { connection } from "next/server"
 import Link from "next/link"
 import Image from "next/image"
 import { getBestSellers, getNewArrivals } from "@/lib/products"
-import { getCategories } from "@/lib/categories"
 import { Newsletter } from "@/app/components/Newsletter"
 import { AddToCartButton } from "@/app/components/ui/AddToCartButton"
 
@@ -859,8 +858,7 @@ function Footer() {
 export default async function HomePage() {
   await connection()
 
-  const [categories, bestSellers, newArrivals] = await Promise.all([
-    getCategories(),
+  const [bestSellers, newArrivals] = await Promise.all([
     getBestSellers(8),
     getNewArrivals(4),
   ])
@@ -880,9 +878,7 @@ export default async function HomePage() {
         <NewArrivals products={newArrivals} />
         {/* 6. Gift Box — primary revenue driver */}
         <GiftBoxSection />
-        {/* 7. Collections — buyable category grid */}
-        <CollectionsGrid categories={categories} />
-        {/* 8. Social Proof — reviews + CTA */}
+        {/* 7. Social Proof — reviews + CTA */}
         <SocialProof />
         {/* 9. Brand Trust — condensed story + stats */}
         <BrandTrust />
