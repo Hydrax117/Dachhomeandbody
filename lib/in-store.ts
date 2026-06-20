@@ -158,11 +158,12 @@ export async function getTodayInStoreSummary() {
 
 /**
  * Record an in-store sale.
- * - Validates stock availability
- * - Decrements stock (variant if applicable, otherwise product)
- * - Re-syncs product base stock when variants are involved
- * - Creates StockHistory entries with channel = IN_STORE_SALE
- * All wrapped in a transaction.
+ *
+ * Structured to minimise round trips inside the transaction to avoid
+ * pgbouncer's transaction-mode timeout:
+ * 1. Bulk-fetch all products and variants needed (outside transaction — read-only)
+ * 2. Validate stock availability (in memory, no DB)
+ * 3. Run a single short transaction: create sale, bulk-update stock, bulk-create history
  */
 export async function createInStoreSale(
   input: InStoreSaleCreateInput,
@@ -171,15 +172,32 @@ export async function createInStoreSale(
   const { items, customerName, paymentMethod, notes } = inStoreSaleCreateSchema.parse(input)
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const total = subtotal // No shipping for in-store; extend later if needed
+  const total = subtotal
 
-  // Validate stock availability before starting transaction
+  // ── 1. Bulk-fetch all products and variants needed ─────────────────────
+  const productIds = [...new Set(items.map((i) => i.productId))]
+  const variantIds = [...new Set(items.map((i) => i.variantId).filter((id): id is string => !!id))]
+
+  const [products, variants] = await Promise.all([
+    prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, stock: true, name: true },
+    }),
+    variantIds.length > 0
+      ? prisma.productVariant.findMany({
+          where: { id: { in: variantIds } },
+          select: { id: true, productId: true, stock: true, name: true },
+        })
+      : Promise.resolve([]),
+  ])
+
+  const productMap = new Map(products.map((p) => [p.id, p]))
+  const variantMap = new Map(variants.map((v) => [v.id, v]))
+
+  // ── 2. Validate stock in memory ────────────────────────────────────────
   for (const item of items) {
     if (item.variantId) {
-      const variant = await prisma.productVariant.findUnique({
-        where: { id: item.variantId },
-        select: { stock: true, name: true },
-      })
+      const variant = variantMap.get(item.variantId)
       if (!variant) throw new Error(`Variant not found for ${item.productName}`)
       if (variant.stock < item.quantity) {
         throw new Error(
@@ -188,10 +206,7 @@ export async function createInStoreSale(
         )
       }
     } else {
-      const product = await prisma.product.findUnique({
-        where: { id: item.productId },
-        select: { stock: true, name: true },
-      })
+      const product = productMap.get(item.productId)
       if (!product) throw new Error(`Product not found: ${item.productName}`)
       if (product.stock < item.quantity) {
         throw new Error(
@@ -202,11 +217,33 @@ export async function createInStoreSale(
     }
   }
 
+  // Pre-compute all new stock values in memory to keep the transaction short
+  // Track running stock per variant/product across multiple line items
+  const variantStockDelta = new Map<string, number>() // variantId → total qty sold
+  const productStockDelta = new Map<string, number>() // productId → total qty sold (non-variant)
+
+  for (const item of items) {
+    if (item.variantId) {
+      variantStockDelta.set(
+        item.variantId,
+        (variantStockDelta.get(item.variantId) ?? 0) + item.quantity
+      )
+    } else {
+      productStockDelta.set(
+        item.productId,
+        (productStockDelta.get(item.productId) ?? 0) + item.quantity
+      )
+    }
+  }
+
+  const saleNumber = generateSaleNumber()
+
+  // ── 3. Single short transaction ────────────────────────────────────────
   return prisma.$transaction(async (tx) => {
-    // Create the in-store sale record
+    // Create the sale record
     const sale = await tx.inStoreSale.create({
       data: {
-        saleNumber: generateSaleNumber(),
+        saleNumber,
         staffId: staffUserId,
         customerName: customerName ?? null,
         items: items.map((i) => ({
@@ -226,102 +263,79 @@ export async function createInStoreSale(
       select: { id: true, saleNumber: true },
     })
 
-    // Decrement stock and create history entries
-    for (const item of items) {
-      if (item.variantId) {
-        const variant = await tx.productVariant.findUnique({
-          where: { id: item.variantId },
-          select: { stock: true },
-        })
-        if (!variant) continue
+    // Decrement variant stock
+    for (const [variantId, qty] of variantStockDelta.entries()) {
+      const variant = variantMap.get(variantId)!
+      const newStock = variant.stock - qty
+      await tx.productVariant.update({
+        where: { id: variantId },
+        data: { stock: newStock },
+      })
+      await tx.stockHistory.create({
+        data: {
+          productId: variant.productId,
+          variantId,
+          userId: staffUserId,
+          inStoreSaleId: sale.id,
+          previousStock: variant.stock,
+          newStock,
+          change: -qty,
+          channel: "IN_STORE_SALE",
+          reason: "In-store sale",
+          notes: saleNumber,
+        },
+      })
+    }
 
-        const newVariantStock = variant.stock - item.quantity
+    // Re-sync product stock for products that had variant sales
+    // Group variants by product
+    const variantsByProduct = new Map<string, string[]>()
+    for (const [variantId] of variantStockDelta.entries()) {
+      const productId = variantMap.get(variantId)!.productId
+      const existing = variantsByProduct.get(productId) ?? []
+      variantsByProduct.set(productId, [...existing, variantId])
+    }
 
-        await tx.productVariant.update({
-          where: { id: item.variantId },
-          data: { stock: newVariantStock },
-        })
+    for (const [productId] of variantsByProduct.entries()) {
+      // Sum all variant stocks (using the delta values we already know)
+      const allVariants = variants.filter((v) => v.productId === productId)
+      const newProductStock = allVariants.reduce((sum, v) => {
+        const delta = variantStockDelta.get(v.id) ?? 0
+        return sum + (v.stock - delta)
+      }, 0)
+      await tx.product.update({
+        where: { id: productId },
+        data: { stock: newProductStock },
+      })
+    }
 
-        // Re-sync product base stock from sum of variants
-        const variants = await tx.productVariant.findMany({
-          where: { productId: item.productId },
-          select: { stock: true },
-        })
-        const newProductStock = variants.reduce((s, v) => s + v.stock, 0)
-
-        const product = await tx.product.findUnique({
-          where: { id: item.productId },
-          select: { stock: true },
-        })
-
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: newProductStock },
-        })
-
-        await tx.stockHistory.create({
-          data: {
-            productId: item.productId,
-            variantId: item.variantId,
-            userId: staffUserId,
-            inStoreSaleId: sale.id,
-            previousStock: variant.stock,
-            newStock: newVariantStock,
-            change: -item.quantity,
-            channel: "IN_STORE_SALE",
-            reason: "In-store sale",
-            notes: sale.saleNumber,
-          },
-        })
-
-        // Also record the product-level sync
-        if (product) {
-          await tx.stockHistory.create({
-            data: {
-              productId: item.productId,
-              variantId: null,
-              userId: staffUserId,
-              inStoreSaleId: sale.id,
-              previousStock: product.stock,
-              newStock: newProductStock,
-              change: newProductStock - product.stock,
-              channel: "IN_STORE_SALE",
-              reason: "In-store sale (product sync)",
-              notes: sale.saleNumber,
-            },
-          })
-        }
-      } else {
-        const product = await tx.product.findUnique({
-          where: { id: item.productId },
-          select: { stock: true },
-        })
-        if (!product) continue
-
-        const newStock = product.stock - item.quantity
-
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: newStock },
-        })
-
-        await tx.stockHistory.create({
-          data: {
-            productId: item.productId,
-            variantId: null,
-            userId: staffUserId,
-            inStoreSaleId: sale.id,
-            previousStock: product.stock,
-            newStock,
-            change: -item.quantity,
-            channel: "IN_STORE_SALE",
-            reason: "In-store sale",
-            notes: sale.saleNumber,
-          },
-        })
-      }
+    // Decrement non-variant product stock
+    for (const [productId, qty] of productStockDelta.entries()) {
+      const product = productMap.get(productId)!
+      const newStock = product.stock - qty
+      await tx.product.update({
+        where: { id: productId },
+        data: { stock: newStock },
+      })
+      await tx.stockHistory.create({
+        data: {
+          productId,
+          variantId: null,
+          userId: staffUserId,
+          inStoreSaleId: sale.id,
+          previousStock: product.stock,
+          newStock,
+          change: -qty,
+          channel: "IN_STORE_SALE",
+          reason: "In-store sale",
+          notes: saleNumber,
+        },
+      })
     }
 
     return sale
+  }, {
+    // Give pgbouncer enough headroom — 15 seconds covers the bulk writes
+    timeout: 15000,
   })
 }
