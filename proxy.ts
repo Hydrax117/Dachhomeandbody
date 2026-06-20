@@ -37,6 +37,8 @@ export default auth((req) => {
 
   const isLoggedIn = !!session?.user
   const isAdmin = session?.user?.role === "ADMIN"
+  const isStaff = session?.user?.role === "STAFF"
+  const isAdminOrStaff = isAdmin || isStaff
 
   // ── Always-public paths — never intercept ─────────────────────────────
   // /pay/  — Pay-For-Me public pages (payer has no account)
@@ -56,14 +58,14 @@ export default auth((req) => {
       loginUrl.searchParams.set("callbackUrl", pathname)
       return NextResponse.redirect(loginUrl)
     }
-    if (!isAdmin) {
+    if (!isAdminOrStaff) {
       return NextResponse.redirect(new URL("/", nextUrl))
     }
     return NextResponse.next()
   }
 
-  // ── Customer-only routes — redirect admins to their dashboard ──────────
-  if (customerOnlyRoutes.some((r) => pathname.startsWith(r)) && isLoggedIn && isAdmin) {
+  // ── Customer-only routes — redirect admins/staff to their dashboard ────
+  if (customerOnlyRoutes.some((r) => pathname.startsWith(r)) && isLoggedIn && isAdminOrStaff) {
     return NextResponse.redirect(new URL("/admin", nextUrl))
   }
 
@@ -84,7 +86,7 @@ export default auth((req) => {
   // ── Auth pages — redirect logged-in users to their destination ─────────
   if (authRoutes.some((r) => pathname.startsWith(r)) && isLoggedIn) {
     const callbackUrl = nextUrl.searchParams.get("callbackUrl")
-    const destination = isAdmin
+    const destination = isAdminOrStaff
       ? "/admin"
       : callbackUrl && callbackUrl.startsWith("/")
       ? callbackUrl

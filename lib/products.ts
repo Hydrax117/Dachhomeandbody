@@ -401,9 +401,16 @@ export async function getAdminProduct(id: string) {
 export const stockAdjustmentSchema = z.object({
   newStock: z.number().int().nonnegative({ message: "Stock cannot be negative" }),
   notes: z.string().max(500).optional(),
+  channel: z.enum(["MANUAL_ADJUSTMENT", "RESTOCK"]).default("MANUAL_ADJUSTMENT"),
+})
+
+export const restockSchema = z.object({
+  quantity: z.number().int().positive("Quantity must be at least 1"),
+  notes: z.string().max(500).optional(),
 })
 
 export type StockAdjustmentInput = z.infer<typeof stockAdjustmentSchema>
+export type RestockInput = z.infer<typeof restockSchema>
 
 /**
  * Update product stock and record the change in StockHistory.
@@ -414,7 +421,7 @@ export async function updateProductStock(
   input: StockAdjustmentInput,
   adminUserId?: string
 ) {
-  const { newStock, notes } = stockAdjustmentSchema.parse(input)
+  const { newStock, notes, channel } = stockAdjustmentSchema.parse(input)
 
   return prisma.$transaction(async (tx) => {
     const product = await tx.product.findUnique({
@@ -439,11 +446,98 @@ export async function updateProductStock(
         previousStock: product.stock,
         newStock,
         change,
-        reason: "Manual adjustment",
+        channel: channel,
+        reason: channel === "RESTOCK" ? "Restock" : "Manual adjustment",
         notes: notes ?? null,
       },
     })
 
+    return updated
+  })
+}
+
+/**
+ * Add stock to a product (restock from a shipment).
+ * Records StockHistory with channel = RESTOCK.
+ */
+export async function restockProduct(
+  productId: string,
+  input: RestockInput,
+  userId?: string
+) {
+  const { quantity, notes } = restockSchema.parse(input)
+
+  return prisma.$transaction(async (tx) => {
+    const product = await tx.product.findUnique({
+      where: { id: productId },
+      select: { id: true, stock: true, name: true },
+    })
+    if (!product) throw new Error("Product not found")
+
+    const newStock = product.stock + quantity
+
+    const updated = await tx.product.update({
+      where: { id: productId },
+      data: { stock: newStock },
+      select: productListSelect,
+    })
+
+    await tx.stockHistory.create({
+      data: {
+        productId,
+        userId: userId ?? null,
+        previousStock: product.stock,
+        newStock,
+        change: quantity,
+        channel: "RESTOCK",
+        reason: "Restock",
+        notes: notes ?? null,
+      },
+    })
+
+    return updated
+  })
+}
+
+/**
+ * Add stock to a specific variant (restock).
+ */
+export async function restockVariant(
+  variantId: string,
+  input: RestockInput,
+  userId?: string
+) {
+  const { quantity, notes } = restockSchema.parse(input)
+
+  const variant = await prisma.productVariant.findUnique({
+    where: { id: variantId },
+    select: { id: true, stock: true, productId: true },
+  })
+  if (!variant) throw new Error("Variant not found")
+
+  return prisma.$transaction(async (tx) => {
+    const newStock = variant.stock + quantity
+
+    const updated = await tx.productVariant.update({
+      where: { id: variantId },
+      data: { stock: newStock },
+    })
+
+    await tx.stockHistory.create({
+      data: {
+        productId: variant.productId,
+        variantId,
+        userId: userId ?? null,
+        previousStock: variant.stock,
+        newStock,
+        change: quantity,
+        channel: "RESTOCK",
+        reason: "Restock",
+        notes: notes ?? null,
+      },
+    })
+
+    await syncProductPriceAndStock(tx, variant.productId)
     return updated
   })
 }
@@ -464,6 +558,7 @@ export async function getStockHistory(productId: string, limit = 20) {
       previousStock: true,
       newStock: true,
       change: true,
+      channel: true,
       reason: true,
       notes: true,
       createdAt: true,
@@ -560,7 +655,7 @@ export async function updateVariantStock(
   input: StockAdjustmentInput,
   adminUserId?: string
 ) {
-  const { newStock, notes } = stockAdjustmentSchema.parse(input)
+  const { newStock, notes, channel } = stockAdjustmentSchema.parse(input)
 
   const variant = await prisma.productVariant.findUnique({
     where: { id: variantId },
@@ -584,7 +679,8 @@ export async function updateVariantStock(
         previousStock: variant.stock,
         newStock,
         change,
-        reason: "Manual adjustment",
+        channel: channel,
+        reason: channel === "RESTOCK" ? "Restock" : "Manual adjustment",
         notes: notes ?? null,
       },
     })
@@ -609,6 +705,7 @@ export async function getVariantStockHistory(variantId: string, limit = 20) {
       previousStock: true,
       newStock: true,
       change: true,
+      channel: true,
       reason: true,
       notes: true,
       createdAt: true,

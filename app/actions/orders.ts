@@ -29,7 +29,8 @@ export async function updateOrderStatusAction(
   status: string
 ): Promise<{ success: boolean; error?: string }> {
   const session = await auth()
-  if (!session?.user || session.user.role !== "ADMIN") {
+  // Both ADMIN and STAFF can update order status
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
     return { success: false, error: "Unauthorized" }
   }
 

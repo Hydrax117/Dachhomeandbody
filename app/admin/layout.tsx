@@ -17,13 +17,15 @@ export default async function AdminLayout({
   // Server-side role check (middleware handles redirect, this is a safety net)
   const session = await auth()
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
     redirect("/auth/login?callbackUrl=/admin")
   }
 
+  const isAdmin = session.user.role === "ADMIN"
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#F7F4EF]">
-      <AdminSidebar />
+      <AdminSidebar role={session.user.role} />
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -31,6 +33,11 @@ export default async function AdminLayout({
         <header className="h-16 bg-[#F8F5F2] border-b border-[#e5e5e5] flex items-center justify-between px-6 shrink-0">
           <div />
           <div className="flex items-center gap-3">
+            {!isAdmin && (
+              <span className="text-[9px] tracking-[0.15em] uppercase text-[#B8965C] bg-[#B8965C]/10 px-1.5 py-0.5 rounded">
+                Staff
+              </span>
+            )}
             <span className="text-xs text-[#8C8C8C]">
               {session.user.name ?? session.user.email}
             </span>

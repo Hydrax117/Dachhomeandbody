@@ -155,7 +155,8 @@ export async function updateGiftOrderStatusAction(
   status: string
 ): Promise<{ success: boolean; error?: string }> {
   const session = await auth()
-  if (!session?.user || session.user.role !== "ADMIN") {
+  // Both ADMIN and STAFF can update gift order status
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
     return { success: false, error: "Unauthorized" }
   }
 

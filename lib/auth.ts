@@ -7,7 +7,7 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { authConfig } from "@/auth.config"
 
-type UserRole = "CUSTOMER" | "ADMIN"
+type UserRole = "CUSTOMER" | "STAFF" | "ADMIN"
 
 // Extend the built-in session types
 declare module "next-auth" {

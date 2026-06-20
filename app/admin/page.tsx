@@ -5,11 +5,14 @@ import {
   getTopProducts,
   getCustomerMetrics,
 } from "@/lib/analytics"
+import { auth } from "@/lib/auth"
+import { getTodayInStoreSummary } from "@/lib/in-store"
 import Link from "next/link"
 import { Suspense } from "react"
 import DateRangeFilter, { type DateRangePreset } from "./components/DateRangeFilter"
 import RevenueChartWrapper from "./components/RevenueChartWrapper"
 import NeedsAttention from "./components/NeedsAttention"
+import StaffDashboard from "./components/StaffDashboard"
 
 export const metadata = {
   title: "Dashboard",
@@ -157,6 +160,42 @@ export default async function AdminDashboardPage({
   searchParams: Promise<{ range?: string }>
 }) {
   const params = await searchParams
+  const session = await auth()
+
+  // ── Staff dashboard ────────────────────────────────────────────────────
+  if (session?.user?.role === "STAFF") {
+    const [alertCounts, todaySummary, recentOrders] = await Promise.all([
+      getAlertStats(),
+      getTodayInStoreSummary(),
+      getRecentOrders(),
+    ])
+
+    return (
+      <StaffDashboard
+        staffName={session.user.name}
+        staffEmail={session.user.email}
+        initial={{
+          pendingOrders: alertCounts.pendingOrders,
+          newPayRequests: alertCounts.newPayRequests,
+          lowStock: alertCounts.lowStockProducts,
+          todaySales: todaySummary.saleCount,
+          todayRevenue: todaySummary.totalRevenue,
+          todayItems: todaySummary.totalItems,
+          recentOrders: recentOrders.map((o) => ({
+            id: o.id,
+            orderNumber: o.orderNumber,
+            total: o.total,
+            status: o.status,
+            createdAt: o.createdAt,
+            customerName: o.user?.name ?? o.guestName ?? "Guest",
+            customerEmail: o.user?.email ?? o.guestEmail ?? "",
+          })),
+        }}
+      />
+    )
+  }
+
+  // ── Admin dashboard ────────────────────────────────────────────────────
   const range = (params.range ?? "30d") as DateRangePreset
   const validRanges: DateRangePreset[] = ["7d", "30d", "90d", "365d"]
   const safeRange: DateRangePreset = validRanges.includes(range) ? range : "30d"

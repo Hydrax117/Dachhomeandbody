@@ -11,6 +11,7 @@ interface StockHistoryEntry {
   previousStock: number
   newStock: number
   change: number
+  channel: string
   reason: string
   notes: string | null
   createdAt: Date
@@ -47,6 +48,26 @@ function ChangeIndicator({ change }: { change: number }) {
   }
   return (
     <span className="text-red-600 text-xs font-medium">{change}</span>
+  )
+}
+
+// ── Channel badge ──────────────────────────────────────────────────────────
+
+const channelLabels: Record<string, { label: string; style: string }> = {
+  ONLINE_ORDER:      { label: "Online",    style: "bg-blue-50 text-blue-700 border-blue-200" },
+  IN_STORE_SALE:     { label: "In-Store",  style: "bg-purple-50 text-purple-700 border-purple-200" },
+  MANUAL_ADJUSTMENT: { label: "Manual",    style: "bg-gray-50 text-gray-600 border-gray-200" },
+  RESTOCK:           { label: "Restock",   style: "bg-green-50 text-green-700 border-green-200" },
+  CANCELLATION:      { label: "Cancelled", style: "bg-orange-50 text-orange-700 border-orange-200" },
+  REFUND:            { label: "Refund",    style: "bg-yellow-50 text-yellow-700 border-yellow-200" },
+}
+
+function ChannelBadge({ channel }: { channel: string }) {
+  const cfg = channelLabels[channel] ?? { label: channel, style: "bg-gray-50 text-gray-600 border-gray-200" }
+  return (
+    <span className={`inline-block text-[9px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded border ${cfg.style}`}>
+      {cfg.label}
+    </span>
   )
 }
 
@@ -216,7 +237,7 @@ export default function StockManager({
                     Before → After
                   </th>
                   <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
-                    Reason
+                    Channel
                   </th>
                   <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden lg:table-cell">
                     By
@@ -245,7 +266,7 @@ export default function StockManager({
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-xs text-[#8C8C8C]">{entry.reason}</span>
+                      <ChannelBadge channel={entry.channel} />
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
                       <span className="text-xs text-[#8C8C8C]">

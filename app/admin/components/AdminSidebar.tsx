@@ -34,14 +34,8 @@ function Badge({ count, pulse = false }: { count: number; pulse?: boolean }) {
 }
 
 // ---------------------------------------------------------------------------
-// Nav item definition
+// Nav item definition (now defined in nav groups section below)
 // ---------------------------------------------------------------------------
-interface NavItem {
-  label: string
-  href: string
-  icon: React.ReactNode
-  badgeKey?: keyof AdminCounts
-}
 
 function LogoutButton() {
   const { pending } = useFormStatus()
@@ -195,10 +189,47 @@ function PopupIcon() {
   )
 }
 
+function InventoryIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  )
+}
+
+function StaffIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <line x1="19" y1="8" x2="19" y2="14" />
+      <line x1="22" y1="11" x2="16" y2="11" />
+    </svg>
+  )
+}
+
 // ---------------------------------------------------------------------------
-// Nav groups
+// Nav groups — each item can declare which roles can see it
 // ---------------------------------------------------------------------------
-const navGroups = [
+
+type Role = "ADMIN" | "STAFF"
+
+interface NavItemDef {
+  label: string
+  href: string
+  icon: React.ReactNode
+  badgeKey?: keyof AdminCounts
+  roles?: Role[] // if undefined, visible to all admin/staff
+}
+
+interface NavGroup {
+  label: string
+  items: NavItemDef[]
+  roles?: Role[] // if undefined, group visible to all
+}
+
+const navGroups: NavGroup[] = [
   {
     label: "Overview",
     items: [
@@ -208,8 +239,8 @@ const navGroups = [
   {
     label: "Catalog",
     items: [
-      { label: "Products", href: "/admin/products", icon: <ProductsIcon /> },
-      { label: "Categories", href: "/admin/categories", icon: <CategoriesIcon /> },
+      { label: "Products", href: "/admin/products", icon: <ProductsIcon />, badgeKey: "lowStock" as const },
+      { label: "Categories", href: "/admin/categories", icon: <CategoriesIcon />, roles: ["ADMIN"] },
     ],
   },
   {
@@ -218,22 +249,36 @@ const navGroups = [
       { label: "Orders", href: "/admin/orders", icon: <OrdersIcon />, badgeKey: "pendingOrders" as const },
       { label: "Gift Boxes", href: "/admin/gift-boxes", icon: <GiftBoxIcon /> },
       { label: "Pay Requests", href: "/admin/payment-requests", icon: <PayRequestIcon />, badgeKey: "newPayRequests" as const },
-      { label: "Coupons", href: "/admin/coupons", icon: <CouponsIcon /> },
-      { label: "Shipping Rates", href: "/admin/shipping", icon: <ShippingIcon /> },
+      { label: "Coupons", href: "/admin/coupons", icon: <CouponsIcon />, roles: ["ADMIN"] },
+      { label: "Shipping Rates", href: "/admin/shipping", icon: <ShippingIcon />, roles: ["ADMIN"] },
+    ],
+  },
+  {
+    label: "Inventory",
+    items: [
+      { label: "Stock Levels", href: "/admin/inventory", icon: <InventoryIcon /> },
+      { label: "In-Store Sales", href: "/admin/inventory/in-store", icon: <StoreIcon /> },
     ],
   },
   {
     label: "Community",
     items: [
       { label: "Customers", href: "/admin/customers", icon: <CustomersIcon /> },
-      { label: "Reviews", href: "/admin/reviews", icon: <ReviewsIcon />, badgeKey: "pendingReviews" as const },
+      { label: "Reviews", href: "/admin/reviews", icon: <ReviewsIcon />, badgeKey: "pendingReviews" as const, roles: ["ADMIN"] },
     ],
   },
   {
     label: "Marketing",
     items: [
-      { label: "Popup", href: "/admin/popup", icon: <PopupIcon /> },
-      { label: "Chat", href: "/admin/chat", icon: <ChatIcon /> },
+      { label: "Popup", href: "/admin/popup", icon: <PopupIcon />, roles: ["ADMIN"] },
+      { label: "Chat", href: "/admin/chat", icon: <ChatIcon />, roles: ["ADMIN"] },
+    ],
+  },
+  {
+    label: "Management",
+    roles: ["ADMIN"],
+    items: [
+      { label: "Staff", href: "/admin/staff", icon: <StaffIcon />, roles: ["ADMIN"] },
     ],
   },
 ]
@@ -241,7 +286,7 @@ const navGroups = [
 // ---------------------------------------------------------------------------
 // Sidebar nav item
 // ---------------------------------------------------------------------------
-function NavItem({ item, counts }: { item: NavItem; counts: AdminCounts | null }) {
+function NavItem({ item, counts }: { item: NavItemDef; counts: AdminCounts | null }) {
   const pathname = usePathname()
   const isActive =
     item.href === "/admin"
@@ -274,7 +319,8 @@ function NavItem({ item, counts }: { item: NavItem; counts: AdminCounts | null }
 // ---------------------------------------------------------------------------
 // Sidebar
 // ---------------------------------------------------------------------------
-export default function AdminSidebar() {
+
+export default function AdminSidebar({ role }: { role: "ADMIN" | "STAFF" }) {
   const [counts, setCounts] = useState<AdminCounts | null>(null)
 
   const fetchCounts = useCallback(async () => {
@@ -297,6 +343,15 @@ export default function AdminSidebar() {
     return () => clearInterval(interval)
   }, [fetchCounts])
 
+  // Filter groups and items based on role
+  const visibleGroups = navGroups
+    .filter((g) => !g.roles || g.roles.includes(role))
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((item) => !item.roles || item.roles.includes(role)),
+    }))
+    .filter((g) => g.items.length > 0)
+
   return (
     <aside
       className="w-60 shrink-0 bg-[#F8F5F2] border-r border-[#e5e5e5] flex flex-col h-full"
@@ -311,7 +366,7 @@ export default function AdminSidebar() {
           Dachhomeandbody
         </Link>
         <span className="ml-2 text-[9px] tracking-[0.15em] uppercase text-[#B8965C] bg-[#B8965C]/10 px-1.5 py-0.5 rounded">
-          Admin
+          {role === "STAFF" ? "Staff" : "Admin"}
         </span>
         {/* Total unprocessed badge on brand — visible from anywhere */}
         {counts && (counts.pendingOrders + counts.newPayRequests) > 0 && (
@@ -323,7 +378,7 @@ export default function AdminSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-6">
-        {navGroups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.label}>
             <p className="text-[10px] tracking-[0.25em] uppercase text-[#aaa] mb-2 px-3">
               {group.label}
