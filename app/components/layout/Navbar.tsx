@@ -534,7 +534,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
 
           {/* Desktop nav links */}
           <ul
-            className="hidden lg:flex items-center gap-10 text-[10px] tracking-[0.18em] uppercase font-medium transition-colors duration-300"
+            className="hidden lg:flex items-center gap-10 text-xs tracking-[0.15em] uppercase font-semibold transition-colors duration-300"
             style={{ color: textColor }}
             role="list"
           >
