@@ -71,22 +71,30 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-        {giftBoxes.map((box, i) => (
-          <motion.div
-            key={box.id}
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.6,
-              delay: i * 0.12,
-              ease: [0.25, 0.1, 0.25, 1],
-            }}
-          >
-            <GiftBoxCard box={box} />
-          </motion.div>
-        ))}
-      </div>
+      {giftBoxes.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-[#C4C4C4] text-sm">
+            No gift boxes are available at the moment. Please check back soon.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {giftBoxes.map((box, i) => (
+            <motion.div
+              key={box.id}
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.6,
+                delay: i * 0.12,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+            >
+              <GiftBoxCard box={box} />
+            </motion.div>
+          ))}
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -120,11 +128,13 @@ function BuildStep({ products, categories }: { products: ProductData[]; categori
           Curate Your Selection
         </h2>
         <p className="text-[#8C8C8C] text-sm max-w-md mx-auto leading-relaxed">
-          Add up to{" "}
+          Choose between{" "}
+          <span className="text-[#111111] font-medium">1</span>
+          {" "}and{" "}
           <span className="text-[#111111] font-medium">
             {state.selectedBox?.maxItems} items
           </span>{" "}
-          to your{" "}
+          for your{" "}
           <span className="text-[#111111] font-medium">
             {state.selectedBox?.title}
           </span>

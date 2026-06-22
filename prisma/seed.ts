@@ -99,6 +99,61 @@ async function main() {
   })
   console.log('✅ Created coupon: WELCOME10 (10% off orders over ₦20,000)')
 
+  // ── Gift Boxes ─────────────────────────────────────────────────────────
+
+  const giftBoxes = [
+    {
+      title: 'Signature Cream Box',
+      slug: 'signature-cream-box',
+      description: 'Our classic cream textured gift box with black satin ribbon and gold embossed logo. Perfect for any occasion, this timeless choice speaks of understated elegance.',
+      image: '/images/gift-boxes/signature-cream.jpg',
+      maxItems: 3,
+      price: 5000,
+      theme: 'SIGNATURE_CREAM' as const,
+      active: true,
+      sortOrder: 1,
+    },
+    {
+      title: 'Noir Luxury Box',
+      slug: 'noir-luxury-box',
+      description: 'A statement in sophistication. Matte black rigid box with velvet interior, gold foil branding, and a premium weight that signals intention before it is even opened.',
+      image: '/images/gift-boxes/noir-luxury.jpg',
+      maxItems: 5,
+      price: 8500,
+      theme: 'NOIR_LUXURY' as const,
+      active: true,
+      sortOrder: 2,
+    },
+    {
+      title: 'Romantic Blush Box',
+      slug: 'romantic-blush-box',
+      description: 'Delicate nude blush tones with silk ribbon and a handwritten-style floral insert card. Ideal for anniversaries, Valentine\'s Day, or simply saying "I love you".',
+      image: '/images/gift-boxes/romantic-blush.jpg',
+      maxItems: 4,
+      price: 6500,
+      theme: 'ROMANTIC_BLUSH' as const,
+      active: true,
+      sortOrder: 3,
+    },
+  ]
+
+  for (const box of giftBoxes) {
+    await prisma.giftBox.upsert({
+      where: { slug: box.slug },
+      update: {
+        title: box.title,
+        description: box.description,
+        maxItems: box.maxItems,
+        price: box.price,
+        theme: box.theme,
+        active: box.active,
+        sortOrder: box.sortOrder,
+      },
+      create: box,
+    })
+  }
+  console.log('✅ Created 3 gift boxes')
+
   console.log('🎉 Seeding complete!')
 }
 

@@ -25,7 +25,7 @@ const itemPositions = [
 ]
 
 export default function LiveBoxPreview() {
-  const { state, itemCount, remainingCapacity, total, removeItem } = useGiftBuilder()
+  const { state, itemCount, remainingCapacity, isFull, total, removeItem } = useGiftBuilder()
   const { selectedBox, items } = state
 
   if (!selectedBox) {
@@ -131,9 +131,11 @@ export default function LiveBoxPreview() {
             {itemCount} of {selectedBox.maxItems} items
           </span>
           <span className="text-[10px] tracking-[0.15em] uppercase text-[#B8965C]">
-            {remainingCapacity > 0
-              ? `${remainingCapacity} remaining`
-              : "Box full"}
+            {isFull
+              ? "Box full"
+              : itemCount === 0
+              ? `Up to ${selectedBox.maxItems}`
+              : `${remainingCapacity} more available`}
           </span>
         </div>
         <div className="h-0.5 bg-[#e5e5e5] overflow-hidden">
