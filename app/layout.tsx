@@ -64,10 +64,52 @@ export const metadata: Metadata = {
     "home scents",
     "body care Nigeria",
   ],
+  metadataBase: new URL("https://www.dachhomeandbody.com"),
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/dach logo.jpeg", type: "image/jpeg" },
+    ],
+    shortcut: "/dach logo.jpeg",
+    apple: "/dach logo.jpeg",
+  },
   openGraph: {
     type: "website",
     locale: "en_NG",
+    url: "https://www.dachhomeandbody.com",
     siteName: "DACH Home & Body",
+    title: "DACH Home & Body — Luxury Home Fragrance, Natural Skincare & Gift Services",
+    description:
+      "Luxury home fragrance, natural skincare, and curated gift services crafted for the wellness lifestyle. Delivered across Abuja and Nigeria.",
+    images: [
+      {
+        url: "/homepage-bg.png",
+        width: 1200,
+        height: 630,
+        alt: "DACH Home & Body — Luxury Fragrance & Skincare",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@dachhomeandbody",
+    title: "DACH Home & Body — Luxury Home Fragrance, Natural Skincare & Gift Services",
+    description:
+      "Luxury home fragrance, natural skincare, and curated gift services. Delivered across Abuja and Nigeria.",
+    images: ["/homepage-bg.png"],
   },
 };
 

@@ -78,7 +78,7 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch">
           {giftBoxes.map((box, i) => (
             <motion.div
               key={box.id}
@@ -89,6 +89,7 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
                 delay: i * 0.12,
                 ease: [0.25, 0.1, 0.25, 1],
               }}
+              className="h-full"
             >
               <GiftBoxCard box={box} />
             </motion.div>

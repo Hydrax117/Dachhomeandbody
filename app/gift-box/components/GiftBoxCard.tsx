@@ -51,7 +51,7 @@ export default function GiftBoxCard({ box }: GiftBoxCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{ y: -6 }}
-      className={`group relative flex flex-col overflow-hidden border transition-all duration-500 ${
+      className={`group relative flex flex-col h-full overflow-hidden border transition-all duration-500 ${
         isSelected
           ? `${borderColor} shadow-[0_8px_40px_0_rgb(184_150_92/0.18)]`
           : "border-[#e5e5e5] hover:border-[#C4C4C4] shadow-sm hover:shadow-lg"
