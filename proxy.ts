@@ -27,12 +27,13 @@ function buildCsp(nonce: string): string {
     // Only allow resources from the same origin by default
     "default-src 'self'",
 
-    // Scripts: same origin + nonce for Next.js inline runtime chunks.
-    // 'strict-dynamic' lets nonce-trusted scripts load further scripts,
-    // which is required for Next.js chunk loading.
-    // In dev, 'unsafe-eval' is needed because React uses eval() for
-    // better error stack traces — never needed in production.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    // Scripts: nonce for Next.js inline runtime chunks.
+    // 'strict-dynamic' lets nonce-trusted scripts load further scripts
+    // (required for Next.js chunk loading). 'self' is redundant with
+    // strict-dynamic but kept for older browser fallback.
+    // 'unsafe-eval' is required by Framer Motion's animation engine in
+    // both dev and production — it uses eval() internally.
+    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval'`,
 
     // Styles — split into two granular directives (CSP Level 3):
     //
