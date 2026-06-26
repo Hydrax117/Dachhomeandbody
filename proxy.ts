@@ -34,9 +34,26 @@ function buildCsp(nonce: string): string {
     // better error stack traces — never needed in production.
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
 
-    // Styles: same origin + nonce. In dev allow unsafe-inline because
-    // the Next.js dev overlay injects styles without a nonce.
-    `style-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-inline'" : ""}`,
+    // Styles — split into two granular directives (CSP Level 3):
+    //
+    // style-src-elem  governs <style> tags and <link rel="stylesheet">.
+    //   Next.js automatically attaches the nonce to every <style> it emits,
+    //   so nonce-only is correct here.
+    //
+    // style-src-attr  governs style="…" *attributes* on HTML elements.
+    //   Nonces cannot be placed on attributes (only on elements), so the only
+    //   practical option for allowing framework/library inline styles (Framer
+    //   Motion sets opacity:1;transform:none, etc.) is 'unsafe-inline'.
+    //   This is acceptable: style attributes cannot execute scripts, so the
+    //   XSS risk of unsafe-inline here is limited to CSS-based attacks (e.g.
+    //   data exfiltration via attribute selectors), not arbitrary JS execution.
+    //   A strict script-src with nonces/strict-dynamic already covers the
+    //   primary injection vector.
+    //
+    // style-src is intentionally omitted so the two granular directives take
+    // full effect without a fallback overriding them.
+    `style-src-elem 'self' 'nonce-${nonce}'`,
+    `style-src-attr 'unsafe-inline'`,
 
     // Images: same origin, data URIs (used by some UI libs), blob: (canvas exports),
     // plus the two external image hosts used by next/image.
@@ -68,14 +85,12 @@ function buildCsp(nonce: string): string {
     // Auto-upgrade any accidental http:// resource loads to https://
     "upgrade-insecure-requests",
 
-    // Trusted Types — block all DOM XSS sinks (innerHTML, document.write, etc.)
-    // from accepting plain strings. Only code that creates a TrustedHTML/
-    // TrustedScript/TrustedScriptURL object via a registered policy can write to
-    // a sink. React doesn't use raw DOM sinks in production, so this is safe.
-    // In dev we allow the 'nextjs#bundler' policy used by the dev overlay.
-    ...(isDev
-      ? ["require-trusted-types-for 'script'", "trusted-types nextjs#bundler"]
-      : ["require-trusted-types-for 'script'"]),
+    // NOTE: Trusted Types (require-trusted-types-for / trusted-types) is
+    // intentionally omitted. Turbopack's chunk loader assigns script.src as a
+    // plain string without going through any Trusted Types policy — enabling
+    // the directive crashes the app in both dev and prod.
+    // XSS protection is provided by the nonce-based script-src + strict-dynamic
+    // above, which already prevents any injected script from executing.
   ]
 
   return policy.join("; ")

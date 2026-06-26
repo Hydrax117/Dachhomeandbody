@@ -5,8 +5,10 @@ import { useGiftBuilder } from "@/app/gift-box/context/GiftBuilderContext"
 import {
   GIFT_CARD_STYLE_META,
   GIFT_RIBBON_STYLE_META,
+  GIFT_RIBBON_COLOR_META,
   type GiftCardStyle,
   type GiftRibbonStyle,
+  type GiftRibbonColor,
 } from "@/lib/gift-boxes"
 
 const cardStyles = Object.entries(GIFT_CARD_STYLE_META) as [
@@ -16,14 +18,44 @@ const cardStyles = Object.entries(GIFT_CARD_STYLE_META) as [
 
 const ribbonStyles = Object.entries(GIFT_RIBBON_STYLE_META) as [
   GiftRibbonStyle,
-  { label: string }
+  { label: string; description: string }
 ][]
 
-const ribbonColors: Record<GiftRibbonStyle, string> = {
-  BLACK_SATIN: "#111111",
-  IVORY_SILK: "#F2EDE8",
-  BLUSH_RIBBON: "#E8C4B8",
-  GOLD_VELVET: "#B8965C",
+const ribbonColors = Object.entries(GIFT_RIBBON_COLOR_META) as [
+  GiftRibbonColor,
+  { label: string; hex: string }
+][]
+
+// Texture illustrations for each ribbon style
+const RibbonTexture = ({ style, active }: { style: GiftRibbonStyle; active: boolean }) => {
+  const color = active ? "white" : "#C4C4C4"
+  if (style === "SATIN") {
+    // Smooth wavy lines = glossy satin
+    return (
+      <svg width="32" height="20" viewBox="0 0 32 20" fill="none" aria-hidden="true">
+        <path d="M2 10 Q8 4 16 10 Q24 16 30 10" stroke={color} strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M2 14 Q8 8 16 14 Q24 20 30 14" stroke={color} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.5" />
+      </svg>
+    )
+  }
+  if (style === "GROSGRAIN") {
+    // Horizontal ribs = grosgrain weave
+    return (
+      <svg width="32" height="20" viewBox="0 0 32 20" fill="none" aria-hidden="true">
+        {[4, 8, 12, 16].map((y) => (
+          <line key={y} x1="4" y1={y} x2="28" y2={y} stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        ))}
+      </svg>
+    )
+  }
+  // VELVET — soft dense strokes
+  return (
+    <svg width="32" height="20" viewBox="0 0 32 20" fill="none" aria-hidden="true">
+      {[6, 10, 14, 18, 22, 26].map((x) => (
+        <line key={x} x1={x} y1="3" x2={x} y2="17" stroke={color} strokeWidth="1.8" strokeLinecap="round" opacity={x % 8 === 0 ? "1" : "0.6"} />
+      ))}
+    </svg>
+  )
 }
 
 export default function CustomizationStep() {
@@ -42,9 +74,7 @@ export default function CustomizationStep() {
     >
       {/* Gift Message */}
       <section>
-        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">
-          01
-        </p>
+        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">01</p>
         <h3 className="font-serif text-2xl font-medium text-[#111111] mb-6">
           Your Gift Message
         </h3>
@@ -87,9 +117,7 @@ export default function CustomizationStep() {
 
       {/* Card Style */}
       <section>
-        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">
-          02
-        </p>
+        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">02</p>
         <h3 className="font-serif text-2xl font-medium text-[#111111] mb-6">
           Card Design
         </h3>
@@ -104,12 +132,9 @@ export default function CustomizationStep() {
                   : "border-[#e5e5e5] bg-white text-[#8C8C8C] hover:border-[#C4C4C4] hover:text-[#111111]"
               }`}
             >
-              {/* Card icon */}
               <div
                 className={`w-8 h-10 mx-auto mb-3 border ${
-                  customization.cardStyle === key
-                    ? "border-white/30"
-                    : "border-[#e5e5e5]"
+                  customization.cardStyle === key ? "border-white/30" : "border-[#e5e5e5]"
                 } flex items-center justify-center`}
               >
                 {key === "LUXURY_GOLD" && (
@@ -137,37 +162,77 @@ export default function CustomizationStep() {
 
       {/* Ribbon Style */}
       <section>
-        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">
-          03
-        </p>
-        <h3 className="font-serif text-2xl font-medium text-[#111111] mb-6">
+        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">03</p>
+        <h3 className="font-serif text-2xl font-medium text-[#111111] mb-2">
           Ribbon Style
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <p className="text-[#8C8C8C] text-xs mb-6 leading-relaxed">
+          Choose the texture and weave of your ribbon.
+        </p>
+        <div className="grid grid-cols-3 gap-3">
           {ribbonStyles.map(([key, meta]) => (
             <button
               key={key}
               onClick={() => setCustomization({ ribbonStyle: key })}
-              className={`relative py-5 px-3 border text-center transition-all duration-300 ${
+              className={`relative py-5 px-3 border text-center transition-all duration-300 group ${
                 customization.ribbonStyle === key
+                  ? "border-[#111111] bg-[#111111]"
+                  : "border-[#e5e5e5] bg-white hover:border-[#B8965C]"
+              }`}
+            >
+              {/* Texture icon */}
+              <div className="flex items-center justify-center mb-3 h-5">
+                <RibbonTexture style={key} active={customization.ribbonStyle === key} />
+              </div>
+              <span className={`block text-[10px] tracking-[0.18em] uppercase font-medium mb-1 ${
+                customization.ribbonStyle === key ? "text-white" : "text-[#111111]"
+              }`}>
+                {meta.label}
+              </span>
+              <span className={`block text-[10px] leading-snug ${
+                customization.ribbonStyle === key ? "text-white/50" : "text-[#8C8C8C]"
+              }`}>
+                {meta.description}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Ribbon Color */}
+      <section>
+        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">04</p>
+        <h3 className="font-serif text-2xl font-medium text-[#111111] mb-2">
+          Ribbon Color
+        </h3>
+        <p className="text-[#8C8C8C] text-xs mb-6 leading-relaxed">
+          Pick the colour to complement your chosen box style.
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          {ribbonColors.map(([key, meta]) => (
+            <button
+              key={key}
+              onClick={() => setCustomization({ ribbonColor: key })}
+              className={`relative py-5 px-3 border text-center transition-all duration-300 ${
+                customization.ribbonColor === key
                   ? "border-[#111111]"
                   : "border-[#e5e5e5] hover:border-[#C4C4C4]"
               }`}
             >
-              {/* Ribbon swatch */}
+              {/* Color swatch */}
               <div className="flex items-center justify-center mb-3">
                 <div
-                  className="w-10 h-1.5 rounded-full"
-                  style={{ backgroundColor: ribbonColors[key] }}
+                  className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+                    customization.ribbonColor === key
+                      ? "border-[#111111] scale-110 shadow-[0_0_0_3px_rgb(0_0_0/0.08)]"
+                      : "border-[#e5e5e5]"
+                  }`}
+                  style={{ backgroundColor: meta.hex }}
                 />
               </div>
-              <span
-                className={`text-[10px] tracking-[0.15em] uppercase font-medium ${
-                  customization.ribbonStyle === key
-                    ? "text-[#111111]"
-                    : "text-[#8C8C8C]"
-                }`}
-              >
+              <span className={`text-[10px] tracking-[0.18em] uppercase font-medium ${
+                customization.ribbonColor === key ? "text-[#111111]" : "text-[#8C8C8C]"
+              }`}>
                 {meta.label}
               </span>
             </button>
@@ -177,9 +242,7 @@ export default function CustomizationStep() {
 
       {/* Delivery Date */}
       <section>
-        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">
-          04
-        </p>
+        <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2">05</p>
         <h3 className="font-serif text-2xl font-medium text-[#111111] mb-6">
           Delivery Date
         </h3>
@@ -188,9 +251,7 @@ export default function CustomizationStep() {
             type="date"
             value={customization.deliveryDate}
             min={new Date().toISOString().split("T")[0]}
-            onChange={(e) =>
-              setCustomization({ deliveryDate: e.target.value })
-            }
+            onChange={(e) => setCustomization({ deliveryDate: e.target.value })}
             className="w-full px-5 py-4 bg-white border border-[#e5e5e5] text-[#111111] text-sm focus:outline-none focus:border-[#B8965C] focus:shadow-[0_0_0_3px_rgb(184_150_92/0.12)] transition-all duration-300 font-sans"
           />
           <p className="text-[11px] text-[#8C8C8C] mt-2 tracking-wide">

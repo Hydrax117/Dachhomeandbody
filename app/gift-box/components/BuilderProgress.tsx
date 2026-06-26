@@ -4,13 +4,20 @@ import { motion } from "framer-motion"
 import { useGiftBuilder, type BuilderStep } from "@/app/gift-box/context/GiftBuilderContext"
 
 const steps: { key: BuilderStep; label: string; number: number }[] = [
-  { key: "select-box", label: "Choose Box", number: 1 },
-  { key: "build", label: "Add Products", number: 2 },
-  { key: "customize", label: "Personalise", number: 3 },
-  { key: "summary", label: "Review", number: 4 },
+  { key: "select-box", label: "Choose Style", number: 1 },
+  { key: "select-size", label: "Choose Size", number: 2 },
+  { key: "build", label: "Add Products", number: 3 },
+  { key: "customize", label: "Personalise", number: 4 },
+  { key: "summary", label: "Review", number: 5 },
 ]
 
-const stepOrder: BuilderStep[] = ["select-box", "build", "customize", "summary"]
+const stepOrder: BuilderStep[] = [
+  "select-box",
+  "select-size",
+  "build",
+  "customize",
+  "summary",
+]
 
 export default function BuilderProgress() {
   const { state, setStep } = useGiftBuilder()
@@ -19,7 +26,8 @@ export default function BuilderProgress() {
   const canNavigateTo = (step: BuilderStep): boolean => {
     const targetIndex = stepOrder.indexOf(step)
     if (targetIndex > currentIndex) return false
-    if (step === "build" && !state.selectedBox) return false
+    if (step === "select-size" && !state.selectedBox) return false
+    if (step === "build" && !state.selectedSizeTier) return false
     if (step === "customize" && state.items.length === 0) return false
     if (step === "summary" && state.items.length === 0) return false
     return true
@@ -40,7 +48,7 @@ export default function BuilderProgress() {
                 onClick={() => isNavigable && setStep(step.key)}
                 disabled={!isNavigable}
                 aria-current={isActive ? "step" : undefined}
-                className={`flex flex-col items-center gap-2 px-4 py-2 transition-all duration-300 ${
+                className={`flex flex-col items-center gap-2 px-3 sm:px-4 py-2 transition-all duration-300 ${
                   isNavigable ? "cursor-pointer" : "cursor-default"
                 }`}
               >
@@ -103,7 +111,7 @@ export default function BuilderProgress() {
 
               {/* Connector line */}
               {idx < steps.length - 1 && (
-                <div className="w-12 lg:w-20 h-px bg-[#e5e5e5] relative overflow-hidden mx-1">
+                <div className="w-8 lg:w-14 h-px bg-[#e5e5e5] relative overflow-hidden mx-0.5">
                   <motion.div
                     className="absolute inset-y-0 left-0 bg-[#B8965C]"
                     initial={{ width: 0 }}

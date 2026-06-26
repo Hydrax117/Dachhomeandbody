@@ -9,6 +9,8 @@ import {
   GIFT_BOX_THEME_META,
   GIFT_CARD_STYLE_META,
   GIFT_RIBBON_STYLE_META,
+  GIFT_RIBBON_COLOR_META,
+  GIFT_BOX_SIZE_TIERS,
   type GiftBoxTheme,
 } from "@/lib/gift-boxes"
 
@@ -41,6 +43,10 @@ function SummaryRow({
 export default function SummaryStep() {
   const { state, setStep, subtotal, total, reset } = useGiftBuilder()
   const { selectedBox, items, customization } = state
+
+  // Size tier for display and price
+  const sizeTier = state.selectedSizeTier ??
+    GIFT_BOX_SIZE_TIERS.find(t => t.key === customization.boxSize)
 
   const [formState, formAction, isPending] = useActionState(
     placeGiftOrderAction,
@@ -211,9 +217,24 @@ export default function SummaryStep() {
             value={GIFT_CARD_STYLE_META[customization.cardStyle].label}
           />
           <SummaryRow
-            label="Ribbon"
+            label="Ribbon Style"
             value={GIFT_RIBBON_STYLE_META[customization.ribbonStyle].label}
           />
+          <SummaryRow
+            label="Ribbon Color"
+            value={
+              <span className="flex items-center gap-2 justify-end">
+                <span
+                  className="inline-block w-3 h-3 rounded-full border border-[#e5e5e5]"
+                  style={{ backgroundColor: GIFT_RIBBON_COLOR_META[customization.ribbonColor].hex }}
+                />
+                {GIFT_RIBBON_COLOR_META[customization.ribbonColor].label}
+              </span>
+            }
+          />
+          {sizeTier && (
+            <SummaryRow label="Box Size" value={`${sizeTier.label} (${sizeTier.itemRange})`} />
+          )}
           {customization.deliveryDate && (
             <SummaryRow
               label="Delivery"
@@ -245,10 +266,10 @@ export default function SummaryStep() {
             <span>{formatCurrency(subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm text-[#8C8C8C]">
-            <span>Gift box</span>
+            <span>Gift box ({sizeTier?.label ?? "Box"})</span>
             <span>
-              {selectedBox.price > 0
-                ? formatCurrency(selectedBox.price)
+              {(sizeTier?.price ?? selectedBox.price) > 0
+                ? formatCurrency(sizeTier?.price ?? selectedBox.price)
                 : "Complimentary"}
             </span>
           </div>
@@ -292,6 +313,16 @@ export default function SummaryStep() {
             type="hidden"
             name="ribbonStyle"
             value={customization.ribbonStyle}
+          />
+          <input
+            type="hidden"
+            name="ribbonColor"
+            value={customization.ribbonColor}
+          />
+          <input
+            type="hidden"
+            name="boxSize"
+            value={customization.boxSize}
           />
           <input
             type="hidden"

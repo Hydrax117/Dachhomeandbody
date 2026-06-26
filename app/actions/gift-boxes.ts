@@ -214,7 +214,9 @@ export async function placeGiftOrderAction(
     customization: {
       message: formData.get("message") || undefined,
       cardStyle: formData.get("cardStyle") || "MINIMAL",
-      ribbonStyle: formData.get("ribbonStyle") || "BLACK_SATIN",
+      ribbonStyle: formData.get("ribbonStyle") || "SATIN",
+      ribbonColor: formData.get("ribbonColor") || "BLACK",
+      boxSize: formData.get("boxSize") || "SMALL",
       deliveryDate,
       anonymous: formData.get("anonymous") === "true",
     },

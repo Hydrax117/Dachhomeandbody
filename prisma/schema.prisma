@@ -358,14 +358,16 @@ model GiftBox {
 }
 
 model GiftCustomization {
-  id           String          @id @default(cuid())
-  message      String?         @db.VarChar(200)
-  cardStyle    GiftCardStyle   @default(MINIMAL)
-  ribbonStyle  GiftRibbonStyle @default(BLACK_SATIN)
+  id           String           @id @default(cuid())
+  message      String?          @db.VarChar(200)
+  cardStyle    GiftCardStyle    @default(MINIMAL)
+  ribbonStyle  GiftRibbonStyle  @default(SATIN)
+  ribbonColor  GiftRibbonColor  @default(BLACK)
+  boxSize      GiftBoxSize      @default(SMALL)
   deliveryDate DateTime?
-  anonymous    Boolean         @default(false)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  anonymous    Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
   giftOrder    GiftOrder?
 }
 
@@ -581,10 +583,22 @@ enum GiftCardStyle {
 }
 
 enum GiftRibbonStyle {
-  BLACK_SATIN
-  IVORY_SILK
-  BLUSH_RIBBON
-  GOLD_VELVET
+  SATIN
+  GROSGRAIN
+  VELVET
+}
+
+enum GiftRibbonColor {
+  BLACK
+  GOLD
+  ROSE_PINK
+}
+
+enum GiftBoxSize {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
 }
 
 enum GiftOrderStatus {

@@ -25,8 +25,8 @@ const itemPositions = [
 ]
 
 export default function LiveBoxPreview() {
-  const { state, itemCount, remainingCapacity, isFull, total, removeItem } = useGiftBuilder()
-  const { selectedBox, items } = state
+  const { state, itemCount, remainingCapacity, isFull, total, removeItem, maxItems } = useGiftBuilder()
+  const { selectedBox, selectedSizeTier, items } = state
 
   if (!selectedBox) {
     return (
@@ -44,7 +44,7 @@ export default function LiveBoxPreview() {
   }
 
   const meta = GIFT_BOX_THEME_META[selectedBox.theme as GiftBoxTheme]
-  const fillPercent = Math.round((itemCount / selectedBox.maxItems) * 100)
+  const fillPercent = Math.round((itemCount / (maxItems || 1)) * 100)
 
   return (
     <div className="sticky top-8 space-y-4">
@@ -128,13 +128,13 @@ export default function LiveBoxPreview() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[10px] tracking-[0.2em] uppercase text-[#8C8C8C]">
-            {itemCount} of {selectedBox.maxItems} items
+            {itemCount} of {maxItems} items
           </span>
           <span className="text-[10px] tracking-[0.15em] uppercase text-[#B8965C]">
             {isFull
               ? "Box full"
               : itemCount === 0
-              ? `Up to ${selectedBox.maxItems}`
+              ? `Up to ${maxItems}`
               : `${remainingCapacity} more available`}
           </span>
         </div>
@@ -216,10 +216,10 @@ export default function LiveBoxPreview() {
             </span>
           </div>
           <div className="flex justify-between text-xs text-[#8C8C8C]">
-            <span>Box</span>
+            <span>Box ({selectedSizeTier?.label ?? ""})</span>
             <span>
-              {selectedBox.price > 0
-                ? formatCurrency(selectedBox.price)
+              {(selectedSizeTier?.price ?? 0) > 0
+                ? formatCurrency(selectedSizeTier!.price)
                 : "Complimentary"}
             </span>
           </div>

@@ -830,8 +830,8 @@ function Footer() {
           </p>
           <div className="flex items-center gap-5">
             {[
-              { label: "Instagram", href: "https://instagram.com/dachhomeandbody", path: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z M17.5 6.5h.01 M2 2h20v20H2z" },
-              { label: "TikTok", href: "#", path: "M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" },
+              { label: "Instagram", href: "https://www.instagram.com/dach.ng", path: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z M17.5 6.5h.01 M2 2h20v20H2z" },
+              { label: "TikTok", href: "https://www.tiktok.com/@dach.ng", path: "M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" },
             ].map(({ label, href, path }) => (
               <a key={label} href={href} aria-label={label} target="_blank" rel="noopener noreferrer"
                 className="text-white/30 hover:text-[#B8965C] transition-colors duration-200 w-10 h-10 flex items-center justify-center">

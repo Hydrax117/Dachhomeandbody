@@ -33,12 +33,26 @@ export const GiftCardStyle = {
 export type GiftCardStyle = (typeof GiftCardStyle)[keyof typeof GiftCardStyle]
 
 export const GiftRibbonStyle = {
-  BLACK_SATIN: "BLACK_SATIN",
-  IVORY_SILK: "IVORY_SILK",
-  BLUSH_RIBBON: "BLUSH_RIBBON",
-  GOLD_VELVET: "GOLD_VELVET",
+  SATIN: "SATIN",
+  GROSGRAIN: "GROSGRAIN",
+  VELVET: "VELVET",
 } as const
 export type GiftRibbonStyle = (typeof GiftRibbonStyle)[keyof typeof GiftRibbonStyle]
+
+export const GiftRibbonColor = {
+  BLACK: "BLACK",
+  GOLD: "GOLD",
+  ROSE_PINK: "ROSE_PINK",
+} as const
+export type GiftRibbonColor = (typeof GiftRibbonColor)[keyof typeof GiftRibbonColor]
+
+export const GiftBoxSize = {
+  SMALL: "SMALL",
+  MEDIUM: "MEDIUM",
+  LARGE: "LARGE",
+  EXTRA_LARGE: "EXTRA_LARGE",
+} as const
+export type GiftBoxSize = (typeof GiftBoxSize)[keyof typeof GiftBoxSize]
 
 export const GiftOrderStatus = {
   DRAFT: "DRAFT",
@@ -99,6 +113,8 @@ const giftOrderSelect = {
       message: true,
       cardStyle: true,
       ribbonStyle: true,
+      ribbonColor: true,
+      boxSize: true,
       deliveryDate: true,
       anonymous: true,
     },
@@ -149,7 +165,9 @@ export const giftBoxUpdateSchema = giftBoxCreateSchema.partial()
 export const giftCustomizationSchema = z.object({
   message: z.string().max(200).optional(),
   cardStyle: z.enum(["MINIMAL", "ROMANTIC", "BIRTHDAY", "LUXURY_GOLD"]).default("MINIMAL"),
-  ribbonStyle: z.enum(["BLACK_SATIN", "IVORY_SILK", "BLUSH_RIBBON", "GOLD_VELVET"]).default("BLACK_SATIN"),
+  ribbonStyle: z.enum(["SATIN", "GROSGRAIN", "VELVET"]).default("SATIN"),
+  ribbonColor: z.enum(["BLACK", "GOLD", "ROSE_PINK"]).default("BLACK"),
+  boxSize: z.enum(["SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE"]).default("SMALL"),
   deliveryDate: z.coerce.date().optional(),
   anonymous: z.boolean().default(false),
 })
@@ -401,6 +419,8 @@ export async function createGiftOrder(
         message: data.customization.message ?? null,
         cardStyle: data.customization.cardStyle,
         ribbonStyle: data.customization.ribbonStyle,
+        ribbonColor: data.customization.ribbonColor,
+        boxSize: data.customization.boxSize,
         deliveryDate: data.customization.deliveryDate ?? null,
         anonymous: data.customization.anonymous,
       },
@@ -474,9 +494,62 @@ export const GIFT_CARD_STYLE_META: Record<GiftCardStyle, { label: string }> = {
   LUXURY_GOLD: { label: "Luxury Gold" },
 }
 
-export const GIFT_RIBBON_STYLE_META: Record<GiftRibbonStyle, { label: string }> = {
-  BLACK_SATIN: { label: "Black Satin" },
-  IVORY_SILK: { label: "Ivory Silk" },
-  BLUSH_RIBBON: { label: "Blush Ribbon" },
-  GOLD_VELVET: { label: "Gold Velvet" },
+export const GIFT_RIBBON_STYLE_META: Record<GiftRibbonStyle, { label: string; description: string }> = {
+  SATIN: { label: "Satin", description: "Smooth, glossy finish with a luxurious drape" },
+  GROSGRAIN: { label: "Grosgrain", description: "Ribbed texture with a structured, classic look" },
+  VELVET: { label: "Velvet", description: "Soft, plush pile for a rich, tactile feel" },
 }
+
+export const GIFT_RIBBON_COLOR_META: Record<GiftRibbonColor, { label: string; hex: string }> = {
+  BLACK: { label: "Black", hex: "#111111" },
+  GOLD: { label: "Gold", hex: "#B8965C" },
+  ROSE_PINK: { label: "Rose Pink", hex: "#D4828A" },
+}
+
+// ---------------------------------------------------------------------------
+// Box size definitions — fixed tiers (independent of DB gift box record)
+// ---------------------------------------------------------------------------
+
+export interface GiftBoxSizeTier {
+  key: GiftBoxSize
+  label: string
+  itemRange: string
+  maxItems: number
+  price: number
+  description: string
+}
+
+export const GIFT_BOX_SIZE_TIERS: GiftBoxSizeTier[] = [
+  {
+    key: "SMALL",
+    label: "Small",
+    itemRange: "1–5 items",
+    maxItems: 5,
+    price: 8500,
+    description: "Perfect for a focused, intimate gift",
+  },
+  {
+    key: "MEDIUM",
+    label: "Medium",
+    itemRange: "5–10 items",
+    maxItems: 10,
+    price: 10500,
+    description: "A generous selection for any occasion",
+  },
+  {
+    key: "LARGE",
+    label: "Large",
+    itemRange: "10–15 items",
+    maxItems: 15,
+    price: 15000,
+    description: "A lavish collection that truly impresses",
+  },
+  {
+    key: "EXTRA_LARGE",
+    label: "Extra Large",
+    itemRange: "Up to 24 items",
+    maxItems: 24,
+    price: 25000,
+    description: "The ultimate luxury gifting experience",
+  },
+]

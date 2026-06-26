@@ -9,7 +9,15 @@ import BuilderProductCard from "./BuilderProductCard"
 import LiveBoxPreview from "./LiveBoxPreview"
 import CustomizationStep from "./CustomizationStep"
 import SummaryStep from "./SummaryStep"
+import { GIFT_BOX_SIZE_TIERS } from "@/lib/gift-boxes"
 import type { GiftBoxTheme } from "@/lib/gift-boxes"
+
+const formatCurrency = (n: number) =>
+  new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+  }).format(n)
 
 // ---------------------------------------------------------------------------
 // Types (matching what the server passes down)
@@ -48,7 +56,7 @@ interface GiftBuilderClientProps {
 }
 
 // ---------------------------------------------------------------------------
-// Step 1: Select Box
+// Step 1: Select Box Style
 // ---------------------------------------------------------------------------
 
 function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
@@ -62,12 +70,14 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
         <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-3 sm:mb-4">
           Step One
         </p>
-        <h2 className="font-serif font-medium text-[#111111] mb-3 sm:mb-4" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}>
-          Choose Your Box
+        <h2
+          className="font-serif font-medium text-[#111111] mb-3 sm:mb-4"
+          style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}
+        >
+          Choose Your Box Style
         </h2>
         <p className="text-[#8C8C8C] text-sm max-w-md mx-auto leading-relaxed">
-          Each box is a world of its own. Select the one that speaks to the
-          occasion.
+          Each box is a world of its own. Select the aesthetic that speaks to the occasion.
         </p>
       </div>
 
@@ -101,13 +111,124 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
 }
 
 // ---------------------------------------------------------------------------
-// Step 2: Build the Box
+// Step 2: Select Size
+// ---------------------------------------------------------------------------
+
+function SelectSizeStep() {
+  const { state, selectSize } = useGiftBuilder()
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="text-center mb-8 sm:mb-12">
+        <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-3 sm:mb-4">
+          Step Two
+        </p>
+        <h2
+          className="font-serif font-medium text-[#111111] mb-3 sm:mb-4"
+          style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}
+        >
+          Choose Your Box Size
+        </h2>
+        <p className="text-[#8C8C8C] text-sm max-w-md mx-auto leading-relaxed">
+          Select how many items you&apos;d like to include. The box price is fixed per size.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-5xl mx-auto">
+        {GIFT_BOX_SIZE_TIERS.map((tier, i) => {
+          const isSelected = state.selectedSizeTier?.key === tier.key
+
+          return (
+            <motion.button
+              key={tier.key}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+              onClick={() => selectSize(tier)}
+              className={`relative flex flex-col text-left p-6 border transition-all duration-300 group ${
+                isSelected
+                  ? "border-[#111111] bg-[#111111] text-white shadow-[0_8px_40px_0_rgb(0_0_0/0.15)]"
+                  : "border-[#e5e5e5] bg-white hover:border-[#B8965C] hover:shadow-md"
+              }`}
+            >
+              {/* Selected check */}
+              {isSelected && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-4 right-4 w-6 h-6 bg-[#B8965C] flex items-center justify-center"
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </motion.div>
+              )}
+
+              {/* Size label */}
+              <p className={`text-[10px] tracking-[0.3em] uppercase font-medium mb-2 ${
+                isSelected ? "text-[#B8965C]" : "text-[#B8965C]"
+              }`}>
+                {tier.label}
+              </p>
+
+              {/* Price */}
+              <p className={`font-serif text-2xl font-medium mb-1 ${
+                isSelected ? "text-white" : "text-[#111111]"
+              }`}>
+                {formatCurrency(tier.price)}
+              </p>
+
+              {/* Item range */}
+              <p className={`text-sm font-medium mb-3 ${
+                isSelected ? "text-white/70" : "text-[#4A4A4A]"
+              }`}>
+                {tier.itemRange}
+              </p>
+
+              {/* Divider */}
+              <div className={`w-8 h-px mb-3 ${isSelected ? "bg-white/20" : "bg-[#e5e5e5]"}`} />
+
+              {/* Description */}
+              <p className={`text-xs leading-relaxed ${
+                isSelected ? "text-white/50" : "text-[#8C8C8C]"
+              }`}>
+                {tier.description}
+              </p>
+
+              {/* Select CTA */}
+              <div className={`mt-5 text-[10px] tracking-[0.2em] uppercase font-medium transition-colors duration-200 ${
+                isSelected
+                  ? "text-[#B8965C]"
+                  : "text-[#C4C4C4] group-hover:text-[#111111]"
+              }`}>
+                {isSelected ? "Selected ✓" : "Select"}
+              </div>
+            </motion.button>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Step 3: Build the Box
 // ---------------------------------------------------------------------------
 
 const CATEGORY_ALL = "__all__"
 
-function BuildStep({ products, categories }: { products: ProductData[]; categories: { id: string; name: string; slug: string }[] }) {
-  const { state, setStep, itemCount } = useGiftBuilder()
+function BuildStep({
+  products,
+  categories,
+}: {
+  products: ProductData[]
+  categories: { id: string; name: string; slug: string }[]
+}) {
+  const { state, setStep, itemCount, maxItems } = useGiftBuilder()
   const [activeCategory, setActiveCategory] = useState(CATEGORY_ALL)
 
   const filtered =
@@ -123,21 +244,20 @@ function BuildStep({ products, categories }: { products: ProductData[]; categori
     >
       <div className="text-center mb-8 sm:mb-10">
         <p className="text-[#B8965C] text-[10px] tracking-[0.35em] uppercase mb-3 sm:mb-4">
-          Step Two
+          Step Three
         </p>
-        <h2 className="font-serif font-medium text-[#111111] mb-3 sm:mb-4" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}>
+        <h2
+          className="font-serif font-medium text-[#111111] mb-3 sm:mb-4"
+          style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)" }}
+        >
           Curate Your Selection
         </h2>
         <p className="text-[#8C8C8C] text-sm max-w-md mx-auto leading-relaxed">
-          Choose between{" "}
-          <span className="text-[#111111] font-medium">1</span>
-          {" "}and{" "}
-          <span className="text-[#111111] font-medium">
-            {state.selectedBox?.maxItems} items
-          </span>{" "}
+          Choose up to{" "}
+          <span className="text-[#111111] font-medium">{maxItems} items</span>{" "}
           for your{" "}
           <span className="text-[#111111] font-medium">
-            {state.selectedBox?.title}
+            {state.selectedSizeTier?.label} {state.selectedBox?.title}
           </span>
           .
         </p>
@@ -202,13 +322,13 @@ function BuildStep({ products, categories }: { products: ProductData[]; categori
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <div>
             <p className="text-xs font-medium text-[#111111]">
-              {itemCount} of {state.selectedBox?.maxItems} items
+              {itemCount} of {maxItems} items
             </p>
             <div className="w-24 h-0.5 bg-[#e5e5e5] mt-1 overflow-hidden">
               <motion.div
                 className="h-full bg-[#B8965C]"
                 animate={{
-                  width: `${Math.round((itemCount / (state.selectedBox?.maxItems ?? 1)) * 100)}%`,
+                  width: `${Math.round((itemCount / (maxItems || 1)) * 100)}%`,
                 }}
                 transition={{ duration: 0.4 }}
               />
@@ -298,6 +418,18 @@ export default function GiftBuilderClient({
               transition={{ duration: 0.4 }}
             >
               <SelectBoxStep giftBoxes={giftBoxes} />
+            </motion.div>
+          )}
+
+          {state.step === "select-size" && (
+            <motion.div
+              key="select-size"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <SelectSizeStep />
             </motion.div>
           )}
 
