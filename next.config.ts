@@ -2,12 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Generate cryptographic integrity hashes for all JS chunks at build time.
-    // Browsers verify these hashes before executing scripts, preventing
-    // tampered or injected scripts from running even if served from the CDN.
-    sri: {
-      algorithm: "sha256",
-    },
+    // sri (Subresource Integrity) is intentionally disabled.
+    // The app uses nonce-based CSP (script-src + strict-dynamic) for script
+    // integrity, which is incompatible with SRI: SRI hashes are baked at build
+    // time but nonce-rendered pages are generated per-request, causing
+    // hash mismatches after every redeploy and breaking chunk loading.
   },
   images: {
     remotePatterns: [
