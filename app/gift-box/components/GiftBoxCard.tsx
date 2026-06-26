@@ -22,20 +22,10 @@ const themeBorderColor: Record<GiftBoxTheme, string> = {
 }
 
 const themeButtonStyle: Record<GiftBoxTheme, string> = {
-  SIGNATURE_CREAM:
-    "bg-[#111111] text-[#F8F5F2] hover:bg-[#B8965C] hover:text-[#111111]",
-  NOIR_LUXURY:
-    "bg-[#B8965C] text-[#111111] hover:bg-[#CBA96E]",
-  ROMANTIC_BLUSH:
-    "bg-[#111111] text-[#F8F5F2] hover:bg-[#B8965C] hover:text-[#111111]",
+  SIGNATURE_CREAM: "bg-[#111111] text-[#F8F5F2] hover:bg-[#B8965C] hover:text-[#111111]",
+  NOIR_LUXURY: "bg-[#B8965C] text-[#111111] hover:bg-[#CBA96E]",
+  ROMANTIC_BLUSH: "bg-[#111111] text-[#F8F5F2] hover:bg-[#B8965C] hover:text-[#111111]",
 }
-
-const formatCurrency = (n: number) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(n)
 
 export default function GiftBoxCard({ box }: GiftBoxCardProps) {
   const { selectBox, state } = useGiftBuilder()
@@ -58,9 +48,7 @@ export default function GiftBoxCard({ box }: GiftBoxCardProps) {
       }`}
     >
       {/* Image */}
-      <div
-        className={`relative aspect-[4/5] overflow-hidden bg-gradient-to-br ${meta.palette}`}
-      >
+      <div className={`relative aspect-[4/5] overflow-hidden bg-gradient-to-br ${meta.palette}`}>
         <Image
           src={box.image}
           alt={box.title}
@@ -68,15 +56,7 @@ export default function GiftBoxCard({ box }: GiftBoxCardProps) {
           className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
-        {/* Cinematic overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-        {/* Capacity badge */}
-        <div className="absolute top-4 right-4">
-          <span className="bg-white/90 backdrop-blur-sm text-[#111111] text-[10px] tracking-[0.2em] uppercase px-3 py-1.5 font-medium">
-            Up to {box.maxItems} items
-          </span>
-        </div>
 
         {/* Selected indicator */}
         {isSelected && (
@@ -85,14 +65,7 @@ export default function GiftBoxCard({ box }: GiftBoxCardProps) {
             animate={{ scale: 1 }}
             className="absolute top-4 left-4 w-7 h-7 bg-[#B8965C] flex items-center justify-center"
           >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-            >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </motion.div>
@@ -100,44 +73,23 @@ export default function GiftBoxCard({ box }: GiftBoxCardProps) {
       </div>
 
       {/* Content */}
-      <div
-        className={`flex flex-col flex-1 p-6 bg-gradient-to-br ${meta.palette}`}
-      >
+      <div className={`flex flex-col flex-1 p-6 bg-gradient-to-br ${meta.palette}`}>
         <p className="text-[#B8965C] text-[10px] tracking-[0.3em] uppercase mb-2 font-medium">
           {meta.label}
         </p>
-        <h3
-          className={`font-serif text-xl font-medium mb-3 leading-snug ${textColor}`}
-        >
+        <h3 className={`font-serif text-xl font-medium mb-3 leading-snug ${textColor}`}>
           {box.title}
         </h3>
-        <p
-          className={`text-sm leading-relaxed mb-5 flex-1 ${
-            box.theme === "NOIR_LUXURY"
-              ? "text-[#F8F5F2]/60"
-              : "text-[#8C8C8C]"
-          }`}
-        >
+        <p className={`text-sm leading-relaxed mb-5 flex-1 ${
+          box.theme === "NOIR_LUXURY" ? "text-[#F8F5F2]/60" : "text-[#8C8C8C]"
+        }`}>
           {box.description}
         </p>
-
-        <div className="flex items-center justify-between mb-5">
-          <span
-            className={`font-serif text-lg font-medium ${textColor}`}
-          >
-            {box.price > 0 ? formatCurrency(box.price) : "Complimentary"}
-          </span>
-          <span
-            className={`text-[10px] tracking-[0.15em] uppercase ${
-              box.theme === "NOIR_LUXURY"
-                ? "text-[#F8F5F2]/40"
-                : "text-[#8C8C8C]"
-            }`}
-          >
-            Box price
-          </span>
-        </div>
-
+        <p className={`text-[11px] tracking-[0.15em] uppercase mb-5 ${
+          box.theme === "NOIR_LUXURY" ? "text-[#F8F5F2]/40" : "text-[#8C8C8C]"
+        }`}>
+          Choose size in next step
+        </p>
         <button
           onClick={() => selectBox(box)}
           className={`w-full py-3.5 text-[10px] tracking-[0.25em] uppercase font-medium transition-all duration-300 ${buttonStyle}`}

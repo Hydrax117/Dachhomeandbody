@@ -19,8 +19,6 @@ export interface SelectedGiftBox {
   slug: string
   description: string
   image: string
-  maxItems: number
-  price: number
   theme: string
 }
 

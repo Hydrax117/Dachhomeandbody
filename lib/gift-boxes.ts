@@ -53,6 +53,8 @@ export const GiftBoxSize = {
   EXTRA_LARGE: "EXTRA_LARGE",
 } as const
 export type GiftBoxSize = (typeof GiftBoxSize)[keyof typeof GiftBoxSize]
+// Alias — the schema uses GiftBoxSizeKey, keeping GiftBoxSize as the app-level name
+export type GiftBoxSizeKey = GiftBoxSize
 
 export const GiftOrderStatus = {
   DRAFT: "DRAFT",
@@ -81,8 +83,6 @@ const giftBoxSelect = {
   slug: true,
   description: true,
   image: true,
-  maxItems: true,
-  price: true,
   theme: true,
   active: true,
   sortOrder: true,
@@ -153,8 +153,6 @@ export const giftBoxCreateSchema = z.object({
   slug: z.string().min(1).max(100),
   description: z.string().min(10).max(1000),
   image: z.string().url(),
-  maxItems: z.number().int().min(1).max(20),
-  price: z.number().nonnegative(),
   theme: z.enum(["SIGNATURE_CREAM", "NOIR_LUXURY", "ROMANTIC_BLUSH"]),
   active: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
@@ -376,9 +374,19 @@ export async function createGiftOrder(
       where: { id: data.giftBoxId, active: true },
     })
     if (!giftBox) throw new Error("Gift box not found or unavailable")
-    if (data.productIds.length > giftBox.maxItems) {
+
+    // 1b. Look up the size tier from DB — this is the authoritative source
+    //     for maxItems and price, not the client-submitted values.
+    const sizeTier = await tx.giftBoxSizeTier.findUnique({
+      where: { key: data.customization.boxSize as any },
+      select: { maxItems: true, price: true, label: true, active: true },
+    })
+    if (!sizeTier || !sizeTier.active) {
+      throw new Error("Selected box size is unavailable")
+    }
+    if (data.productIds.length > sizeTier.maxItems) {
       throw new Error(
-        `This box holds a maximum of ${giftBox.maxItems} items`
+        `The ${sizeTier.label} size holds a maximum of ${sizeTier.maxItems} items`
       )
     }
 
@@ -410,7 +418,7 @@ export async function createGiftOrder(
       subtotal += product.price * qty
     }
 
-    const boxPrice = giftBox.price
+    const boxPrice = sizeTier.price  // authoritative price from DB tier
     const total = subtotal + boxPrice
 
     // 4. Create customization
@@ -507,49 +515,71 @@ export const GIFT_RIBBON_COLOR_META: Record<GiftRibbonColor, { label: string; he
 }
 
 // ---------------------------------------------------------------------------
-// Box size definitions — fixed tiers (independent of DB gift box record)
+// Size tier — DB-backed shape
 // ---------------------------------------------------------------------------
 
 export interface GiftBoxSizeTier {
+  id: string
   key: GiftBoxSize
   label: string
   itemRange: string
   maxItems: number
   price: number
   description: string
+  active: boolean
+  sortOrder: number
 }
 
-export const GIFT_BOX_SIZE_TIERS: GiftBoxSizeTier[] = [
-  {
-    key: "SMALL",
-    label: "Small",
-    itemRange: "1–5 items",
-    maxItems: 5,
-    price: 8500,
-    description: "Perfect for a focused, intimate gift",
-  },
-  {
-    key: "MEDIUM",
-    label: "Medium",
-    itemRange: "5–10 items",
-    maxItems: 10,
-    price: 10500,
-    description: "A generous selection for any occasion",
-  },
-  {
-    key: "LARGE",
-    label: "Large",
-    itemRange: "10–15 items",
-    maxItems: 15,
-    price: 15000,
-    description: "A lavish collection that truly impresses",
-  },
-  {
-    key: "EXTRA_LARGE",
-    label: "Extra Large",
-    itemRange: "Up to 24 items",
-    maxItems: 24,
-    price: 25000,
-    description: "The ultimate luxury gifting experience",
-  },
-]
+const sizeTierSelect = {
+  id: true,
+  key: true,
+  label: true,
+  itemRange: true,
+  maxItems: true,
+  price: true,
+  description: true,
+  active: true,
+  sortOrder: true,
+} satisfies Prisma.GiftBoxSizeTierSelect
+
+/** Get all active size tiers, ordered by sortOrder. Used on the customer builder. */
+export async function getGiftBoxSizeTiers(): Promise<GiftBoxSizeTier[]> {
+  return prisma.giftBoxSizeTier.findMany({
+    where: { active: true },
+    orderBy: [{ sortOrder: "asc" }],
+    select: sizeTierSelect,
+  }) as Promise<GiftBoxSizeTier[]>
+}
+
+/** Get all size tiers for admin (including inactive). */
+export async function getAllGiftBoxSizeTiers(): Promise<GiftBoxSizeTier[]> {
+  return prisma.giftBoxSizeTier.findMany({
+    orderBy: [{ sortOrder: "asc" }],
+    select: sizeTierSelect,
+  }) as Promise<GiftBoxSizeTier[]>
+}
+
+export const giftBoxSizeTierUpdateSchema = z.object({
+  label: z.string().min(1).max(50),
+  itemRange: z.string().min(1).max(50),
+  maxItems: z.number().int().min(1).max(100),
+  price: z.number().nonnegative(),
+  description: z.string().max(200),
+  active: z.boolean(),
+  sortOrder: z.number().int(),
+})
+
+export type GiftBoxSizeTierUpdateInput = z.infer<typeof giftBoxSizeTierUpdateSchema>
+
+/** Update a size tier by its DB id. Admin only. */
+export async function updateGiftBoxSizeTier(
+  id: string,
+  input: GiftBoxSizeTierUpdateInput
+): Promise<GiftBoxSizeTier> {
+  const data = giftBoxSizeTierUpdateSchema.parse(input)
+  return prisma.giftBoxSizeTier.update({
+    where: { id },
+    data,
+    select: sizeTierSelect,
+  }) as Promise<GiftBoxSizeTier>
+}

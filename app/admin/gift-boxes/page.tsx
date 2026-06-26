@@ -11,20 +11,11 @@ interface GiftBoxRow {
   slug: string
   description: string
   image: string
-  maxItems: number
-  price: number
   theme: GiftBoxTheme
   active: boolean
   sortOrder: number
   _count?: { giftOrders: number }
 }
-
-const formatCurrency = (n: number) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(n)
 
 export default async function AdminGiftBoxesPage({
   searchParams,
@@ -55,6 +46,12 @@ export default async function AdminGiftBoxesPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Link
+            href="/admin/gift-boxes/sizes"
+            className="inline-flex items-center gap-2 border border-[#e5e5e5] text-[#8C8C8C] text-xs tracking-[0.12em] uppercase px-4 py-2.5 rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
+          >
+            Sizes &amp; Pricing
+          </Link>
           <Link
             href="/admin/gift-boxes/orders"
             className="inline-flex items-center gap-2 border border-[#e5e5e5] text-[#8C8C8C] text-xs tracking-[0.12em] uppercase px-4 py-2.5 rounded hover:border-[#B8965C] hover:text-[#B8965C] transition-colors"
@@ -96,12 +93,6 @@ export default async function AdminGiftBoxesPage({
                   </th>
                   <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden md:table-cell">
                     Theme
-                  </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
-                    Capacity
-                  </th>
-                  <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium hidden sm:table-cell">
-                    Price
                   </th>
                   <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase text-[#8C8C8C] font-medium">
                     Status
@@ -152,25 +143,7 @@ export default async function AdminGiftBoxesPage({
 
                       {/* Theme */}
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-xs text-[#8C8C8C]">
-                          {meta.label}
-                        </span>
-                      </td>
-
-                      {/* Capacity */}
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <span className="text-xs text-[#8C8C8C]">
-                          {box.maxItems} items
-                        </span>
-                      </td>
-
-                      {/* Price */}
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <span className="font-medium text-[#111111] text-xs">
-                          {box.price > 0
-                            ? formatCurrency(box.price)
-                            : "Free"}
-                        </span>
+                        <span className="text-xs text-[#8C8C8C]">{meta.label}</span>
                       </td>
 
                       {/* Status */}

@@ -9,8 +9,7 @@ import BuilderProductCard from "./BuilderProductCard"
 import LiveBoxPreview from "./LiveBoxPreview"
 import CustomizationStep from "./CustomizationStep"
 import SummaryStep from "./SummaryStep"
-import { GIFT_BOX_SIZE_TIERS } from "@/lib/gift-boxes"
-import type { GiftBoxTheme } from "@/lib/gift-boxes"
+import type { GiftBoxTheme, GiftBoxSizeTier } from "@/lib/gift-boxes"
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("en-NG", {
@@ -29,8 +28,6 @@ interface GiftBoxData {
   slug: string
   description: string
   image: string
-  maxItems: number
-  price: number
   theme: GiftBoxTheme
   active: boolean
   sortOrder: number
@@ -53,6 +50,7 @@ interface GiftBuilderClientProps {
   giftBoxes: GiftBoxData[]
   products: ProductData[]
   categories: { id: string; name: string; slug: string }[]
+  sizeTiers: GiftBoxSizeTier[]
 }
 
 // ---------------------------------------------------------------------------
@@ -114,7 +112,7 @@ function SelectBoxStep({ giftBoxes }: { giftBoxes: GiftBoxData[] }) {
 // Step 2: Select Size
 // ---------------------------------------------------------------------------
 
-function SelectSizeStep() {
+function SelectSizeStep({ sizeTiers }: { sizeTiers: GiftBoxSizeTier[] }) {
   const { state, selectSize } = useGiftBuilder()
 
   return (
@@ -139,7 +137,7 @@ function SelectSizeStep() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-5xl mx-auto">
-        {GIFT_BOX_SIZE_TIERS.map((tier, i) => {
+        {sizeTiers.map((tier, i) => {
           const isSelected = state.selectedSizeTier?.key === tier.key
 
           return (
@@ -155,7 +153,6 @@ function SelectSizeStep() {
                   : "border-[#e5e5e5] bg-white hover:border-[#B8965C] hover:shadow-md"
               }`}
             >
-              {/* Selected check */}
               {isSelected && (
                 <motion.div
                   initial={{ scale: 0 }}
@@ -167,43 +164,21 @@ function SelectSizeStep() {
                   </svg>
                 </motion.div>
               )}
-
-              {/* Size label */}
-              <p className={`text-[10px] tracking-[0.3em] uppercase font-medium mb-2 ${
-                isSelected ? "text-[#B8965C]" : "text-[#B8965C]"
-              }`}>
+              <p className="text-[10px] tracking-[0.3em] uppercase font-medium mb-2 text-[#B8965C]">
                 {tier.label}
               </p>
-
-              {/* Price */}
-              <p className={`font-serif text-2xl font-medium mb-1 ${
-                isSelected ? "text-white" : "text-[#111111]"
-              }`}>
+              <p className={`font-serif text-2xl font-medium mb-1 ${isSelected ? "text-white" : "text-[#111111]"}`}>
                 {formatCurrency(tier.price)}
               </p>
-
-              {/* Item range */}
-              <p className={`text-sm font-medium mb-3 ${
-                isSelected ? "text-white/70" : "text-[#4A4A4A]"
-              }`}>
+              <p className={`text-sm font-medium mb-3 ${isSelected ? "text-white/70" : "text-[#4A4A4A]"}`}>
                 {tier.itemRange}
               </p>
-
-              {/* Divider */}
               <div className={`w-8 h-px mb-3 ${isSelected ? "bg-white/20" : "bg-[#e5e5e5]"}`} />
-
-              {/* Description */}
-              <p className={`text-xs leading-relaxed ${
-                isSelected ? "text-white/50" : "text-[#8C8C8C]"
-              }`}>
+              <p className={`text-xs leading-relaxed ${isSelected ? "text-white/50" : "text-[#8C8C8C]"}`}>
                 {tier.description}
               </p>
-
-              {/* Select CTA */}
               <div className={`mt-5 text-[10px] tracking-[0.2em] uppercase font-medium transition-colors duration-200 ${
-                isSelected
-                  ? "text-[#B8965C]"
-                  : "text-[#C4C4C4] group-hover:text-[#111111]"
+                isSelected ? "text-[#B8965C]" : "text-[#C4C4C4] group-hover:text-[#111111]"
               }`}>
                 {isSelected ? "Selected ✓" : "Select"}
               </div>
@@ -366,6 +341,7 @@ export default function GiftBuilderClient({
   giftBoxes,
   products,
   categories,
+  sizeTiers,
 }: GiftBuilderClientProps) {
   const { state } = useGiftBuilder()
 
@@ -429,7 +405,7 @@ export default function GiftBuilderClient({
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.4 }}
             >
-              <SelectSizeStep />
+              <SelectSizeStep sizeTiers={sizeTiers} />
             </motion.div>
           )}
 

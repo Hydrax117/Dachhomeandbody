@@ -10,9 +10,11 @@ import {
   deleteGiftBox,
   createGiftOrder,
   updateGiftOrderStatus,
+  updateGiftBoxSizeTier,
   giftBoxCreateSchema,
   giftBoxUpdateSchema,
   giftOrderCreateSchema,
+  giftBoxSizeTierUpdateSchema,
   type GiftOrderStatus,
 } from "@/lib/gift-boxes"
 
@@ -39,8 +41,6 @@ export async function createGiftBoxAction(
     slug: formData.get("slug"),
     description: formData.get("description"),
     image: formData.get("image"),
-    maxItems: Number(formData.get("maxItems")),
-    price: Number(formData.get("price")),
     theme: formData.get("theme"),
     active: formData.get("active") === "true",
     sortOrder: Number(formData.get("sortOrder") ?? 0),
@@ -87,8 +87,6 @@ export async function updateGiftBoxAction(
     slug: formData.get("slug"),
     description: formData.get("description"),
     image: formData.get("image"),
-    maxItems: Number(formData.get("maxItems")),
-    price: Number(formData.get("price")),
     theme: formData.get("theme"),
     active: formData.get("active") === "true",
     sortOrder: Number(formData.get("sortOrder") ?? 0),
@@ -253,4 +251,53 @@ export async function placeGiftOrderAction(
       err instanceof Error ? err.message : "Failed to place order. Please try again."
     return { errors: { _form: [msg] } }
   }
+}
+
+// ── Admin: Update Gift Box Size Tier ──────────────────────────────────────
+
+export type SizeTierFormState = {
+  errors?: Partial<
+    Record<keyof z.infer<typeof giftBoxSizeTierUpdateSchema> | "_form", string[]>
+  >
+  success?: boolean
+}
+
+export async function updateGiftBoxSizeTierAction(
+  id: string,
+  _prev: SizeTierFormState,
+  formData: FormData
+): Promise<SizeTierFormState> {
+  const session = await auth()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { errors: { _form: ["Unauthorized"] } }
+  }
+
+  const raw = {
+    label: formData.get("label"),
+    itemRange: formData.get("itemRange"),
+    maxItems: Number(formData.get("maxItems")),
+    price: Number(formData.get("price")),
+    description: formData.get("description"),
+    active: formData.get("active") === "true",
+    sortOrder: Number(formData.get("sortOrder") ?? 0),
+  }
+
+  const parsed = giftBoxSizeTierUpdateSchema.safeParse(raw)
+  if (!parsed.success) {
+    const fieldErrors: SizeTierFormState["errors"] = {}
+    for (const [key, msgs] of Object.entries(parsed.error.flatten().fieldErrors)) {
+      ;(fieldErrors as Record<string, string[]>)[key] = msgs as string[]
+    }
+    return { errors: fieldErrors }
+  }
+
+  try {
+    await updateGiftBoxSizeTier(id, parsed.data)
+  } catch {
+    return { errors: { _form: ["Failed to update size tier. Please try again."] } }
+  }
+
+  revalidatePath("/admin/gift-boxes")
+  revalidatePath("/gift-box")
+  return { success: true }
 }

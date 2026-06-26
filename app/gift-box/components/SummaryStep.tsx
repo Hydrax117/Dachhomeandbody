@@ -10,7 +10,6 @@ import {
   GIFT_CARD_STYLE_META,
   GIFT_RIBBON_STYLE_META,
   GIFT_RIBBON_COLOR_META,
-  GIFT_BOX_SIZE_TIERS,
   type GiftBoxTheme,
 } from "@/lib/gift-boxes"
 
@@ -45,8 +44,7 @@ export default function SummaryStep() {
   const { selectedBox, items, customization } = state
 
   // Size tier for display and price
-  const sizeTier = state.selectedSizeTier ??
-    GIFT_BOX_SIZE_TIERS.find(t => t.key === customization.boxSize)
+  const sizeTier = state.selectedSizeTier
 
   const [formState, formAction, isPending] = useActionState(
     placeGiftOrderAction,
@@ -268,8 +266,8 @@ export default function SummaryStep() {
           <div className="flex justify-between text-sm text-[#8C8C8C]">
             <span>Gift box ({sizeTier?.label ?? "Box"})</span>
             <span>
-              {(sizeTier?.price ?? selectedBox.price) > 0
-                ? formatCurrency(sizeTier?.price ?? selectedBox.price)
+              {(sizeTier?.price ?? 0) > 0
+                ? formatCurrency(sizeTier!.price)
                 : "Complimentary"}
             </span>
           </div>

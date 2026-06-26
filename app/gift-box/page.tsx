@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { connection } from "next/server"
-import { getGiftBoxes } from "@/lib/gift-boxes"
+import { getGiftBoxes, getGiftBoxSizeTiers } from "@/lib/gift-boxes"
 import { getProducts } from "@/lib/products"
 import { getCategories } from "@/lib/categories"
 import { GiftBuilderProvider } from "./context/GiftBuilderContext"
@@ -15,10 +15,11 @@ export const metadata: Metadata = {
 export default async function GiftBoxPage() {
   await connection()
 
-  const [giftBoxes, productsResult, categories] = await Promise.all([
+  const [giftBoxes, productsResult, categories, sizeTiers] = await Promise.all([
     getGiftBoxes({ active: true }),
     getProducts({}, "newest", { pageSize: 100 }),
     getCategories(),
+    getGiftBoxSizeTiers(),
   ])
 
   return (
@@ -27,6 +28,7 @@ export default async function GiftBoxPage() {
         giftBoxes={giftBoxes}
         products={productsResult.data}
         categories={categories}
+        sizeTiers={sizeTiers}
       />
     </GiftBuilderProvider>
   )

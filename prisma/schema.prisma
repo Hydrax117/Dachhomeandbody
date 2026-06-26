@@ -338,14 +338,29 @@ model ShippingRate {
   @@index([state])
 }
 
+model GiftBoxSizeTier {
+  id          String      @id @default(cuid())
+  key         GiftBoxSizeKey @unique
+  label       String
+  itemRange   String
+  maxItems    Int
+  price       Float
+  description String
+  active      Boolean     @default(true)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([active])
+  @@index([sortOrder])
+}
+
 model GiftBox {
   id          String       @id @default(cuid())
   title       String
   slug        String       @unique
   description String
   image       String
-  maxItems    Int
-  price       Float
   theme       GiftBoxTheme
   active      Boolean      @default(true)
   sortOrder   Int          @default(0)
@@ -363,7 +378,7 @@ model GiftCustomization {
   cardStyle    GiftCardStyle    @default(MINIMAL)
   ribbonStyle  GiftRibbonStyle  @default(SATIN)
   ribbonColor  GiftRibbonColor  @default(BLACK)
-  boxSize      GiftBoxSize      @default(SMALL)
+  boxSize      GiftBoxSizeKey   @default(SMALL)
   deliveryDate DateTime?
   anonymous    Boolean          @default(false)
   createdAt    DateTime         @default(now())
@@ -569,6 +584,13 @@ enum DiscountType {
   FIXED
 }
 
+enum GiftBoxSizeKey {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
+}
+
 enum GiftBoxTheme {
   SIGNATURE_CREAM
   NOIR_LUXURY
@@ -592,13 +614,6 @@ enum GiftRibbonColor {
   BLACK
   GOLD
   ROSE_PINK
-}
-
-enum GiftBoxSize {
-  SMALL
-  MEDIUM
-  LARGE
-  EXTRA_LARGE
 }
 
 enum GiftOrderStatus {
