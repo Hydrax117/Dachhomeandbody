@@ -766,7 +766,7 @@ function Footer() {
               Crafted for intentional living. Based in Abuja, FCT.
             </p>
             <div className="space-y-2.5 text-xs text-white/30">
-              <p><a href="tel:07064313141" className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center">07064313141</a></p>
+              <p><a href="tel:08099007999" className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center">08099007999</a></p>
               <p><a href="mailto:adachadzarma@gmail.com" className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center">adachadzarma@gmail.com</a></p>
             </div>
           </div>
@@ -801,7 +801,7 @@ function Footer() {
               <ul className="space-y-3 text-sm">
                 {[
                   { label: "Shipping & Returns", href: "#" },
-                  { label: "FAQ", href: "#" },
+                  { label: "FAQ", href: "/faq" },
                   { label: "Privacy Policy", href: "#" },
                   { label: "Terms of Service", href: "#" },
                 ].map((l) => (
@@ -889,3 +889,5 @@ export default async function HomePage() {
     </>
   )
 }
+
+

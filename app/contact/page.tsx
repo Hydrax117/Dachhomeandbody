@@ -67,8 +67,8 @@ function ContactCards() {
         </svg>
       ),
       label: "Phone / WhatsApp",
-      value: "07064313141",
-      href: "tel:07064313141",
+      value: "08099007999",
+      href: "tel:08099007999",
       note: "Mon – Sat, 9 am – 6 pm WAT",
     },
     {
@@ -317,10 +317,10 @@ function Footer() {
             </p>
             <div className="space-y-2.5 text-xs text-white/30">
               <a
-                href="tel:07064313141"
+                href="tel:08099007999"
                 className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center"
               >
-                07064313141
+                08099007999
               </a>
               <a
                 href="mailto:adachadzarma@gmail.com"
@@ -369,7 +369,7 @@ function Footer() {
               <ul className="space-y-3 text-sm">
                 {[
                   { label: "Shipping & Returns", href: "#" },
-                  { label: "FAQ", href: "#" },
+                  { label: "FAQ", href: "/faq" },
                   { label: "Privacy Policy", href: "#" },
                   { label: "Terms of Service", href: "#" },
                 ].map((l) => (
@@ -461,3 +461,5 @@ export default function ContactPage() {
     </>
   )
 }
+
+

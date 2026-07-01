@@ -185,7 +185,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             {
               id: `error-${Date.now()}`,
               role: "assistant",
-              text: "Sorry, I ran into an issue. Please try again or contact us at 07064313141.",
+              text: "Sorry, I ran into an issue. Please try again or contact us at 08099007999.",
               createdAt: Date.now(),
             },
           ])
@@ -205,3 +205,5 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     </ChatContext.Provider>
   )
 }
+
+

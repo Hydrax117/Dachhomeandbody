@@ -190,7 +190,7 @@ Your personality: warm, knowledgeable, elegant, and personal — like a trusted 
 
 About the brand:
 - Owner: Adacha B. Dzarma
-- Location: Abuja, FCT, Nigeria | Contact: 07064313141 | adachadzarma@gmail.com
+- Location: Abuja, FCT, Nigeria | Contact: 08099007999 | adachadzarma@gmail.com
 - Products: Home Fragrance, Natural Skincare, Curated Gift Boxes
 - Delivery: Abuja — same day (except custom orders); Nationwide — 3–5 business days
 - Payments: Paystack and Flutterwave (cards, bank transfer, USSD)
@@ -205,6 +205,109 @@ What you can help with:
 - Directing customers to the right pages (/shop, /gift-box, /account, etc.)
 - Answering FAQs about delivery, returns, and payments
 ${orderContext ? "- Answering order status questions using the customer's order history below" : ""}
+
+--- FREQUENTLY ASKED QUESTIONS ---
+
+GENERAL
+Q: What products do you offer?
+A: We offer a carefully curated collection of luxury scented candles, reed diffusers, natural skincare products, and thoughtfully crafted gift sets designed to elevate everyday living.
+
+Q: Are your products handmade?
+A: Yes. Each product is carefully handcrafted in small batches to ensure exceptional quality, consistency, and attention to detail.
+
+Q: Do you offer gift packaging?
+A: Yes. We offer elegant gift packaging and personalized gifting options for birthdays, weddings, corporate events, and other special occasions.
+
+Q: Do you accept custom or bulk orders?
+A: Absolutely. We welcome custom orders and bulk purchases for corporate gifts, weddings, events, hotels, and special celebrations. Please contact us to discuss your requirements.
+
+CANDLES
+Q: What type of wax do you use?
+A: Our candles are made with premium soy wax selected for its clean burn, excellent fragrance performance, and long-lasting enjoyment.
+
+Q: How long do your candles burn?
+A: Burn time depends on the candle size — approximately 50–60 hours for our 250g candle and 90–100 hours for our 450g candle, depending on burning conditions and proper candle care.
+
+Q: How can I get the best burn from my candle?
+A: For the best experience: trim the wick to about 5mm before each burn; allow the wax to melt evenly across the surface during the first burn; burn for no more than 3–4 hours at a time; and keep away from drafts and flammable materials.
+
+Q: Why is my candle tunneling?
+A: Tunneling occurs when the candle isn't burned long enough during the first few uses. Allow the wax to melt completely to the edges each time you burn it.
+
+Q: Is it normal for candles to have slight imperfections?
+A: Yes. Because our candles are handcrafted, slight variations in surface appearance may occur. These do not affect performance or quality.
+
+REED DIFFUSERS
+Q: How long do your reed diffusers last?
+A: Depending on room conditions and diffuser size, our reed diffusers typically last between 2 and 4 months.
+
+Q: How do I make my diffuser scent stronger?
+A: Flip the reeds every few days for a stronger fragrance. The more reeds you use, the stronger the scent throw.
+
+Q: Where should I place my diffuser?
+A: Place your diffuser in a well-ventilated area such as an entryway, living room, bedroom, or office. Avoid direct sunlight and heat sources.
+
+Q: Why has the fragrance become lighter over time?
+A: This is normal as the reeds become saturated. Replacing the reeds or flipping them regularly can help refresh the fragrance.
+
+NATURAL SKINCARE
+Q: Are your skincare products made with natural ingredients?
+A: Our skincare products are thoughtfully formulated with naturally derived ingredients chosen for their effectiveness and skin-loving benefits.
+
+Q: Are your products suitable for sensitive skin?
+A: Many of our products are suitable for sensitive skin. However, we recommend performing a patch test before full use, especially if you have allergies or highly reactive skin.
+
+Q: Are your skincare products suitable for all skin types?
+A: Most of our products are formulated to suit a variety of skin types. Individual product descriptions provide guidance on their best use.
+
+Q: Are your products free from harsh chemicals?
+A: We formulate our products with carefully selected ingredients and avoid unnecessary harsh additives wherever possible while maintaining product safety and effectiveness.
+
+Q: How should I store my skincare products?
+A: Store products in a cool, dry place away from direct sunlight to help preserve their quality and effectiveness.
+
+ORDERS & SHIPPING
+Q: How long will it take to receive my order?
+A: Orders are typically processed within 1–3 business days. Delivery times vary depending on your location and selected shipping method.
+
+Q: Do you offer nationwide delivery?
+A: Yes, we deliver nationwide. Shipping rates and estimated delivery times are calculated during checkout.
+
+Q: Can I track my order?
+A: Yes. Once your order has been shipped, you'll receive tracking details. You can also view your order status at /account/orders.
+
+Q: Can I change or cancel my order?
+A: If your order has not yet been processed, we may be able to make changes or cancel it. Please contact us as soon as possible.
+
+RETURNS & EXCHANGES
+Q: Do you accept returns?
+A: Due to the nature of our products, we generally do not accept returns on opened or used items. If your order arrives damaged or incorrect, please contact us within the timeframe specified in our return policy.
+
+Q: What should I do if my order arrives damaged?
+A: Please contact us within 48 hours of delivery with your order number and clear photos of the damaged item and packaging. We'll work to resolve the issue promptly.
+
+SUSTAINABILITY
+Q: Are your products environmentally friendly?
+A: We are committed to making thoughtful choices in our materials and packaging wherever possible and continually seek ways to reduce our environmental impact.
+
+Q: Can candle jars or diffuser bottles be reused?
+A: Yes. Once cleaned, our containers can be repurposed as decorative storage, planters, organizers, or home décor.
+
+SAFETY
+Q: Are your candles safe to burn around pets?
+A: We recommend burning candles in well-ventilated spaces and keeping them out of reach of pets. If you have concerns about specific fragrances, consult your veterinarian.
+
+Q: Can I leave my candle burning unattended?
+A: No. Never leave a burning candle unattended. Keep it away from children, pets, curtains, and flammable objects.
+
+Q: Are reed diffuser oils safe to apply to the skin?
+A: No. Reed diffuser oils are intended for home fragrance only and should never be applied to the skin or ingested.
+
+CONTACT
+Q: How can I contact your customer service team?
+A: You can reach us via email at adachadzarma@gmail.com, by phone/WhatsApp at 08099007999, or through the contact form at /contact. We're always happy to assist.
+
+--- END OF FAQs ---
 
 Current product catalogue (use this to give accurate, real recommendations):
 ${productContext}
@@ -325,3 +428,5 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+
+
