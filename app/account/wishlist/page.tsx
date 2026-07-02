@@ -11,6 +11,8 @@ import { redirect } from "next/navigation"
 import { getWishlist } from "@/app/actions/wishlist"
 import WishlistClient from "./components/WishlistClient"
 import type { Metadata } from "next"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 export const metadata: Metadata = {
   title: "My Wishlist",
@@ -23,7 +25,15 @@ export default async function WishlistPage() {
     redirect("/auth/login?callbackUrl=/account/wishlist")
   }
 
-  const items = await getWishlist()
+  const { data: items, unavailable } = await withDbFallback(() => getWishlist(), [])
+
+  if (unavailable) {
+    return (
+      <div className="max-w-5xl mx-auto py-16">
+        <ServiceUnavailable message="We're having trouble loading your wishlist right now. Please try again in a moment." />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

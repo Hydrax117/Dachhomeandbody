@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { createHash } from "crypto"
+import { withRetry, isDbConnectionError } from "@/lib/db-resilience"
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -95,22 +96,31 @@ async function getCatalogue(): Promise<{ products: ProductWithVariants[]; text: 
     return { products: _catalogueCache.products, text: _catalogueCache.text }
   }
 
-  const products = await prisma.product.findMany({
-    where: { deleted: false, stock: { gt: 0 } },
-    include: {
-      category: { select: { name: true } },
-      variants: {
-        where: { stock: { gt: 0 } },
-        orderBy: { sortOrder: "asc" },
-        take: 5,
+  try {
+    const products = await withRetry(() => prisma.product.findMany({
+      where: { deleted: false, stock: { gt: 0 } },
+      include: {
+        category: { select: { name: true } },
+        variants: {
+          where: { stock: { gt: 0 } },
+          orderBy: { sortOrder: "asc" },
+          take: 5,
+        },
       },
-    },
-    orderBy: [{ featured: "desc" }, { averageRating: { sort: "desc", nulls: "last" } }],
-  })
+      orderBy: [{ featured: "desc" }, { averageRating: { sort: "desc", nulls: "last" } }],
+    }))
 
-  const text = formatProducts(products)
-  _catalogueCache = { products, text, expiresAt: now + CATALOGUE_TTL_MS }
-  return { products, text }
+    const text = formatProducts(products)
+    _catalogueCache = { products, text, expiresAt: now + CATALOGUE_TTL_MS }
+    return { products, text }
+  } catch (err) {
+    if (isDbConnectionError(err)) {
+      console.error("[Chat] DB unavailable — responding without live catalogue")
+      // Return empty catalogue; the bot will rely on FAQ knowledge only
+      return { products: [], text: "Product catalogue temporarily unavailable." }
+    }
+    throw err
+  }
 }
 
 /** Call this whenever a product is created/updated/deleted to bust the cache immediately. */
@@ -160,25 +170,28 @@ function formatProducts(products: ProductWithVariants[]): string {
 // ── Order lookup for authenticated users ───────────────────────────────────
 
 async function getOrderContext(userId: string): Promise<string> {
-  const orders = await prisma.order.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    include: {
-      items: {
-        include: { product: { select: { name: true } } },
+  try {
+    const orders = await withRetry(() => prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: {
+        items: { include: { product: { select: { name: true } } } },
       },
-    },
-  })
+    }))
 
-  if (orders.length === 0) return ""
+    if (orders.length === 0) return ""
 
-  const lines = orders.map((o) => {
-    const items = o.items.map((i) => `${i.product.name} x${i.quantity}`).join(", ")
-    return `Order #${o.orderNumber} — Status: ${o.status} | Payment: ${o.paymentStatus} | Total: ₦${o.total.toLocaleString("en-NG")} | Items: ${items} | Date: ${o.createdAt.toLocaleDateString("en-NG")}`
-  })
+    const lines = orders.map((o) => {
+      const items = o.items.map((i) => `${i.product.name} x${i.quantity}`).join(", ")
+      return `Order #${o.orderNumber} — Status: ${o.status} | Payment: ${o.paymentStatus} | Total: ₦${o.total.toLocaleString("en-NG")} | Items: ${items} | Date: ${o.createdAt.toLocaleDateString("en-NG")}`
+    })
 
-  return `\n\nThis customer's recent orders:\n${lines.join("\n")}`
+    return `\n\nThis customer's recent orders:\n${lines.join("\n")}`
+  } catch (err) {
+    if (isDbConnectionError(err)) return "" // Non-critical — skip order context
+    throw err
+  }
 }
 
 // ── System prompt ──────────────────────────────────────────────────────────

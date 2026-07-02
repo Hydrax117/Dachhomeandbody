@@ -11,6 +11,8 @@ import { getUserOrders, getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
 import Pagination from "@/app/components/ui/Pagination"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 // Derive the order shape from the existing data access function
 type OrderListItem = NonNullable<Awaited<ReturnType<typeof getOrder>>>
@@ -68,10 +70,20 @@ export default async function OrderHistoryPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1)
   const pageSize = 10
 
-  const { data: orders, total, totalPages } = await getUserOrders(
-    session!.user.id,
-    { page, pageSize }
+  const { data: ordersResult, unavailable } = await withDbFallback(
+    () => getUserOrders(session!.user.id, { page, pageSize }),
+    { data: [], total: 0, page: 1, pageSize, totalPages: 0 }
   )
+
+  if (unavailable) {
+    return (
+      <div className="max-w-4xl mx-auto py-16">
+        <ServiceUnavailable message="We're having trouble loading your orders right now. Please try again in a moment." />
+      </div>
+    )
+  }
+
+  const { data: orders, total, totalPages } = ordersResult
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

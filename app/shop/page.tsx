@@ -3,6 +3,8 @@ import { getProducts } from "@/lib/products"
 import type { ProductFilters, ProductSort } from "@/lib/products"
 import { getCategories } from "@/lib/categories"
 import { ShopClient } from "./components/ShopClient"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -62,10 +64,38 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const page = parsePage(str("page"))
   const pageSize = 20
 
-  const [result, categories] = await Promise.all([
-    getProducts(filters, sort, { page, pageSize }),
-    getCategories(),
+  const [
+    { data: result, unavailable },
+    { data: categories },
+  ] = await Promise.all([
+    withDbFallback(
+      () => getProducts(filters, sort, { page, pageSize }),
+      { data: [], total: 0, page: 1, pageSize, totalPages: 0 }
+    ),
+    withDbFallback(() => getCategories(), []),
   ])
+
+  if (unavailable) {
+    return (
+      <main>
+        <header className="relative overflow-hidden bg-[#111111] pt-28 pb-14 sm:pt-32 sm:pb-20 lg:pt-40 lg:pb-28">
+          <div className="grain-overlay" aria-hidden="true" />
+          <div className="relative z-10 px-5 sm:px-8 lg:px-16 max-w-7xl mx-auto">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <div className="w-6 h-px bg-[#B8965C]/50" aria-hidden="true" />
+              <p className="text-[#B8965C] text-[10px] tracking-[0.4em] uppercase">Our Products</p>
+            </div>
+            <h1 className="font-serif text-white font-light leading-[1.05]" style={{ fontSize: "clamp(2rem, 7vw, 5rem)" }}>
+              Shop
+            </h1>
+          </div>
+        </header>
+        <div className="container-luxury py-20">
+          <ServiceUnavailable message="We're having trouble loading products right now. Please try again in a moment." />
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main>

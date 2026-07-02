@@ -9,6 +9,8 @@ import { ReviewsList } from "./components/ReviewsList"
 import { AddToCartButton } from "./components/AddToCartButton"
 import { VariantSelector } from "./components/VariantSelector"
 import { ProductCard } from "@/app/shop/components/ProductCard"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 // ---------------------------------------------------------------------------
 // Metadata
@@ -105,7 +107,21 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
-  const product = await getProduct(slug)
+
+  const { data: product, unavailable } = await withDbFallback(
+    () => getProduct(slug),
+    null
+  )
+
+  if (unavailable) {
+    return (
+      <main className="pt-28">
+        <div className="container-luxury py-20">
+          <ServiceUnavailable message="We're having trouble loading this product right now. Please try again in a moment." />
+        </div>
+      </main>
+    )
+  }
 
   if (!product) notFound()
 
@@ -120,11 +136,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const bestEnjoyedDuring = getBestEnjoyedDuring(product.moodTags ?? [], product.fragranceType)
 
-  // Related products — same category, exclude current
-  const relatedResult = await getProducts(
-    { categoryId: product.category.id },
-    "newest",
-    { pageSize: 5 }
+  // Related products — same category, exclude current (non-critical, silent failure)
+  const { data: relatedResult } = await withDbFallback(
+    () => getProducts({ categoryId: product.category.id }, "newest", { pageSize: 5 }),
+    { data: [], total: 0, page: 1, pageSize: 5, totalPages: 0 }
   )
   const related = relatedResult.data.filter((p) => p.slug !== slug).slice(0, 4)
 

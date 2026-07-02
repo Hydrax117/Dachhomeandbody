@@ -4,6 +4,8 @@ import Image from "next/image"
 import { getBestSellers, getNewArrivals } from "@/lib/products"
 import { Newsletter } from "@/app/components/Newsletter"
 import { AddToCartButton } from "@/app/components/ui/AddToCartButton"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 // ---------------------------------------------------------------------------
 // Hero — split layout: content left, product image right
@@ -858,9 +860,12 @@ function Footer() {
 export default async function HomePage() {
   await connection()
 
-  const [bestSellers, newArrivals] = await Promise.all([
-    getBestSellers(8),
-    getNewArrivals(4),
+  const [
+    { data: bestSellers },
+    { data: newArrivals },
+  ] = await Promise.all([
+    withDbFallback(() => getBestSellers(8), []),
+    withDbFallback(() => getNewArrivals(4), []),
   ])
 
   return (

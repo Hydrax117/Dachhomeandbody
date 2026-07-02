@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { withRetry, isDbConnectionError } from "@/lib/db-resilience"
 import type { CartItem } from "@/app/components/cart/CartContext"
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -28,54 +29,50 @@ export async function loadCart(): Promise<PersistedCartItem[]> {
   const session = await auth()
   if (!session?.user?.id) return []
 
-  const items = await prisma.cartItem.findMany({
-    where: { userId: session.user.id },
-    include: {
-      product: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          price: true,
-          images: true,
-          stock: true,
-          deleted: true,
-        },
-      },
-      variant: {
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          stock: true,
-        },
-      },
-    },
-  })
-
-  return items
-    .filter((item) => !item.product.deleted)
-    .map((item) => {
-      // If variant exists, use variant price and stock
-      const effectivePrice = item.variant ? item.variant.price : item.product.price
-      const effectiveStock = item.variant ? item.variant.stock : item.product.stock
-
-      return {
-        productId: item.productId,
-        variantId: item.variantId,
-        quantity: item.quantity,
+  try {
+    const items = await withRetry(() => prisma.cartItem.findMany({
+      where: { userId: session.user.id },
+      include: {
         product: {
-          id: item.product.id,
-          name: item.product.name,
-          slug: item.product.slug,
-          price: effectivePrice,
-          images: item.product.images,
-          stock: effectiveStock,
-          variantId: item.variantId,
-          variantName: item.variant?.name ?? null,
+          select: {
+            id: true, name: true, slug: true, price: true,
+            images: true, stock: true, deleted: true,
+          },
         },
-      }
-    })
+        variant: {
+          select: { id: true, name: true, price: true, stock: true },
+        },
+      },
+    }))
+
+    return items
+      .filter((item) => !item.product.deleted)
+      .map((item) => {
+        const effectivePrice = item.variant ? item.variant.price : item.product.price
+        const effectiveStock = item.variant ? item.variant.stock : item.product.stock
+        return {
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+          product: {
+            id: item.product.id,
+            name: item.product.name,
+            slug: item.product.slug,
+            price: effectivePrice,
+            images: item.product.images,
+            stock: effectiveStock,
+            variantId: item.variantId,
+            variantName: item.variant?.name ?? null,
+          },
+        }
+      })
+  } catch (err) {
+    if (isDbConnectionError(err)) {
+      console.error("[Cart] DB unavailable when loading cart:", (err as Error)?.message)
+      return [] // Return empty cart rather than crashing
+    }
+    throw err
+  }
 }
 
 // ── Save a single cart item (upsert) ──────────────────────────────────────
@@ -89,30 +86,36 @@ export async function saveCartItem(
   if (!session?.user?.id) return
   const userId = session.user.id
 
-  if (quantity <= 0) {
-    await prisma.cartItem.deleteMany({
-      where: { userId, productId, variantId },
-    })
-    return
-  }
-
-  // Prisma's compound unique key does not accept null in the `where` clause.
-  // When variantId is null we must use findFirst + update/create manually.
-  if (variantId) {
-    await prisma.cartItem.upsert({
-      where: { userId_productId_variantId: { userId, productId, variantId } },
-      create: { userId, productId, variantId, quantity },
-      update: { quantity },
-    })
-  } else {
-    const existing = await prisma.cartItem.findFirst({
-      where: { userId, productId, variantId: null },
-    })
-    if (existing) {
-      await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity } })
-    } else {
-      await prisma.cartItem.create({ data: { userId, productId, variantId: null, quantity } })
+  try {
+    if (quantity <= 0) {
+      await withRetry(() => prisma.cartItem.deleteMany({
+        where: { userId, productId, variantId },
+      }))
+      return
     }
+
+    if (variantId) {
+      await withRetry(() => prisma.cartItem.upsert({
+        where: { userId_productId_variantId: { userId, productId, variantId } },
+        create: { userId, productId, variantId, quantity },
+        update: { quantity },
+      }))
+    } else {
+      const existing = await withRetry(() => prisma.cartItem.findFirst({
+        where: { userId, productId, variantId: null },
+      }))
+      if (existing) {
+        await withRetry(() => prisma.cartItem.update({ where: { id: existing.id }, data: { quantity } }))
+      } else {
+        await withRetry(() => prisma.cartItem.create({ data: { userId, productId, variantId: null, quantity } }))
+      }
+    }
+  } catch (err) {
+    if (isDbConnectionError(err)) {
+      console.error("[Cart] DB unavailable when saving cart item:", (err as Error)?.message)
+      return // Silently swallow — cart is still functional in local state
+    }
+    throw err
   }
 }
 
@@ -125,20 +128,34 @@ export async function removeCartItem(
   const session = await auth()
   if (!session?.user?.id) return
 
-  await prisma.cartItem.deleteMany({
-    where: { userId: session.user.id, productId, variantId },
-  })
+  try {
+    await withRetry(() => prisma.cartItem.deleteMany({
+      where: { userId: session.user.id, productId, variantId },
+    }))
+  } catch (err) {
+    if (isDbConnectionError(err)) {
+      console.error("[Cart] DB unavailable when removing cart item:", (err as Error)?.message)
+      return
+    }
+    throw err
+  }
 }
-
-// ── Clear entire cart from DB ──────────────────────────────────────────────
 
 export async function clearPersistedCart(): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) return
 
-  await prisma.cartItem.deleteMany({
-    where: { userId: session.user.id },
-  })
+  try {
+    await withRetry(() => prisma.cartItem.deleteMany({
+      where: { userId: session.user.id },
+    }))
+  } catch (err) {
+    if (isDbConnectionError(err)) {
+      console.error("[Cart] DB unavailable when clearing cart:", (err as Error)?.message)
+      return
+    }
+    throw err
+  }
 }
 
 // ── Merge guest cart into user cart on login ───────────────────────────────

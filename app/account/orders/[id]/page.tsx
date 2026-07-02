@@ -11,6 +11,8 @@ import { redirect, notFound } from "next/navigation"
 import { getOrder } from "@/lib/orders"
 import Link from "next/link"
 import type { Metadata } from "next"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 type OrderDetail = NonNullable<Awaited<ReturnType<typeof getOrder>>>
 type OrderItem = OrderDetail["items"][number]
@@ -207,7 +209,16 @@ export default async function OrderDetailPage({ params }: PageProps) {
   }
 
   const { id } = await params
-  const order = await getOrder(id)
+
+  const { data: order, unavailable } = await withDbFallback(() => getOrder(id), null)
+
+  if (unavailable) {
+    return (
+      <div className="max-w-4xl mx-auto py-16">
+        <ServiceUnavailable message="We're having trouble loading this order right now. Please try again in a moment." />
+      </div>
+    )
+  }
 
   if (!order) {
     notFound()

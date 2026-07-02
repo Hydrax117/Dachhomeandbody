@@ -13,6 +13,8 @@ import {
   type GiftCardStyle,
   type GiftRibbonStyle,
 } from "@/lib/gift-boxes"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 export const metadata: Metadata = { title: "My Gift Orders" }
 
@@ -131,7 +133,18 @@ export default async function GiftOrdersPage() {
     redirect("/auth/login?callbackUrl=/account/gift-orders")
   }
 
-  const orders = await getUserGiftOrders(session.user.id) as GiftOrderItem[]
+  const { data: orders, unavailable } = await withDbFallback(
+    () => getUserGiftOrders(session.user.id),
+    []
+  )
+
+  if (unavailable) {
+    return (
+      <div className="max-w-4xl mx-auto py-16">
+        <ServiceUnavailable message="We're having trouble loading your gift orders right now. Please try again in a moment." />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -140,13 +153,13 @@ export default async function GiftOrdersPage() {
           My Gift Orders
         </h1>
         <p className="text-sm text-[#8C8C8C] mt-1">
-          {orders.length === 0
+          {(orders as GiftOrderItem[]).length === 0
             ? "You haven't placed any gift orders yet."
-            : `${orders.length} gift order${orders.length === 1 ? "" : "s"}`}
+            : `${(orders as GiftOrderItem[]).length} gift order${(orders as GiftOrderItem[]).length === 1 ? "" : "s"}`}
         </p>
       </div>
 
-      {orders.length === 0 ? (
+        {(orders as GiftOrderItem[]).length === 0 ? (
         <div className="bg-white border border-[#e5e5e5] rounded p-12 text-center">
           <div className="w-14 h-14 bg-[#f5f0e8] flex items-center justify-center mx-auto mb-5">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B8965C" strokeWidth="1.5">
@@ -167,7 +180,7 @@ export default async function GiftOrdersPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {orders.map((order: GiftOrderItem) => {
+          {(orders as GiftOrderItem[]).map((order: GiftOrderItem) => {
             const meta = GIFT_BOX_THEME_META[order.giftBox.theme as GiftBoxTheme]
             const address = order.shippingAddress as Record<string, string>
 

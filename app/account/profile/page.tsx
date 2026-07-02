@@ -13,6 +13,8 @@ import type { Metadata } from "next"
 import ProfileForm from "./components/ProfileForm"
 import PasswordForm from "./components/PasswordForm"
 import AddressList from "./components/AddressList"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -38,18 +40,29 @@ export default async function ProfilePage() {
     redirect("/auth/login?callbackUrl=/account/profile")
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      name: true,
-      email: true,
-      phone: true,
-      password: true,
-      addresses: {
-        orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+  const { data: user, unavailable } = await withDbFallback(
+    () => prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        name: true,
+        email: true,
+        phone: true,
+        password: true,
+        addresses: {
+          orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+        },
       },
-    },
-  })
+    }),
+    null
+  )
+
+  if (unavailable) {
+    return (
+      <div className="max-w-3xl mx-auto py-16">
+        <ServiceUnavailable message="We're having trouble loading your profile right now. Please try again in a moment." />
+      </div>
+    )
+  }
 
   if (!user) {
     redirect("/auth/login")

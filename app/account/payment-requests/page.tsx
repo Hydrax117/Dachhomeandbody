@@ -13,6 +13,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { PaymentRequestsClient } from "./components/PaymentRequestsClient"
+import { withDbFallback } from "@/lib/db-resilience"
+import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
 
 export const metadata: Metadata = { title: "Payment Requests" }
 
@@ -28,10 +30,23 @@ export default async function PaymentRequestsPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1)
   const pageSize = 10
 
-  const { data: requests, total, totalPages } = await getUserPaymentRequests(
-    session.user.id,
-    { page, pageSize }
+  const {
+    data: requestsResult,
+    unavailable,
+  } = await withDbFallback(
+    () => getUserPaymentRequests(session.user.id, { page, pageSize }),
+    { data: [], total: 0, page: 1, pageSize, totalPages: 0 }
   )
+
+  if (unavailable) {
+    return (
+      <div className="max-w-4xl mx-auto py-16">
+        <ServiceUnavailable message="We're having trouble loading your payment requests right now. Please try again in a moment." />
+      </div>
+    )
+  }
+
+  const { data: requests, total, totalPages } = requestsResult
 
   const siteUrl = process.env.NEXTAUTH_URL ?? ""
 
@@ -40,12 +55,15 @@ export default async function PaymentRequestsPage({ searchParams }: PageProps) {
     .filter((r) => r.status === "PAID" && r.orderId)
     .map((r) => r.orderId as string)
 
-  const orderNumbers = paidOrderIds.length > 0
-    ? await prisma.order.findMany({
-        where: { id: { in: paidOrderIds } },
-        select: { id: true, orderNumber: true },
-      })
-    : []
+  const { data: orderNumbers } = paidOrderIds.length > 0
+    ? await withDbFallback(
+        () => prisma.order.findMany({
+          where: { id: { in: paidOrderIds } },
+          select: { id: true, orderNumber: true },
+        }),
+        []
+      )
+    : { data: [] }
 
   const orderNumberMap = new Map(orderNumbers.map((o) => [o.id, o.orderNumber]))
 
