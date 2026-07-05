@@ -804,8 +804,8 @@ function Footer() {
                 {[
                   { label: "Shipping & Returns", href: "#" },
                   { label: "FAQ", href: "/faq" },
-                  { label: "Privacy Policy", href: "#" },
-                  { label: "Terms of Service", href: "#" },
+                  { label: "Privacy Policy", href: "/privacy-policy" },
+                  { label: "Terms of Service", href: "/terms" },
                 ].map((l) => (
                   <li key={l.label}><Link href={l.href} className="hover:text-white transition-colors duration-200">{l.label}</Link></li>
                 ))}
@@ -894,5 +894,6 @@ export default async function HomePage() {
     </>
   )
 }
+
 
 
