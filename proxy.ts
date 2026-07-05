@@ -38,22 +38,17 @@ function buildCsp(nonce: string): string {
     // Styles — split into two granular directives (CSP Level 3):
     //
     // style-src-elem  governs <style> tags and <link rel="stylesheet">.
-    //   Next.js automatically attaches the nonce to every <style> it emits,
-    //   so nonce-only is correct here.
+    //   In production: nonce-only (Next.js attaches the nonce automatically).
+    //   In dev: unsafe-inline only — when a nonce is present, browsers ignore
+    //   unsafe-inline entirely (CSP Level 2 spec), so the two can't coexist.
+    //   The Next.js/Turbopack dev overlay and Sentry devtools inject <style>
+    //   tags without a nonce, so dev must use unsafe-inline without a nonce.
     //
-    // style-src-attr  governs style="…" *attributes* on HTML elements.
-    //   Nonces cannot be placed on attributes (only on elements), so the only
-    //   practical option for allowing framework/library inline styles (Framer
-    //   Motion sets opacity:1;transform:none, etc.) is 'unsafe-inline'.
-    //   This is acceptable: style attributes cannot execute scripts, so the
-    //   XSS risk of unsafe-inline here is limited to CSS-based attacks (e.g.
-    //   data exfiltration via attribute selectors), not arbitrary JS execution.
-    //   A strict script-src with nonces/strict-dynamic already covers the
-    //   primary injection vector.
-    //
-    // style-src is intentionally omitted so the two granular directives take
-    // full effect without a fallback overriding them.
-    `style-src-elem 'self' 'nonce-${nonce}'`,
+    // style-src-attr  governs style="…" attributes — nonces can't apply here,
+    //   so unsafe-inline is required in all environments.
+    isDev
+      ? "style-src-elem 'self' 'unsafe-inline'"
+      : `style-src-elem 'self' 'nonce-${nonce}'`,
     `style-src-attr 'unsafe-inline'`,
 
     // Images: same origin, data URIs (used by some UI libs), blob: (canvas exports),
@@ -63,9 +58,9 @@ function buildCsp(nonce: string): string {
     // Fonts: self only — next/font/google self-hosts all fonts at build time.
     "font-src 'self'",
 
-    // Fetch/XHR: same origin only. Paystack API calls happen server-side (Node.js),
-    // never from the browser, so no external connect-src needed.
-    "connect-src 'self'",
+    // Fetch/XHR: same origin + Sentry ingest for error reporting.
+    // Paystack API calls happen server-side (Node.js), never from the browser.
+    "connect-src 'self' https://*.ingest.us.sentry.io https://*.ingest.sentry.io",
 
     // No plugins (Flash, etc.)
     "object-src 'none'",

@@ -1,5 +1,6 @@
 "use client"
 
+import * as Sentry from "@sentry/nextjs"
 import { useEffect } from "react"
 import Link from "next/link"
 
@@ -33,6 +34,7 @@ export default function Error({
   unstable_retry: () => void
 }) {
   useEffect(() => {
+    Sentry.captureException(error)
     console.error("[App Error]", error)
   }, [error])
 

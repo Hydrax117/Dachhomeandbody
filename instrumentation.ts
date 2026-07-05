@@ -1,8 +1,14 @@
+import * as Sentry from "@sentry/nextjs"
 import type { Instrumentation } from "next"
 
-export function register() {
-  // Placeholder for observability tool registration (e.g. OpenTelemetry, Sentry)
-  // Example: registerOTel('dachhomeandbody')
+export async function register() {
+  // Load Sentry config for the appropriate runtime
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("./sentry.server.config")
+  }
+  if (process.env.NEXT_RUNTIME === "edge") {
+    await import("./sentry.edge.config")
+  }
 }
 
 export const onRequestError: Instrumentation.onRequestError = async (
@@ -10,22 +16,11 @@ export const onRequestError: Instrumentation.onRequestError = async (
   request,
   context
 ) => {
+  // Forward every server-side request error to Sentry
+  await Sentry.captureRequestError(err, request, context)
+
+  // Also log locally for observability
   const error = err as Error & { digest?: string }
-  const isDev = process.env.NODE_ENV === "development"
-
-  if (isDev) {
-    console.error("[Server Request Error]", {
-      message: error.message,
-      digest: error.digest,
-      path: request.path,
-      method: request.method,
-      routePath: context.routePath,
-      routeType: context.routeType,
-    })
-    return
-  }
-
-  // Production: structured log for observability ingestion
   console.error(
     JSON.stringify({
       level: "error",
