@@ -21,19 +21,19 @@ export default function ChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [inputTimeout, setInputTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
 
-  // Hide on admin pages
-  if (pathname.startsWith("/admin")) return null
-
-  // Auto-scroll to bottom
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Auto-scroll to bottom — must be before any early return
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, isLoading])
 
-  // Focus input when chat opens
+  // Focus input when chat opens — must be before any early return
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 300)
   }, [isOpen])
+
+  // Hide on admin pages — AFTER all hooks
+  if (pathname.startsWith("/admin")) return null
 
   // ── Debounced send: wait 400ms of no typing before allowing send ──────────
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
