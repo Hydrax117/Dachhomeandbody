@@ -50,3 +50,9 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Handover document (internal — not for the repo)
+HANDOVER.md
+
+# One-off utility scripts (may contain env-specific config)
+scripts/

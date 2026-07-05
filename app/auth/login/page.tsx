@@ -61,7 +61,6 @@ function LoginForm() {
       // Admins always go to their dashboard; customers go to callbackUrl
       const destination = state.isAdmin ? "/admin" : callbackUrl
       router.push(destination)
-      router.refresh()
     }
   }, [state.success, state.isAdmin, callbackUrl, router, toast])
 

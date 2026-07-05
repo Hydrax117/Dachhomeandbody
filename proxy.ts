@@ -18,6 +18,50 @@ const { auth } = NextAuth(authConfig)
 const isDev = process.env.NODE_ENV === "development"
 
 // ---------------------------------------------------------------------------
+// In-edge rate limiter (per IP, per route prefix)
+// ---------------------------------------------------------------------------
+
+interface RateLimitEntry {
+  count: number
+  resetAt: number
+}
+
+const _rateLimitStore = new Map<string, RateLimitEntry>()
+
+const RATE_LIMIT_RULES: Array<{ prefix: string; limit: number; windowMs: number }> = [
+  { prefix: "/api/payment/initialize", limit: 10, windowMs: 60_000 },
+  { prefix: "/api/payment/initialize-pay-request", limit: 10, windowMs: 60_000 },
+  { prefix: "/api/payment/initialize-request", limit: 10, windowMs: 60_000 },
+  { prefix: "/api/auth", limit: 20, windowMs: 60_000 },
+  { prefix: "/api/upload", limit: 30, windowMs: 60_000 },
+]
+
+function checkRateLimit(ip: string, pathname: string): boolean {
+  const rule = RATE_LIMIT_RULES.find((r) => pathname.startsWith(r.prefix))
+  if (!rule) return true
+
+  const key = `${ip}:${rule.prefix}`
+  const now = Date.now()
+  const entry = _rateLimitStore.get(key)
+
+  if (!entry || now > entry.resetAt) {
+    _rateLimitStore.set(key, { count: 1, resetAt: now + rule.windowMs })
+    return true
+  }
+  if (entry.count >= rule.limit) return false
+  entry.count++
+  return true
+}
+
+function getClientIp(req: { headers: { get: (key: string) => string | null } }): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown"
+  )
+}
+
+// ---------------------------------------------------------------------------
 // CSP helper
 // ---------------------------------------------------------------------------
 
@@ -51,9 +95,10 @@ function buildCsp(nonce: string): string {
       : `style-src-elem 'self' 'nonce-${nonce}'`,
     `style-src-attr 'unsafe-inline'`,
 
-    // Images: same origin, data URIs (used by some UI libs), blob: (canvas exports),
-    // plus the two external image hosts used by next/image.
-    "img-src 'self' data: blob: https://res.cloudinary.com https://*.papersmiths.co.uk",
+    // Images: same origin, data URIs, blob: (canvas exports),
+    // Cloudinary (product images), Google user profile pictures (OAuth),
+    // and the legacy papersmiths host.
+    "img-src 'self' data: blob: https://res.cloudinary.com https://*.papersmiths.co.uk https://lh3.googleusercontent.com https://*.googleusercontent.com",
 
     // Fonts: self only — next/font/google self-hosts all fonts at build time.
     "font-src 'self'",
@@ -180,6 +225,17 @@ export default auth((req: any) => {
     )
 
     return response
+  }
+
+  // ── Rate limiting on sensitive API routes ─────────────────────────────
+  if (pathname.startsWith("/api/")) {
+    const ip = getClientIp(req)
+    if (!checkRateLimit(ip, pathname)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      )
+    }
   }
 
   // ── Always-public paths — never intercept ─────────────────────────────

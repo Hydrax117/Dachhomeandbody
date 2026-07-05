@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useCallback } from "react"
 import { useCart } from "@/app/components/cart/CartContext"
 import { createPaymentRequestAction } from "@/app/actions/payment-requests"
 import type { ShippingAddress } from "./ShippingAddressForm"
@@ -79,46 +79,76 @@ export function PaymentMethodSelector({
   const { cart, clearCart } = useCart()
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("paystack")
   const [error, setError] = useState<string | null>(null)
+  const [errorCode, setErrorCode] = useState<"network" | "gateway" | "validation" | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
   const [isPending, startTransition] = useTransition()
   const [isGeneratingLink, setIsGeneratingLink] = useState(false)
 
   const orderTotal = Math.max(0, cart.subtotal - cart.discount + shippingCost)
 
+  // ── Payment initializer (extracted for retry support) ────────────────────
+  const initializePaystack = useCallback(async () => {
+    const email = guestEmail || "customer@dachhomeandbody.com"
+    const metadata = {
+      items: cart.items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId ?? null,
+        variantName: item.product.variantName ?? null,
+        quantity: item.quantity,
+        price: item.product.price,
+      })),
+      shippingAddress,
+      guestEmail: isAuthenticated ? null : guestEmail,
+      couponCode: cart.couponCode ?? null,
+      subtotal: cart.subtotal,
+      discount: cart.discount,
+      shippingCost,
+      total: orderTotal,
+    }
+    const callbackUrl = `${window.location.origin}/checkout/verify`
+    const res = await fetch("/api/payment/initialize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, amount: orderTotal, metadata, callbackUrl }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      const msg = (data as { error?: string }).error ?? "Failed to initialize payment"
+      // Classify the error for better UX messaging
+      if (res.status >= 500) throw Object.assign(new Error(msg), { code: "gateway" })
+      if (res.status === 400) throw Object.assign(new Error(msg), { code: "validation" })
+      throw Object.assign(new Error(msg), { code: "network" })
+    }
+    const { authorizationUrl } = (await res.json()) as { authorizationUrl: string }
+    window.location.href = authorizationUrl
+  }, [cart, guestEmail, isAuthenticated, orderTotal, shippingAddress, shippingCost])
+
   // ── Pay Now ──────────────────────────────────────────────────────────────
   async function handlePay() {
     setError(null)
+    setErrorCode(null)
     startTransition(async () => {
       try {
-        const email = guestEmail || "customer@dachhomeandbody.com"
-        const metadata = {
-          items: cart.items.map((item) => ({
-            productId: item.productId,
-            variantId: item.variantId ?? null,
-            variantName: item.product.variantName ?? null,
-            quantity: item.quantity,
-            price: item.product.price,
-          })),
-          shippingAddress,
-          guestEmail: isAuthenticated ? null : guestEmail,
-          couponCode: cart.couponCode ?? null,
-          subtotal: cart.subtotal,
-          discount: cart.discount,
-          shippingCost,
-          total: orderTotal,
-        }
-        const callbackUrl = `${window.location.origin}/checkout/verify`
-        const res = await fetch("/api/payment/initialize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, amount: orderTotal, metadata, callbackUrl }),
-        })
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          throw new Error((data as { error?: string }).error ?? "Failed to initialize payment")
-        }
-        const { authorizationUrl } = (await res.json()) as { authorizationUrl: string }
-        window.location.href = authorizationUrl
+        await initializePaystack()
       } catch (err) {
+        const code = (err as { code?: string }).code as typeof errorCode ?? "network"
+        setErrorCode(code)
+        setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
+      }
+    })
+  }
+
+  // ── Retry handler ────────────────────────────────────────────────────────
+  async function handleRetry() {
+    setRetryCount((c) => c + 1)
+    setError(null)
+    setErrorCode(null)
+    startTransition(async () => {
+      try {
+        await initializePaystack()
+      } catch (err) {
+        const code = (err as { code?: string }).code as typeof errorCode ?? "network"
+        setErrorCode(code)
         setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
       }
     })
@@ -200,7 +230,7 @@ export function PaymentMethodSelector({
         {/* Pay with Paystack */}
         <button
           type="button"
-          onClick={() => setSelectedMethod("paystack")}
+          onClick={() => { setSelectedMethod("paystack"); setError(null); setErrorCode(null); setRetryCount(0) }}
           aria-pressed={selectedMethod === "paystack"}
           className={[
             "w-full text-left px-4 py-4 border rounded-sm transition-all duration-200",
@@ -227,7 +257,7 @@ export function PaymentMethodSelector({
         {/* Let someone else pay */}
         <button
           type="button"
-          onClick={() => setSelectedMethod("request")}
+          onClick={() => { setSelectedMethod("request"); setError(null); setErrorCode(null); setRetryCount(0) }}
           aria-pressed={selectedMethod === "request"}
           className={[
             "w-full text-left px-4 py-4 border rounded-sm transition-all duration-200",
@@ -280,8 +310,25 @@ export function PaymentMethodSelector({
       </div>
 
       {error && (
-        <div role="alert" className="mb-4 px-4 py-3 border border-red-200 bg-red-50 text-red-700 text-xs rounded-sm">
-          {error}
+        <div role="alert" className="mb-4 px-4 py-3 border border-red-200 bg-red-50 rounded-sm">
+          <p className="text-red-700 text-xs mb-2">{error}</p>
+          {/* Show retry only for gateway/network errors, not validation */}
+          {errorCode !== "validation" && retryCount < 3 && (
+            <button
+              type="button"
+              onClick={handleRetry}
+              disabled={isPending}
+              className="text-xs font-medium text-red-700 underline hover:no-underline disabled:opacity-50"
+            >
+              {isPending ? "Retrying…" : "Try again"}
+            </button>
+          )}
+          {retryCount >= 3 && (
+            <p className="text-xs text-red-600 mt-1">
+              Still having trouble? Try the &ldquo;Let someone else pay&rdquo; option, or contact us at{" "}
+              <a href="tel:08099007999" className="underline">08099007999</a>.
+            </p>
+          )}
         </div>
       )}
 

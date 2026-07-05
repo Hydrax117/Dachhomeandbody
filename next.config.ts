@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
         hostname: "**.papersmiths.co.uk",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+        pathname: "/**",
+      },
     ],
   },
 };

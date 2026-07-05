@@ -7,20 +7,27 @@ async function main() {
   console.log('🌱 Seeding database...')
 
   // ── Admin user ─────────────────────────────────────────────────────────
+  // Password is read from SEED_ADMIN_PASSWORD env var — never hardcoded.
+  // Set it in .env before running: SEED_ADMIN_PASSWORD=yourpassword npx prisma db seed
 
-  const hashedPassword = await bcrypt.hash('admin123', 10)
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@dachhomeandbody.com' },
-    update: {},
-    create: {
-      email: 'admin@dachhomeandbody.com',
-      name: 'Admin User',
-      password: hashedPassword,
-      role: 'ADMIN',
-      emailVerified: new Date(),
-    },
-  })
-  console.log('✅ Admin user:', admin.email)
+  const seedAdminPassword = process.env.SEED_ADMIN_PASSWORD
+  if (!seedAdminPassword) {
+    console.warn('⚠️  SEED_ADMIN_PASSWORD not set — skipping admin user creation.')
+  } else {
+    const hashedPassword = await bcrypt.hash(seedAdminPassword, 10)
+    const admin = await prisma.user.upsert({
+      where: { email: 'admin@dachhomeandbody.com' },
+      update: {},
+      create: {
+        email: 'admin@dachhomeandbody.com',
+        name: 'Admin User',
+        password: hashedPassword,
+        role: 'ADMIN',
+        emailVerified: new Date(),
+      },
+    })
+    console.log('✅ Admin user:', admin.email)
+  }
 
   // ── Categories ─────────────────────────────────────────────────────────
 
