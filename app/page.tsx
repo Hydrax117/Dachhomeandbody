@@ -28,11 +28,11 @@ function Hero() {
         />
 
         <div className="relative max-w-lg">
-          {/* Eyebrow */}
+          {/* Brand name — immediately visible above headline */}
           <div className="flex items-center gap-3 mb-7">
             <div className="w-7 h-px bg-[#B8965C]" aria-hidden="true" />
-            <p className="text-[#B8965C] text-[10px] tracking-[0.38em] uppercase font-medium">
-              Abuja&apos;s Premium Home &amp; Body Brand
+            <p className="font-serif text-white text-sm tracking-[0.22em] uppercase">
+              DACH Home &amp; Body
             </p>
           </div>
 
