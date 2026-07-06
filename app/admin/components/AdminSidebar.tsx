@@ -392,7 +392,7 @@ export default function AdminSidebar({ role }: { role: "ADMIN" | "STAFF" }) {
         ))}
       </nav>
 
-      {/* Footer — store link + logout */}
+      {/* Footer — store link + profile + logout */}
       <div className="shrink-0 border-t border-[#e5e5e5] px-3 py-4 space-y-1">
         <Link
           href="/"
@@ -400,6 +400,16 @@ export default function AdminSidebar({ role }: { role: "ADMIN" | "STAFF" }) {
         >
           <StoreIcon />
           View Store
+        </Link>
+        <Link
+          href="/admin/profile"
+          className="flex items-center gap-3 px-3 py-2.5 rounded text-sm text-[#6b6b6b] hover:bg-[#f5f0e8] hover:text-[#111111] transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          My Profile
         </Link>
         <form action={logout}>
           <LogoutButton />
