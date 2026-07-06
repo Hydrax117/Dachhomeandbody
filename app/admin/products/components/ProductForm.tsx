@@ -22,6 +22,7 @@ export interface ProductInitialData {
   stock: number
   sku: string
   featured: boolean
+  bestSeller: boolean
   fragranceType?: string | null
   topNotes: string[]
   heartNotes: string[]
@@ -250,16 +251,31 @@ function BasicInfoStep({
         <FieldError message={errors?.categoryId?.[0]} />
       </div>
 
-      {/* Featured */}
-      <div className="flex items-center gap-3">
-        <input
-          id="featured" name="featured" type="checkbox" value="true"
-          defaultChecked={initialData?.featured ?? false}
-          className="w-4 h-4 accent-[#B8965C] rounded"
-        />
-        <label htmlFor="featured" className="text-sm text-[#111111]">
-          Mark as featured product
-        </label>
+      {/* Featured + Best Seller */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <input
+            id="featured" name="featured" type="checkbox" value="true"
+            defaultChecked={initialData?.featured ?? false}
+            className="w-4 h-4 accent-[#B8965C] rounded"
+          />
+          <label htmlFor="featured" className="text-sm text-[#111111]">
+            Mark as featured product
+          </label>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            id="bestSeller" name="bestSeller" type="checkbox" value="true"
+            defaultChecked={initialData?.bestSeller ?? false}
+            className="w-4 h-4 accent-[#B8965C] rounded"
+          />
+          <label htmlFor="bestSeller" className="text-sm text-[#111111]">
+            Mark as best seller
+            <span className="ml-2 text-[10px] text-[#8C8C8C] tracking-wide normal-case">
+              Shows in the Best Sellers section on the homepage
+            </span>
+          </label>
+        </div>
       </div>
     </div>
   )

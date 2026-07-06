@@ -93,6 +93,7 @@ model Product {
   stock          Int              @default(0)
   sku            String           @unique
   featured       Boolean          @default(false)
+  bestSeller     Boolean          @default(false)
   fragranceType  FragranceType?
   topNotes       String[]
   heartNotes     String[]

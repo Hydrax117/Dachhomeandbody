@@ -62,6 +62,7 @@ const productListSelect = {
   stock: true,
   sku: true,
   featured: true,
+  bestSeller: true,
   fragranceType: true,
   topNotes: true,
   heartNotes: true,
@@ -125,6 +126,7 @@ export const productCreateSchema = z.object({
   stock: z.number().int().nonnegative(),
   sku: z.string().min(1),
   featured: z.boolean().default(false),
+  bestSeller: z.boolean().default(false),
   fragranceType: z.nativeEnum(FragranceType).optional(),
   topNotes: z.array(z.string()).default([]),
   heartNotes: z.array(z.string()).default([]),
@@ -266,32 +268,52 @@ export async function getFeaturedProducts(limit = 8) {
 }
 
 /**
- * Get best-selling products ranked by total quantity sold.
+ * Get best-selling products.
+ * If any products are manually flagged as best sellers, those are shown first
+ * (in updatedAt order). Remaining slots are filled from actual sales data.
  * Requirements: 12.3
  */
 export async function getBestSellers(limit = 8) {
-  // Aggregate total quantity sold per product via OrderItems
+  // 1. Manually flagged best sellers
+  const manual = await prisma.product.findMany({
+    where: { bestSeller: true, deleted: false, stock: { gt: 0 } },
+    orderBy: { updatedAt: "desc" },
+    take: limit,
+    select: productListSelect,
+  })
+
+  if (manual.length >= limit) return manual.slice(0, limit)
+
+  // 2. Fill remaining slots from sales data
+  const remaining = limit - manual.length
+  const manualIds = new Set(manual.map((p) => p.id))
+
   const topItems = await prisma.orderItem.groupBy({
     by: ["productId"],
     _sum: { quantity: true },
     orderBy: { _sum: { quantity: "desc" } },
-    take: limit,
+    take: limit, // over-fetch to account for filtering
   })
 
-  if (topItems.length === 0) return []
+  const salesIds = topItems
+    .map((item) => item.productId)
+    .filter((id) => !manualIds.has(id))
+    .slice(0, remaining)
 
-  const productIds = topItems.map((item) => item.productId)
+  if (salesIds.length === 0) return manual
 
-  const products = await prisma.product.findMany({
-    where: { id: { in: productIds }, deleted: false },
+  const salesProducts = await prisma.product.findMany({
+    where: { id: { in: salesIds }, deleted: false },
     select: productListSelect,
   })
 
-  // Preserve the sales-rank order returned by the aggregation
-  const productMap = new Map(products.map((p) => [p.id, p]))
-  return productIds
+  // Preserve sales-rank order
+  const productMap = new Map(salesProducts.map((p) => [p.id, p]))
+  const salesSorted = salesIds
     .map((id) => productMap.get(id))
     .filter((p): p is NonNullable<typeof p> => p !== undefined)
+
+  return [...manual, ...salesSorted]
 }
 
 /**

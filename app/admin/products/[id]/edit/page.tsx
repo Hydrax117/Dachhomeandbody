@@ -49,6 +49,7 @@ export default async function EditProductPage({
     stock: product.stock,
     sku: product.sku,
     featured: product.featured,
+    bestSeller: product.bestSeller,
     fragranceType: product.fragranceType ?? null,
     topNotes: product.topNotes,
     heartNotes: product.heartNotes,
