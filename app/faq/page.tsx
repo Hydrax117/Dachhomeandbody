@@ -1,6 +1,7 @@
 import Link from "next/link"
 import type { Metadata } from "next"
 import { Newsletter } from "@/app/components/Newsletter"
+import { faqSchema } from "@/lib/structured-data"
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | DACH Home & Body",
@@ -455,8 +456,20 @@ function Footer() {
 // ---------------------------------------------------------------------------
 
 export default function FAQPage() {
+  // Build FAQ schema from all questions that have text answers (not lists)
+  const allFaqs = faqSections.flatMap((s) =>
+    s.questions
+      .filter((q): q is typeof q & { a: string } => typeof q.a === "string")
+      .map((q) => ({ question: q.q, answer: q.a }))
+  )
+  const faqJsonLd = faqSchema(allFaqs)
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <main>
         <FAQHero />
         {faqSections.map((section, i) => (

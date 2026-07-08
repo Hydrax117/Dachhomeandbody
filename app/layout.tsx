@@ -11,6 +11,7 @@ import ConditionalNavbar from "@/app/components/layout/ConditionalNavbar";
 import PromotionalPopupWrapper from "@/app/components/PromotionalPopupWrapper";
 import ChatWidget from "@/app/components/chat/ChatWidget";
 import { ChatProvider } from "@/app/components/chat/ChatContext";
+import { organizationSchema, localBusinessSchema, websiteSchema } from "@/lib/structured-data"
 
 // Opt out of static prerendering — all pages are dynamic (require DB/auth at request time)
 export const dynamic = "force-dynamic"
@@ -127,6 +128,20 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${cormorant.variable} ${inter.variable} ${manrope.variable} antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-[#F8F5F2] text-[#111111]">
         <Providers>
           <ChatProvider>

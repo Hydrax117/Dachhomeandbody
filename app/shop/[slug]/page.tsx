@@ -11,6 +11,7 @@ import { VariantSelector } from "./components/VariantSelector"
 import { ProductCard } from "@/app/shop/components/ProductCard"
 import { withDbFallback } from "@/lib/db-resilience"
 import ServiceUnavailable from "@/app/components/ui/ServiceUnavailable"
+import { productSchema, breadcrumbSchema } from "@/lib/structured-data"
 
 // ---------------------------------------------------------------------------
 // Metadata
@@ -31,10 +32,29 @@ export async function generateMetadata({
   return {
     title: product.name,
     description: product.description.slice(0, 160),
+    keywords: [
+      product.name,
+      product.category.name,
+      "DACH Home & Body",
+      "luxury fragrance Nigeria",
+      "natural skincare Abuja",
+      ...product.topNotes.slice(0, 3),
+      ...product.moodTags.slice(0, 2),
+    ].filter(Boolean),
     openGraph: {
-      title: product.name,
+      title: `${product.name} — DACH Home & Body`,
       description: product.description.slice(0, 160),
-      images: product.images[0] ? [{ url: product.images[0] }] : [],
+      images: product.images[0] ? [{ url: product.images[0], alt: product.name }] : [],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.name} — DACH Home & Body`,
+      description: product.description.slice(0, 160),
+      images: product.images[0] ? [product.images[0]] : [],
+    },
+    alternates: {
+      canonical: `https://www.dachhomeandbody.com/shop/${product.slug}`,
     },
   }
 }
@@ -126,6 +146,31 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) notFound()
 
   const isOutOfStock = product.stock === 0
+
+  // ── Structured data (GEO) ──────────────────────────────────────────────
+  const productJsonLd = productSchema({
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    compareAtPrice: product.compareAtPrice,
+    images: product.images,
+    slug: product.slug,
+    sku: product.sku,
+    stock: product.stock,
+    averageRating: product.averageRating,
+    reviewCount: product.reviewCount,
+    categoryName: product.category.name,
+    topNotes: product.topNotes,
+    heartNotes: product.heartNotes,
+    baseNotes: product.baseNotes,
+  })
+
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: "Home", url: "https://www.dachhomeandbody.com" },
+    { name: "Shop", url: "https://www.dachhomeandbody.com/shop" },
+    { name: product.category.name, url: `https://www.dachhomeandbody.com/shop?category=${product.category.slug}` },
+    { name: product.name, url: `https://www.dachhomeandbody.com/shop/${product.slug}` },
+  ])
   const hasDiscount =
     product.compareAtPrice != null && product.compareAtPrice > product.price
   const discountPercent = hasDiscount
@@ -149,6 +194,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* ── Product hero area ── */}
       <div className="pt-20 sm:pt-24 lg:pt-28 bg-[#F8F5F2]">
         <div className="container-luxury pb-0">
