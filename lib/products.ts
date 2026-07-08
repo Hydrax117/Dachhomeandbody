@@ -274,26 +274,26 @@ export async function getFeaturedProducts(limit = 8) {
  * Requirements: 12.3
  */
 export async function getBestSellers(limit = 8) {
-  // 1. Manually flagged best sellers
-  const manual = await prisma.product.findMany({
-    where: { bestSeller: true, deleted: false, stock: { gt: 0 } },
-    orderBy: { updatedAt: "desc" },
-    take: limit,
-    select: productListSelect,
-  })
+  // Run manual best sellers and sales data queries in parallel
+  const [manual, topItems] = await Promise.all([
+    prisma.product.findMany({
+      where: { bestSeller: true, deleted: false, stock: { gt: 0 } },
+      orderBy: { updatedAt: "desc" },
+      take: limit,
+      select: productListSelect,
+    }),
+    prisma.orderItem.groupBy({
+      by: ["productId"],
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: "desc" } },
+      take: limit,
+    }),
+  ])
 
   if (manual.length >= limit) return manual.slice(0, limit)
 
-  // 2. Fill remaining slots from sales data
-  const remaining = limit - manual.length
   const manualIds = new Set(manual.map((p) => p.id))
-
-  const topItems = await prisma.orderItem.groupBy({
-    by: ["productId"],
-    _sum: { quantity: true },
-    orderBy: { _sum: { quantity: "desc" } },
-    take: limit, // over-fetch to account for filtering
-  })
+  const remaining = limit - manual.length
 
   const salesIds = topItems
     .map((item) => item.productId)
@@ -307,7 +307,6 @@ export async function getBestSellers(limit = 8) {
     select: productListSelect,
   })
 
-  // Preserve sales-rank order
   const productMap = new Map(salesProducts.map((p) => [p.id, p]))
   const salesSorted = salesIds
     .map((id) => productMap.get(id))

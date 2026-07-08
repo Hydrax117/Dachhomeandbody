@@ -484,6 +484,34 @@ model ChatLog {
   @@index([createdAt])
 }
 
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model ScheduledCampaign {
+  id          String   @id @default(cuid())
+  subject     String
+  headline    String
+  bodyText    String?
+  ctaLabel    String   @default("Shop Now")
+  ctaUrl      String   @default("/shop")
+  productIds  Json
+  sendTo      String   @default("all")
+  html        String   @db.Text
+  scheduledAt DateTime
+  status      String   @default("PENDING") // PENDING | SENT | CANCELLED
+  sentCount   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([scheduledAt])
+  @@index([status])
+}
+
 model PopupConfig {
   id              String    @id @default(cuid())
   enabled         Boolean   @default(false)

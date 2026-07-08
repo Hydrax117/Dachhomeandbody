@@ -124,6 +124,7 @@ export async function getRevenueByDay(
 
 /**
  * Get top products by sales volume for a date range.
+ * Uses DB-side aggregation instead of fetching all rows into memory.
  * Requirement 10.3
  */
 export async function getTopProducts(
@@ -131,45 +132,43 @@ export async function getTopProducts(
   endDate: Date,
   limit = 8
 ): Promise<TopProduct[]> {
-  const items = await prisma.orderItem.findMany({
+  // Aggregate directly in the DB — avoids loading all order items into memory
+  const items = await prisma.orderItem.groupBy({
+    by: ["productId"],
+    _sum: { quantity: true, subtotal: true },
     where: {
       order: {
-        paymentStatus: 'PAID',
+        paymentStatus: "PAID",
         createdAt: { gte: startDate, lte: endDate },
       },
     },
-    select: {
-      productId: true,
-      quantity: true,
-      subtotal: true,
-      product: { select: { name: true, slug: true } },
-    },
+    orderBy: { _sum: { quantity: "desc" } },
+    take: limit,
   })
 
-  // Aggregate by product
-  const byProduct = new Map<
-    string,
-    { name: string; slug: string; totalQuantity: number; totalRevenue: number }
-  >()
+  if (items.length === 0) return []
 
-  for (const item of items) {
-    const existing = byProduct.get(item.productId) ?? {
-      name: item.product.name,
-      slug: item.product.slug,
-      totalQuantity: 0,
-      totalRevenue: 0,
-    }
-    byProduct.set(item.productId, {
-      ...existing,
-      totalQuantity: existing.totalQuantity + item.quantity,
-      totalRevenue: existing.totalRevenue + item.subtotal,
+  const productIds = items.map((i) => i.productId)
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    select: { id: true, name: true, slug: true },
+  })
+
+  const productMap = new Map(products.map((p) => [p.id, p]))
+
+  return items
+    .map((item) => {
+      const product = productMap.get(item.productId)
+      if (!product) return null
+      return {
+        productId: item.productId,
+        name: product.name,
+        slug: product.slug,
+        totalQuantity: item._sum.quantity ?? 0,
+        totalRevenue: item._sum.subtotal ?? 0,
+      }
     })
-  }
-
-  return Array.from(byProduct.entries())
-    .map(([productId, data]) => ({ productId, ...data }))
-    .sort((a, b) => b.totalQuantity - a.totalQuantity)
-    .slice(0, limit)
+    .filter((p): p is NonNullable<typeof p> => p !== null)
 }
 
 /**
@@ -180,35 +179,30 @@ export async function getCustomerMetrics(
   startDate: Date,
   endDate: Date
 ): Promise<CustomerMetrics> {
-  // New customers: registered in the date range
-  const newCustomers = await prisma.user.count({
-    where: {
-      role: 'CUSTOMER',
-      createdAt: { gte: startDate, lte: endDate },
-    },
-  })
-
-  // Orders in range
-  const ordersInRange = await prisma.order.findMany({
-    where: {
-      createdAt: { gte: startDate, lte: endDate },
-      userId: { not: null },
-    },
-    select: {
-      userId: true,
-      user: { select: { createdAt: true } },
-    },
-  })
-
-  const totalOrders = ordersInRange.length
-  let returningOrders = 0
-
-  for (const order of ordersInRange) {
-    // Returning = user was created before the start of this range
-    if (order.user && order.user.createdAt < startDate) {
-      returningOrders++
-    }
-  }
+  const [newCustomers, totalOrders, returningOrders] = await Promise.all([
+    // New customers registered in the date range
+    prisma.user.count({
+      where: {
+        role: "CUSTOMER",
+        createdAt: { gte: startDate, lte: endDate },
+      },
+    }),
+    // All orders in range from registered users
+    prisma.order.count({
+      where: {
+        createdAt: { gte: startDate, lte: endDate },
+        userId: { not: undefined },
+      },
+    }),
+    // Returning = user created before the start of this range
+    prisma.order.count({
+      where: {
+        createdAt: { gte: startDate, lte: endDate },
+        userId: { not: undefined },
+        user: { createdAt: { lt: startDate } },
+      },
+    }),
+  ])
 
   const returningPercentage =
     totalOrders > 0 ? Math.round((returningOrders / totalOrders) * 100) : 0
