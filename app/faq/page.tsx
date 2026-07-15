@@ -360,7 +360,7 @@ function Footer() {
             </p>
             <div className="space-y-2.5 text-xs text-white/30">
               <a href="tel:08099007999" className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center">08099007999</a>
-              <a href="mailto:adachadzarma@gmail.com" className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center">adachadzarma@gmail.com</a>
+              <a href="mailto:support@dachhomeandbody.com" className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center">support@dachhomeandbody.com</a>
             </div>
           </div>
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-6">

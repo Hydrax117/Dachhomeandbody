@@ -434,10 +434,10 @@ function Footer() {
               </p>
               <p>
                 <a
-                  href="mailto:adachadzarma@gmail.com"
+                  href="mailto:support@dachhomeandbody.com"
                   className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center"
                 >
-                  adachadzarma@gmail.com
+                  support@dachhomeandbody.com
                 </a>
               </p>
             </div>

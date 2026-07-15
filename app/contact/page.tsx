@@ -87,8 +87,8 @@ function ContactCards() {
         </svg>
       ),
       label: "Email",
-      value: "adachadzarma@gmail.com",
-      href: "mailto:adachadzarma@gmail.com",
+      value: "support@dachhomeandbody.com",
+      href: "mailto:support@dachhomeandbody.com",
       note: "We reply within 24 hours",
     },
     {
@@ -323,10 +323,10 @@ function Footer() {
                 08099007999
               </a>
               <a
-                href="mailto:adachadzarma@gmail.com"
+                href="mailto:support@dachhomeandbody.com"
                 className="hover:text-[#B8965C] transition-colors duration-200 min-h-[44px] flex items-center"
               >
-                adachadzarma@gmail.com
+                support@dachhomeandbody.com
               </a>
             </div>
           </div>
