@@ -21,10 +21,50 @@ interface MegaMenuColumn {
   links: NavLink[]
 }
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+  _count: { products: number }
+}
+
 // ---------------------------------------------------------------------------
-// Mega menu data
+// Build mega menu columns from DB categories
 // ---------------------------------------------------------------------------
-const shopMegaMenu: MegaMenuColumn[] = [
+function buildMegaMenu(categories: Category[]): MegaMenuColumn[] {
+  if (categories.length === 0) return fallbackMegaMenu
+
+  // Single flat column listing all categories with an "All Products" entry
+  const links: NavLink[] = [
+    { label: "All Products", href: "/shop" },
+    ...categories.map((cat) => ({
+      label: cat.name,
+      href: `/shop?category=${cat.slug}`,
+    })),
+  ]
+
+  // Split into up to 3 columns of roughly equal size for the grid layout
+  const chunkSize = Math.ceil(links.length / 3)
+  const columns: MegaMenuColumn[] = []
+  for (let i = 0; i < links.length; i += chunkSize) {
+    const chunk = links.slice(i, i + chunkSize)
+    columns.push({
+      heading: i === 0 ? "Shop by Category" : "",
+      links: chunk,
+    })
+  }
+
+  // Always append the featured / utility column
+  columns[columns.length - 1]?.links.push(
+    { label: "Best Sellers", href: "/shop?sort=popularity" },
+    { label: "New Arrivals", href: "/shop?sort=newest" },
+  )
+
+  return columns
+}
+
+// Hardcoded fallback used when DB is unavailable
+const fallbackMegaMenu: MegaMenuColumn[] = [
   {
     heading: "Home Fragrance",
     links: [
@@ -51,7 +91,7 @@ const shopMegaMenu: MegaMenuColumn[] = [
       { label: "All Gift Sets", href: "/shop?category=gift-sets" },
       { label: "Curated Gift Boxes", href: "/shop?category=gift-boxes" },
       { label: "Custom Gifting", href: "/shop?category=custom-gifts" },
-      { label: "Best Sellers", href: "/shop?sort=bestsellers" },
+      { label: "Best Sellers", href: "/shop?sort=popularity" },
       { label: "New Arrivals", href: "/shop?sort=newest" },
     ],
   },
@@ -241,18 +281,20 @@ function AccountDropdown({ color }: { color: string }) {
 // ---------------------------------------------------------------------------
 // Desktop mega menu panel
 // ---------------------------------------------------------------------------
-function MegaMenu({ onClose }: { onClose: () => void }) {
+function MegaMenu({ columns, onClose }: { columns: MegaMenuColumn[]; onClose: () => void }) {
   return (
     <div className="absolute left-0 right-0 bg-[#F8F5F2] border-t border-[#EBEBEB] shadow-lg z-40">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 grid grid-cols-3 gap-10">
-        {shopMegaMenu.map((col) => (
-          <div key={col.heading}>
-            <p className="text-[10px] tracking-[0.28em] uppercase text-[#B8965C] mb-5 font-medium">
-              {col.heading}
-            </p>
+      <div className={`max-w-7xl mx-auto px-6 lg:px-12 py-10 grid gap-10 ${columns.length === 1 ? "grid-cols-1" : columns.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+        {columns.map((col, i) => (
+          <div key={i}>
+            {col.heading && (
+              <p className="text-[10px] tracking-[0.28em] uppercase text-[#B8965C] mb-5 font-medium">
+                {col.heading}
+              </p>
+            )}
             <ul className="space-y-3">
               {col.links.map((link) => (
-                <li key={link.label}>
+                <li key={link.href}>
                   <Link
                     href={link.href}
                     onClick={onClose}
@@ -277,10 +319,12 @@ function MobileMenu({
   open,
   onClose,
   session,
+  menuColumns,
 }: {
   open: boolean
   onClose: () => void
   session: ReturnType<typeof useSession>["data"]
+  menuColumns: MegaMenuColumn[]
 }) {
   const [shopExpanded, setShopExpanded] = useState(false)
 
@@ -366,12 +410,14 @@ function MobileMenu({
                   shopExpanded ? "max-h-[500px]" : "max-h-0"
                 }`}
               >
-                {shopMegaMenu.map((col) => (
-                  <div key={col.heading} className="pl-4 pt-3 pb-1">
-                    <p className="text-[10px] tracking-[0.25em] uppercase text-[#B8965C] mb-2">{col.heading}</p>
+                {menuColumns.map((col, i) => (
+                  <div key={i} className="pl-4 pt-3 pb-1">
+                    {col.heading && (
+                      <p className="text-[10px] tracking-[0.25em] uppercase text-[#B8965C] mb-2">{col.heading}</p>
+                    )}
                     <ul className="space-y-2 mb-3">
                       {col.links.map((link) => (
-                        <li key={link.label}>
+                        <li key={link.href}>
                           <Link
                             href={link.href}
                             onClick={onClose}
@@ -466,7 +512,13 @@ function MobileMenu({
 // ---------------------------------------------------------------------------
 // Main Navbar
 // ---------------------------------------------------------------------------
-export default function Navbar({ transparentHero = false }: { transparentHero?: boolean }) {
+export default function Navbar({
+  transparentHero = false,
+  categories = [],
+}: {
+  transparentHero?: boolean
+  categories?: Category[]
+}) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [shopHovered, setShopHovered] = useState(false)
@@ -475,6 +527,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
   const { itemCount, openCart } = useCart()
 
   const isAdmin = session?.user?.role === "ADMIN"
+  const menuColumns = buildMegaMenu(categories)
 
   const openShopMenu = () => {
     if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current)
@@ -648,7 +701,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
             onMouseEnter={openShopMenu}
             onMouseLeave={closeShopMenu}
           >
-            <MegaMenu onClose={() => setShopHovered(false)} />
+            <MegaMenu columns={menuColumns} onClose={() => setShopHovered(false)} />
           </div>
         )}
       </header>
@@ -658,6 +711,7 @@ export default function Navbar({ transparentHero = false }: { transparentHero?: 
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         session={session}
+        menuColumns={menuColumns}
       />
     </>
   )

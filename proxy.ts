@@ -181,6 +181,8 @@ export default auth((req: any) => {
     response.headers.set("Content-Security-Policy", csp)
     // Pass nonce to Server Components via a readable request header
     response.headers.set("x-nonce", nonce)
+    // Pass pathname to Server Components (used by ConditionalNavbar)
+    response.headers.set("x-pathname", pathname)
 
     // ── Transport security ───────────────────────────────────────────────
     // 2-year max-age, covers all subdomains, eligible for browser preload lists.

@@ -1,19 +1,21 @@
-"use client"
-
-import { usePathname } from "next/navigation"
-import Navbar from "./Navbar"
+import { headers } from "next/headers"
+import NavbarWrapper from "./NavbarWrapper"
 
 /**
- * Renders the public Navbar only on non-admin routes.
- * Admin routes use their own layout with a sidebar.
+ * Server component — reads the current pathname from request headers to decide
+ * which navbar variant to render, then delegates to NavbarWrapper which fetches
+ * categories before rendering the client Navbar.
  */
-export default function ConditionalNavbar() {
-  const pathname = usePathname()
+export default async function ConditionalNavbar() {
+  const headersList = await headers()
+  const pathname = headersList.get("x-pathname") ?? headersList.get("x-invoke-path") ?? ""
+
   // Admin routes use their own sidebar layout
   if (pathname.startsWith("/admin")) return null
   // Checkout has its own minimal header
   if (pathname.startsWith("/checkout")) return null
-  // Only the homepage has a full-bleed dark hero — all other pages have a light background
+
+  // Only the homepage has a full-bleed dark hero
   const transparentHero = pathname === "/"
-  return <Navbar transparentHero={transparentHero} />
+  return <NavbarWrapper transparentHero={transparentHero} />
 }
