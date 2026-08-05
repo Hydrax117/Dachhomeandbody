@@ -124,7 +124,7 @@ async function getCatalogue(): Promise<{ products: ProductWithVariants[]; text: 
 }
 
 /** Call this whenever a product is created/updated/deleted to bust the cache immediately. */
-export function invalidateCatalogueCache() {
+function invalidateCatalogueCache() {
   _catalogueCache = null
 }
 
