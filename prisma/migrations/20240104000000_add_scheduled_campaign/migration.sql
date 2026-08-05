@@ -1,5 +1,5 @@
 -- Add scheduled campaigns table
-CREATE TABLE "ScheduledCampaign" (
+CREATE TABLE IF NOT EXISTS "ScheduledCampaign" (
     "id"          TEXT          NOT NULL,
     "subject"     TEXT          NOT NULL,
     "headline"    TEXT          NOT NULL,
@@ -17,5 +17,5 @@ CREATE TABLE "ScheduledCampaign" (
     CONSTRAINT "ScheduledCampaign_pkey" PRIMARY KEY ("id")
 );
 
-CREATE INDEX "ScheduledCampaign_scheduledAt_idx" ON "ScheduledCampaign"("scheduledAt");
-CREATE INDEX "ScheduledCampaign_status_idx"      ON "ScheduledCampaign"("status");
+CREATE INDEX IF NOT EXISTS "ScheduledCampaign_scheduledAt_idx" ON "ScheduledCampaign"("scheduledAt");
+CREATE INDEX IF NOT EXISTS "ScheduledCampaign_status_idx"      ON "ScheduledCampaign"("status");
