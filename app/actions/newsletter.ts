@@ -26,16 +26,13 @@ export async function subscribeToNewsletter(
   const { email } = parsed.data
 
   try {
-    // Use raw SQL so this works even before `prisma generate` has picked up
-    // the new NewsletterSubscriber model. Once `prisma generate` runs after
-    // the migration, you can replace this with:
-    //   await prisma.newsletterSubscriber.upsert({ where: { email }, update: {}, create: { email } })
-    await prisma.$executeRaw`
-      INSERT INTO "NewsletterSubscriber" (id, email, "subscribedAt")
-      VALUES (gen_random_uuid(), ${email}, NOW())
-      ON CONFLICT (email) DO NOTHING
-    `
-  } catch {
+    await prisma.newsletterSubscriber.upsert({
+      where: { email },
+      update: {},
+      create: { email },
+    })
+  } catch (err) {
+    console.error("[Newsletter] Failed to save subscriber:", err)
     return { error: "Something went wrong. Please try again." }
   }
 
