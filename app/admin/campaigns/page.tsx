@@ -68,7 +68,7 @@ export default async function CampaignsPage() {
 
       {/* Compose form */}
       <div className="bg-white border border-[#e5e5e5] rounded p-6 lg:p-8">
-        <CampaignForm products={products} totalAudience={totalAudience} />
+        <CampaignForm products={products} totalAudience={totalAudience} subscriberCount={subscriberCount} customerCount={customerCount} />
       </div>
 
       {/* Scheduled campaigns list */}

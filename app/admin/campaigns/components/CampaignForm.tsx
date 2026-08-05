@@ -15,6 +15,8 @@ interface Product {
 interface CampaignFormProps {
   products: Product[]
   totalAudience: number
+  subscriberCount: number
+  customerCount: number
 }
 
 function SubmitButton({ mode }: { mode: "send" | "schedule" }) {
@@ -70,11 +72,17 @@ function inputCls(error?: boolean) {
   ].join(" ")
 }
 
-export default function CampaignForm({ products, totalAudience }: CampaignFormProps) {
+export default function CampaignForm({ products, totalAudience, subscriberCount, customerCount }: CampaignFormProps) {
   const [state, formAction] = useActionState<CampaignState, FormData>(sendCampaignAction, {})
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState("")
   const [scheduleMode, setScheduleMode] = useState(false)
+  const [sendTo, setSendTo] = useState<"all" | "subscribers" | "customers">("all")
+
+  const recipientCount =
+    sendTo === "all"         ? totalAudience :
+    sendTo === "subscribers" ? subscriberCount :
+                               customerCount
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
@@ -147,6 +155,7 @@ export default function CampaignForm({ products, totalAudience }: CampaignFormPr
             id="sendTo"
             name="sendTo"
             defaultValue="all"
+            onChange={(e) => setSendTo(e.target.value as "all" | "subscribers" | "customers")}
             className={inputCls() + " appearance-none"}
           >
             <option value="all">Everyone (newsletter subscribers + customers)</option>
@@ -364,7 +373,7 @@ export default function CampaignForm({ products, totalAudience }: CampaignFormPr
           <p className="text-xs text-[#8C8C8C]">
             {selectedIds.size === 0
               ? "Select products to feature in the email."
-              : `${selectedIds.size} product${selectedIds.size !== 1 ? "s" : ""} · ${totalAudience.toLocaleString()} recipients`}
+              : `${selectedIds.size} product${selectedIds.size !== 1 ? "s" : ""} · ${recipientCount.toLocaleString()} recipient${recipientCount !== 1 ? "s" : ""}`}
           </p>
           <SubmitButton mode={scheduleMode ? "schedule" : "send"} />
         </div>
