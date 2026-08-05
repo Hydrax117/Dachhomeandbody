@@ -65,5 +65,11 @@ export default withSentryConfig(nextConfig, {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
       removeDebugLogging: true,
     },
+
+    // Exclude global-error from Sentry's server-component wrapping loader.
+    // The loader injects async-storage access (workStore) which is unavailable
+    // during Next.js static prerendering of /_global-error, causing an
+    // InvariantError at build time.
+    excludeServerRoutes: ["/global-error"],
   },
 });

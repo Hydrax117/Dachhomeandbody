@@ -45,14 +45,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     return Array.isArray(v) ? v[0] : v
   }
 
-  // Build filters
-  const filters: ProductFilters = {
-    search: str("q") ?? undefined,
-    categoryId: str("categoryId") ?? undefined,
-    priceMin: parsePositiveNumber(str("priceMin")),
-    priceMax: parsePositiveNumber(str("priceMax")),
-  }
-
   // Sort
   const sortParam = str("sort") ?? "newest"
   const validSorts: ProductSort[] = ["newest", "popularity", "price_asc", "price_desc"]
@@ -64,15 +56,34 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const page = parsePage(str("page"))
   const pageSize = 20
 
+  // Fetch categories first so we can resolve ?category=<slug> → categoryId
+  const { data: categories } = await withDbFallback(() => getCategories(), [])
+
+  // Resolve categoryId: prefer explicit ?categoryId param, then resolve ?category slug
+  let resolvedCategoryId = str("categoryId") ?? undefined
+  if (!resolvedCategoryId) {
+    const categorySlug = str("category")
+    if (categorySlug) {
+      const match = categories.find((c) => c.slug === categorySlug)
+      if (match) resolvedCategoryId = match.id
+    }
+  }
+
+  // Build filters
+  const filters: ProductFilters = {
+    search: str("q") ?? undefined,
+    categoryId: resolvedCategoryId,
+    priceMin: parsePositiveNumber(str("priceMin")),
+    priceMax: parsePositiveNumber(str("priceMax")),
+  }
+
   const [
     { data: result, unavailable },
-    { data: categories },
   ] = await Promise.all([
     withDbFallback(
       () => getProducts(filters, sort, { page, pageSize }),
       { data: [], total: 0, page: 1, pageSize, totalPages: 0 }
     ),
-    withDbFallback(() => getCategories(), []),
   ])
 
   if (unavailable) {

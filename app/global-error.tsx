@@ -1,6 +1,5 @@
 "use client"
 
-import * as Sentry from "@sentry/nextjs"
 import { useEffect } from "react"
 
 export default function GlobalError({
@@ -11,7 +10,8 @@ export default function GlobalError({
   unstable_retry: () => void
 }) {
   useEffect(() => {
-    Sentry.captureException(error)
+    // Sentry automatically captures global errors via the withSentryConfig
+    // build plugin — no manual captureException call needed here.
     console.error("[Global Error]", error)
   }, [error])
 

@@ -143,7 +143,18 @@ export function FilterSidebar({ categories, mobileOpen, onMobileClose }: FilterS
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  const selectedCategory = searchParams.get("categoryId") ?? ""
+  // Resolve selected category from either ?categoryId (sidebar interactions)
+  // or ?category slug (navbar mega-menu links)
+  const categoryIdParam = searchParams.get("categoryId") ?? ""
+  const categorySlugParam = searchParams.get("category") ?? ""
+  const resolvedCategoryId =
+    categoryIdParam !== ""
+      ? categoryIdParam
+      : categorySlugParam !== ""
+        ? (categories.find((c) => c.slug === categorySlugParam)?.id ?? "")
+        : ""
+
+  const selectedCategory = resolvedCategoryId
   const priceMin = searchParams.get("priceMin") ?? ""
   const priceMax = searchParams.get("priceMax") ?? ""
 
@@ -153,6 +164,8 @@ export function FilterSidebar({ categories, mobileOpen, onMobileClose }: FilterS
     (updates: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString())
       params.delete("page")
+      // Always remove the slug-based ?category param when the sidebar takes over
+      params.delete("category")
 
       for (const [key, value] of Object.entries(updates)) {
         if (value === null || value === "") {
@@ -171,7 +184,7 @@ export function FilterSidebar({ categories, mobileOpen, onMobileClose }: FilterS
 
   const clearAll = () => {
     const params = new URLSearchParams(searchParams.toString())
-    ;["categoryId", "priceMin", "priceMax", "page"].forEach((k) => params.delete(k))
+    ;["categoryId", "category", "priceMin", "priceMax", "page"].forEach((k) => params.delete(k))
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
     })
