@@ -102,7 +102,8 @@ export default function SummaryStep() {
     )
   }
 
-  const meta = GIFT_BOX_THEME_META[selectedBox.theme as GiftBoxTheme]
+  // Fallback to SIGNATURE_CREAM if the theme value isn't in the map
+  const meta = GIFT_BOX_THEME_META[selectedBox.theme as GiftBoxTheme] ?? GIFT_BOX_THEME_META.SIGNATURE_CREAM
 
   // Deduplicate items for display
   const itemMap = new Map<string, { product: (typeof items)[0]; qty: number }>()
@@ -135,13 +136,17 @@ export default function SummaryStep() {
           className={`relative overflow-hidden bg-gradient-to-br ${meta.palette} p-5 flex items-center gap-4`}
         >
           <div className="relative w-16 h-20 shrink-0 overflow-hidden">
-            <Image
-              src={selectedBox.image}
-              alt={selectedBox.title}
-              fill
-              className="object-cover"
-              sizes="64px"
-            />
+            {selectedBox.image ? (
+              <Image
+                src={selectedBox.image}
+                alt={selectedBox.title}
+                fill
+                className="object-cover"
+                sizes="64px"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-[#B8965C]/10" />
+            )}
           </div>
           <div>
             <p className="text-[#B8965C] text-[10px] tracking-[0.2em] uppercase mb-1">

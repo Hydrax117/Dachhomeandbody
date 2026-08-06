@@ -18,16 +18,18 @@ export default async function GiftBoxPage() {
   await connection()
 
   const [
-    { data: giftBoxes, unavailable },
-    { data: productsResult },
-    { data: categories },
-    { data: sizeTiers },
+    { data: giftBoxes, unavailable: unavailable1 },
+    { data: productsResult, unavailable: unavailable2 },
+    { data: categories, unavailable: unavailable3 },
+    { data: sizeTiers, unavailable: unavailable4 },
   ] = await Promise.all([
     withDbFallback(() => getGiftBoxes({ active: true }), []),
     withDbFallback(() => getProducts({}, "newest", { pageSize: 100 }), { data: [], total: 0, page: 1, pageSize: 100, totalPages: 0 }),
     withDbFallback(() => getCategories(), []),
     withDbFallback(() => getGiftBoxSizeTiers(), []),
   ])
+
+  const unavailable = unavailable1 || unavailable2 || unavailable3 || unavailable4
 
   if (unavailable) {
     return (
