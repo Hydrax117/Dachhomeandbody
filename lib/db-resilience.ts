@@ -144,6 +144,17 @@ export async function withDbFallback<T>(
       })
       return { data: fallback, unavailable: true }
     }
-    throw err // Not a connection error — let it propagate normally
+    // Also catch any Prisma client error (e.g. P2021 table not found, P2010
+    // raw query failed, etc.) so a bad migration state never crashes a page.
+    const name = (err as Record<string, unknown>)?.name as string | undefined
+    if (name?.startsWith("PrismaClient")) {
+      console.error("[DB] Prisma error — returning fallback:", {
+        name,
+        code: (err as Record<string, unknown>)?.code,
+        message: (err as Error)?.message,
+      })
+      return { data: fallback, unavailable: true }
+    }
+    throw err // Not a DB error — let it propagate normally
   }
 }
