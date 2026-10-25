@@ -5,7 +5,7 @@
  * Requirements: 4.4, 5.1, 5.2, 9.1, 9.3
  */
 
-import { type Prisma, type OrderStatus } from "@prisma/client"
+import { type Prisma, type OrderStatus, Prisma as PrismaNamespace } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { sendOrderConfirmationEmail, type OrderEmailDetails } from "@/lib/email"
 import { fromKobo } from "@/lib/paystack"
@@ -229,8 +229,14 @@ export async function createOrderFromPayment({
   })
   const productMap = new Map(products.map((p) => [p.id, p]))
 
-  // Create order in a transaction
-  const order = await prisma.$transaction(async (tx) => {
+  // Create order in a transaction.
+  // Wrap in try/catch for P2002 (unique constraint on paymentReference) — handles
+  // the race where both the verify page and the webhook pass the findFirst check
+  // concurrently before either has committed. The second writer will hit the DB-level
+  // unique constraint and we recover gracefully by returning the already-created order.
+  let order: { id: string; orderNumber: string }
+  try {
+    order = await prisma.$transaction(async (tx) => {
     const newOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
@@ -308,6 +314,34 @@ export async function createOrderFromPayment({
 
     return newOrder
   })
+  } catch (txErr) {
+    // Race condition: another concurrent request already created the order and committed
+    // before this one — the unique constraint on paymentReference fired (P2002).
+    // Recover gracefully by returning the winning order instead of throwing.
+    if (
+      txErr instanceof PrismaNamespace.PrismaClientKnownRequestError &&
+      txErr.code === "P2002"
+    ) {
+      const winner = await prisma.order.findFirst({
+        where: { paymentReference: reference },
+        select: { id: true, orderNumber: true },
+      })
+      if (winner) {
+        await fulfilPaymentRequestIfPresent(
+          rawMeta, winner.id, winner.orderNumber,
+          reference, amountKobo, customerEmail, payRequestToken
+        )
+        try {
+          revalidatePath("/admin/orders")
+          revalidatePath("/admin")
+          revalidatePath("/account/orders")
+          revalidatePath("/account/payment-requests")
+        } catch { /* no-op outside Next.js context */ }
+        return { orderNumber: winner.orderNumber, isNew: false }
+      }
+    }
+    throw txErr
+  }
 
   // Send confirmation email (non-blocking — don't fail the order if email fails)
   try {

@@ -157,7 +157,7 @@ model Order {
   status           OrderStatus   @default(PENDING)
   paymentStatus    PaymentStatus @default(PENDING)
   paymentMethod    String
-  paymentReference String?
+  paymentReference String?       @unique
   shippingAddress  Json
   couponCode       String?
   couponId         String?
