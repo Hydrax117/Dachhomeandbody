@@ -284,6 +284,34 @@ model CartItem {
   @@index([variantId])
 }
 
+/// Tracks an in-progress Paystack transaction before it is confirmed.
+/// One row per checkout session (keyed on email + amount).
+/// Prevents duplicate charges when the customer clicks "Pay" more than once,
+/// navigates back after reaching Paystack, or opens two tabs.
+/// Cleared automatically when the order is created successfully.
+model PendingPayment {
+  id               String   @id @default(cuid())
+  /// The Paystack reference tied to this session
+  reference        String   @unique
+  /// The Paystack-hosted checkout URL — returned to repeat callers without a
+  /// second Paystack API call
+  authorizationUrl String
+  /// Who is paying — used to look up the row on repeat calls
+  email            String
+  /// Amount in kobo — if the amount changes the pending row is replaced
+  amountKobo       Int
+  /// Authenticated user (optional — guest checkouts have email only)
+  userId           String?
+  /// Row expires after 30 minutes — Paystack access codes last 10 min but we
+  /// keep the window slightly wider so verify still works on slow connections
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@index([email])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
 model StockHistory {
   id            String          @id @default(cuid())
   productId     String

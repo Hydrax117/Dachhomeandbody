@@ -387,6 +387,14 @@ export async function createOrderFromPayment({
     reference, amountKobo, customerEmail, payRequestToken
   )
 
+  // Clear the pending payment record so the customer's next order gets a fresh
+  // reference instead of being routed back to this (now completed) transaction.
+  try {
+    await prisma.pendingPayment.deleteMany({ where: { reference } })
+  } catch {
+    // Non-critical — the row will expire naturally after 30 minutes
+  }
+
   // Revalidate admin and user dashboards so the new order shows immediately
   try {
     revalidatePath("/admin/orders")

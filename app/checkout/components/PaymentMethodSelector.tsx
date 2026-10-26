@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition, useCallback } from "react"
+import { useState, useTransition, useCallback, useRef } from "react"
 import { useCart } from "@/app/components/cart/CartContext"
 import { createPaymentRequestAction } from "@/app/actions/payment-requests"
 import type { ShippingAddress } from "./ShippingAddressForm"
@@ -83,6 +83,9 @@ export function PaymentMethodSelector({
   const [retryCount, setRetryCount] = useState(0)
   const [isPending, startTransition] = useTransition()
   const [isGeneratingLink, setIsGeneratingLink] = useState(false)
+  // Hard lock — prevents double-fire even in the gap before isPending becomes true.
+  // Reset to false only when the user explicitly retries after an error.
+  const payInitiatedRef = useRef(false)
 
   const orderTotal = Math.max(0, cart.subtotal - cart.discount + shippingCost)
 
@@ -125,12 +128,19 @@ export function PaymentMethodSelector({
 
   // ── Pay Now ──────────────────────────────────────────────────────────────
   async function handlePay() {
+    // Guard against double-clicks — ref is synchronous so it blocks even
+    // before React re-renders with isPending=true
+    if (payInitiatedRef.current) return
+    payInitiatedRef.current = true
+
     setError(null)
     setErrorCode(null)
     startTransition(async () => {
       try {
         await initializePaystack()
       } catch (err) {
+        // Reset the lock so the user can retry after a genuine error
+        payInitiatedRef.current = false
         const code = (err as { code?: string }).code as typeof errorCode ?? "network"
         setErrorCode(code)
         setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
@@ -140,6 +150,7 @@ export function PaymentMethodSelector({
 
   // ── Retry handler ────────────────────────────────────────────────────────
   async function handleRetry() {
+    payInitiatedRef.current = false
     setRetryCount((c) => c + 1)
     setError(null)
     setErrorCode(null)
@@ -147,6 +158,7 @@ export function PaymentMethodSelector({
       try {
         await initializePaystack()
       } catch (err) {
+        payInitiatedRef.current = false
         const code = (err as { code?: string }).code as typeof errorCode ?? "network"
         setErrorCode(code)
         setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
