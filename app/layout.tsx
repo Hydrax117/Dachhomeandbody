@@ -12,6 +12,7 @@ import PromotionalPopupWrapper from "@/app/components/PromotionalPopupWrapper";
 import ChatWidget from "@/app/components/chat/ChatWidget";
 import { ChatProvider } from "@/app/components/chat/ChatContext";
 import { organizationSchema, localBusinessSchema, websiteSchema } from "@/lib/structured-data"
+import { Analytics } from "@vercel/analytics/next"
 
 // Opt out of static prerendering — all pages are dynamic (require DB/auth at request time)
 export const dynamic = "force-dynamic"
@@ -151,6 +152,7 @@ export default function RootLayout({
             <ChatWidget />
           </ChatProvider>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
